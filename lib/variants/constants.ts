@@ -98,10 +98,7 @@ export const BOOSTER_EXCLUDED_VARIANTS: ReadonlySet<string> = new Set([
   'KS-137-MV',
   'KS-133-MV',
   'KS-133_2-MV',
-  'KS-135-SV',
 ]);
-
-export const WORLDCUP_CHAMPION_CARD = 'KS-135-SV';
 
 export const TOURNAMENT_PRIZE_CARD_IDS = [
   'KS-107-MV',

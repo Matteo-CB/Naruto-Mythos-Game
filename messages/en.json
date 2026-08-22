@@ -169,11 +169,6 @@
       "description": "All the results of Naruto Mythos TCG community tournaments: winners, final standings and the history of past editions of the online simulator.",
       "ogAlt": "Naruto Mythos TCG, tournament results"
     },
-    "worldcup": {
-      "title": "World Cup: Country Rankings | Naruto Mythos TCG",
-      "description": "The Naruto Mythos TCG World Cup: a country ranking built from ranked games of the last 7 days. Fair score that balances small and large communities, win rates, top players per country and the most played card group of each nation.",
-      "ogAlt": "Naruto Mythos TCG World Cup country rankings"
-    },
     "feed": {
       "title": "Feed - Naruto Mythos TCG",
       "description": "Share your decks and game replays, follow players and discuss the Naruto Mythos card game community feed."
@@ -433,7 +428,6 @@
     "quests": "Quests",
     "questsBadgeTooltip": "{count} reward(s) to claim",
     "socialBadgeTooltip": "{count} messages or pending requests",
-    "worldcup": "World Cup",
     "social": "Social"
   },
   "gamepad": {
@@ -3824,58 +3818,6 @@
       "closed": "This survey is closed.",
       "alreadyVoted": "You have already voted on this survey."
     }
-  },
-  "worldcup": {
-    "rewardsTitle": "Rewards",
-    "rewardChampionCardTitle": "World champion exclusive card",
-    "rewardChampionCardDesc": "Sakura Haruno, The Leaf Medical Corps: a Secret card that can never be pulled from a booster. Only members of the world champion team can earn it.",
-    "rewardChampion": "Champion team: the exclusive card, 3 variant boosters and XP.",
-    "rewardPodium": "2nd and 3rd podium countries: variant boosters and XP.",
-    "rewardParticipation": "Other players from qualified countries: team XP.",
-    "title": "World Cup",
-    "totalCountries": "Countries",
-    "totalPlayers": "Players",
-    "totalGames": "Games",
-    "colCountry": "Country",
-    "colWinRate": "Win rate",
-    "colPlayers": "Players",
-    "recordLine": "{wins}W - {losses}L",
-    "detailGames": "Games",
-    "detailAvgElo": "Average ELO",
-    "detailTopGroup": "Most played group",
-    "topPlayersTitle": "Top players of the country",
-    "emptyTitle": "No games yet",
-    "emptyText": "No ranked games were played in the last 7 days. Play ranked games with a flag selected in your options to put your country on the board.",
-    "unrankedTitle": "Not ranked: team of fewer than {min} eligible players",
-    "rulesTitle": "Ranking rules",
-    "rule1": "Only ranked games count, over the chosen period: 24h, 7 days, 30 days or the 3-month season.",
-    "rule2": "Only players who picked a flag in their options are counted for their country.",
-    "rule3": "Only players at least Elite Jonin ({elo} ELO or more) are counted.",
-    "rule4": "Each country is represented by its {team} best players (highest ELO), provided they played at least {games} ranked games in the period.",
-    "rule5": "The score combines these {team} players' win rate, the strength of beaten opponents and activity. Only the opponents' ELO counts, not the team's own. Forfeits weigh negatively.",
-    "subtitleSeason": "Current season: {period}. A new World Cup every 3 months.",
-    "subtitleWindow": "Country ranking over the chosen period.",
-    "window_season": "Season (3 months)",
-    "window_30d": "30 days",
-    "window_7d": "7 days",
-    "window_24h": "24 h",
-    "colScore": "Score",
-    "detailBeatenElo": "Average ELO of beaten opponents",
-    "detailForfeits": "Forfeits",
-    "factWinRate": "Wins",
-    "factStrength": "Opposition",
-    "factElo": "Level",
-    "factActivity": "Activity",
-    "rule6": "A new World Cup restarts every 3 months, reset to zero. Ties are broken by number of games.",
-    "championTitle": "World Champion {month}",
-    "reigningNation": "Reigning World Cup nation {month}",
-    "lastChampionLabel": "Reigning champion {month}",
-    "worldMapTitle": "World overview",
-    "comparatorTitle": "Country comparator",
-    "progressionTitle": "Season progression",
-    "progressionCollecting": "Progression data will appear as the season goes on.",
-    "activityTitle": "Activity by hour (UTC)",
-    "worldMapHint": "Hover or tap a country"
   },
   "adminReveal": {
     "title": "Card reveal management",

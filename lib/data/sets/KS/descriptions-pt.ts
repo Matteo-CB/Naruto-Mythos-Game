@@ -144,7 +144,6 @@ export const effectDescriptionsPt: Record<string, string[]> = {
   "KS-133-S": ["[↯] Oculte um personagem inimigo com Poder 5 ou menos nesta missão e outro personagem inimigo com Poder 2 ou menos em jogo.", "efeito: Em vez disso, derrote ambos."],
   "KS-134-S": ["[⧗] Não pode ser ocultado nem derrotado por efeitos inimigos.", "[↯] Oculte qualquer número de personagens não-ocultos em jogo com Poder total 6 ou menos."],
   "KS-135-S": ["[↯] Olhe as 3 primeiras cartas do seu baralho. Jogue um personagem em qualquer lugar e descarte as outras cartas.", "efeito: Em vez disso, jogue a carta pagando 4 a menos."],
-  "KS-135-SV": ["[↯] Olhe as 3 primeiras cartas do seu baralho. Jogue um personagem em qualquer lugar e descarte as outras cartas.", "efeito: Em vez disso, jogue a carta pagando 4 a menos."],
   "KS-136-S": ["[⧗] Quando um personagem é derrotado, ganhe 1 Chakra.", "[↯] Você deve escolher um personagem aliado não-oculto e qualquer personagem inimigo nesta missão e derrotá-los, se possível."],
   "KS-135-MV": ["[↯] Olhe as 3 primeiras cartas do seu baralho. Jogue um personagem em qualquer lugar e descarte as outras cartas.", "efeito: Em vez disso, jogue a carta pagando 4 a menos."],
   "KS-136-MV": ["[⧗] Quando um personagem é derrotado, ganhe 1 Chakra.", "[↯] Você deve escolher um personagem aliado não-oculto e qualquer personagem inimigo nesta missão e derrotá-los, se possível."],

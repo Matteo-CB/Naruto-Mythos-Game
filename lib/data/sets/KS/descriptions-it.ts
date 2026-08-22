@@ -144,7 +144,6 @@ export const effectDescriptionsIt: Record<string, string[]> = {
   "KS-133-S": ["[↯] Nascondi un personaggio nemico con Potenza 5 o meno in questa missione e un altro personaggio nemico con Potenza 2 o meno in gioco.", "effetto: Invece, sconfiggili entrambi."],
   "KS-134-S": ["[⧗] Non può essere nascosto né sconfitto da effetti nemici.", "[↯] Nascondi un numero qualsiasi di personaggi non-nascosti in gioco con Potenza totale 6 o meno."],
   "KS-135-S": ["[↯] Guarda le prime 3 carte del tuo mazzo. Gioca un personaggio ovunque e scarta le altre carte.", "effetto: Invece, gioca la carta pagando 4 in meno."],
-  "KS-135-SV": ["[↯] Guarda le prime 3 carte del tuo mazzo. Gioca un personaggio ovunque e scarta le altre carte.", "effetto: Invece, gioca la carta pagando 4 in meno."],
   "KS-136-S": ["[⧗] Quando un personaggio viene sconfitto, ottieni 1 Chakra.", "[↯] Devi scegliere un personaggio alleato non-nascosto e un personaggio nemico qualsiasi in questa missione e sconfiggerli, se possibile."],
   "KS-135-MV": ["[↯] Guarda le prime 3 carte del tuo mazzo. Gioca un personaggio ovunque e scarta le altre carte.", "effetto: Invece, gioca la carta pagando 4 in meno."],
   "KS-136-MV": ["[⧗] Quando un personaggio viene sconfitto, ottieni 1 Chakra.", "[↯] Devi scegliere un personaggio alleato non-nascosto e un personaggio nemico qualsiasi in questa missione e sconfiggerli, se possibile."],

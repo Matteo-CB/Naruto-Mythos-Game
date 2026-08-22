@@ -332,7 +332,6 @@
     "quests": "Missioni",
     "questsBadgeTooltip": "{count} ricompensa/e da riscuotere",
     "socialBadgeTooltip": "{count} messaggi o richieste in sospeso",
-    "worldcup": "Coppa del Mondo",
     "social": "Social"
   },
   "settings": {
@@ -1981,11 +1980,6 @@
       "description": "Tutti i risultati dei tornei della community Naruto Mythos TCG: vincitori, classifiche finali e la cronologia delle edizioni passate del simulatore online.",
       "ogAlt": "Naruto Mythos TCG, risultati dei tornei"
     },
-    "worldcup": {
-      "title": "Coppa del Mondo: Classifica dei Paesi | Naruto Mythos TCG",
-      "description": "La Coppa del Mondo del Naruto Mythos TCG: una classifica dei paesi costruita dalle partite classificate degli ultimi 7 giorni. Punteggio equo che bilancia comunità piccole e grandi, percentuali di vittoria, migliori giocatori per paese e il gruppo di carte più giocato di ogni nazione.",
-      "ogAlt": "Classifica dei paesi della Coppa del Mondo del Naruto Mythos TCG"
-    },
     "feed": {
       "title": "Feed - Naruto Mythos TCG",
       "description": "Condividi i tuoi mazzi e i replay delle partite, segui i giocatori e discuti nel feed della community del gioco di carte Naruto Mythos."
@@ -2000,58 +1994,6 @@
       "description": "Unisciti alla bacheca della community e ai server Discord di Naruto Mythos: mazzi, replay, giocatori e discussioni.",
       "ogAlt": "Community di Naruto Mythos TCG"
     }
-  },
-  "worldcup": {
-    "rewardsTitle": "Ricompense",
-    "rewardChampionCardTitle": "Carta esclusiva del campione del mondo",
-    "rewardChampionCardDesc": "Sakura Haruno, The Leaf Medical Corps: una carta Segreta che non può mai essere ottenuta da un booster. Solo i membri della squadra campione del mondo possono guadagnarla.",
-    "rewardChampion": "Squadra campione: la carta esclusiva, 3 booster di varianti e XP.",
-    "rewardPodium": "Paesi 2° e 3° sul podio: booster di varianti e XP.",
-    "rewardParticipation": "Altri giocatori dei paesi qualificati: XP per la squadra.",
-    "title": "Coppa del Mondo",
-    "totalCountries": "Paesi",
-    "totalPlayers": "Giocatori",
-    "totalGames": "Partite",
-    "colCountry": "Paese",
-    "colWinRate": "Percentuale vittorie",
-    "colPlayers": "Giocatori",
-    "recordLine": "{wins}V - {losses}S",
-    "detailGames": "Partite",
-    "detailAvgElo": "ELO medio",
-    "detailTopGroup": "Gruppo più giocato",
-    "topPlayersTitle": "Migliori giocatori del paese",
-    "emptyTitle": "Ancora nessuna partita",
-    "emptyText": "Nessuna partita classificata è stata giocata negli ultimi 7 giorni. Gioca partite classificate con una bandiera selezionata nelle tue opzioni per mettere il tuo paese in classifica.",
-    "unrankedTitle": "Non classificato: squadra con meno di {min} giocatori idonei",
-    "rulesTitle": "Regole della classifica",
-    "rule1": "Contano solo le partite classificate, nel periodo scelto: 24h, 7 giorni, 30 giorni o la stagione di 3 mesi.",
-    "rule2": "Sono conteggiati solo i giocatori che hanno scelto una bandiera nelle loro opzioni per il loro paese.",
-    "rule3": "Sono conteggiati solo i giocatori almeno Jonin d'Élite ({elo} ELO o più).",
-    "rule4": "Ogni paese è rappresentato dai suoi {team} migliori giocatori (ELO più alto), a condizione che abbiano giocato almeno {games} partite classificate nel periodo.",
-    "rule5": "Il punteggio combina la percentuale di vittorie di questi {team} giocatori, la forza degli avversari battuti e l'attività. Conta solo l'ELO degli avversari, non quello della propria squadra. I forfeit pesano negativamente.",
-    "subtitleSeason": "Stagione attuale: {period}. Una nuova Coppa del Mondo ogni 3 mesi.",
-    "subtitleWindow": "Classifica dei paesi nel periodo scelto.",
-    "window_season": "Stagione (3 mesi)",
-    "window_30d": "30 giorni",
-    "window_7d": "7 giorni",
-    "window_24h": "24 h",
-    "colScore": "Punteggio",
-    "detailBeatenElo": "ELO medio degli avversari battuti",
-    "detailForfeits": "Forfeit",
-    "factWinRate": "Vittorie",
-    "factStrength": "Opposizione",
-    "factElo": "Livello",
-    "factActivity": "Attività",
-    "rule6": "Una nuova Coppa del Mondo ricomincia ogni 3 mesi, azzerata. I pareggi si decidono in base al numero di partite.",
-    "championTitle": "Campione del Mondo {month}",
-    "reigningNation": "Nazione in carica della Coppa del Mondo {month}",
-    "lastChampionLabel": "Campione in carica {month}",
-    "worldMapTitle": "Panoramica mondiale",
-    "comparatorTitle": "Comparatore di paesi",
-    "progressionTitle": "Progressione della stagione",
-    "progressionCollecting": "I dati di progressione appariranno con il proseguire della stagione.",
-    "activityTitle": "Attività per ora (UTC)",
-    "worldMapHint": "Passa il mouse o tocca un paese"
   },
   "adminBoosterSim": {
     "title": "Simulatore di Booster",

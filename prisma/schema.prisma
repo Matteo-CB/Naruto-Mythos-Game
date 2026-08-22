@@ -720,53 +720,6 @@ model EmailVerification {
   createdAt  DateTime @default(now())
 }
 
-model WorldcupSeason {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  seasonKey    String    @unique
-  startMonth   String
-  endMonth     String
-  label        String
-  status       String    @default("open")
-  championCode String?
-  podium       Json?
-  finalizedAt  DateTime?
-  createdAt    DateTime  @default(now())
-}
-
-model WorldcupSnapshot {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  seasonKey String
-  day       String
-  standings Json
-  createdAt DateTime @default(now())
-
-  @@unique([seasonKey, day])
-  @@index([seasonKey])
-}
-
-model WorldcupTitle {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @db.ObjectId
-  seasonKey   String
-  seasonLabel String
-  countryCode String
-  rank        Int
-  createdAt   DateTime @default(now())
-
-  @@unique([userId, seasonKey])
-  @@index([userId])
-  @@index([seasonKey])
-}
-
-model WorldcupTeamMember {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @unique @db.ObjectId
-  countryCode String
-  updatedAt   DateTime @updatedAt
-
-  @@index([countryCode])
-}
-
 model CountryGroupStat {
   id          String @id @default(auto()) @map("_id") @db.ObjectId
   countryCode String

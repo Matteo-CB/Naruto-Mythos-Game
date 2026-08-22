@@ -5,7 +5,7 @@ import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
 import { getCardById } from '@/lib/data/cardIndex';
 import type { CharacterInPlay, GameState } from '@/lib/engine/types';
 
-const SAKURA_135_IMPRESSIONS = ['KS-135-S', 'KS-135-SV', 'KS-135-MV'];
+const SAKURA_135_IMPRESSIONS = ['KS-135-S', 'KS-135-MV'];
 
 function plateau(): GameState {
   const state = buildSimState({

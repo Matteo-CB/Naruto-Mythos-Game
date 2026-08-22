@@ -169,11 +169,6 @@
       "description": "Naruto Mythos TCGコミュニティトーナメントの全結果：優勝者、最終順位、オンラインシミュレーターの過去大会の履歴。",
       "ogAlt": "Naruto Mythos TCG、トーナメント結果"
     },
-    "worldcup": {
-      "title": "ワールドカップ:国別ランキング | Naruto Mythos TCG",
-      "description": "Naruto Mythos TCGのワールドカップ:過去7日間のランク戦にもとづく国別ランキング。小さなコミュニティと大きなコミュニティを公平に比較するフェアスコア、勝率、国ごとのトッププレイヤー、各国で最も使われた勢力を表示します。",
-      "ogAlt": "Naruto Mythos TCG ワールドカップ国別ランキング"
-    },
     "feed": {
       "title": "フィード - Naruto Mythos TCG",
       "description": "デッキや対戦リプレイを共有し、プレイヤーをフォローして、Naruto Mythosカードゲームのコミュニティフィードで交流しよう。"
@@ -437,7 +432,6 @@
     "quests": "クエスト",
     "questsBadgeTooltip": "受け取り可能な報酬 {count} 件",
     "socialBadgeTooltip": "未読メッセージ・申請 {count}件",
-    "worldcup": "ワールドカップ",
     "social": "コミュニティ"
   },
   "gamepad": {
@@ -3828,58 +3822,6 @@
       "closed": "このアンケートは終了しました。",
       "alreadyVoted": "このアンケートには既に投票済みです。"
     }
-  },
-  "worldcup": {
-    "rewardsTitle": "報酬",
-    "rewardChampionCardTitle": "世界チャンピオン限定カード",
-    "rewardChampionCardDesc": "春野サクラ「木ノ葉の医療班」：ブースターからは絶対に手に入らないシークレットカード。世界チャンピオンチームのメンバーだけが入手できます。",
-    "rewardChampion": "チャンピオンチーム：限定カード、バリアントブースター3個、XP。",
-    "rewardPodium": "表彰台2位・3位の国：バリアントブースターとXP。",
-    "rewardParticipation": "予選通過国のその他の選手：チームXP。",
-    "title": "ワールドカップ",
-    "totalCountries": "国",
-    "totalPlayers": "プレイヤー",
-    "totalGames": "試合",
-    "colCountry": "国",
-    "colWinRate": "勝率",
-    "colPlayers": "プレイヤー",
-    "recordLine": "{wins}勝{losses}敗",
-    "detailGames": "試合数",
-    "detailAvgElo": "平均ELO",
-    "detailTopGroup": "最も使われた勢力",
-    "topPlayersTitle": "この国のトッププレイヤー",
-    "emptyTitle": "まだ試合がありません",
-    "emptyText": "過去7日間にランク戦が行われていません。オプションで国旗を選んでランク戦をプレイすると、自分の国がランキングに登場します。",
-    "unrankedTitle": "ランキング対象外:対象プレイヤーが{min}名未満のチーム",
-    "rulesTitle": "ランキングのルール",
-    "rule1": "対象は選択した期間(24時間・7日・30日・3か月のシーズン)のランク戦のみです。",
-    "rule2": "オプションで国旗を選んだプレイヤーのみが自国に集計されます。",
-    "rule3": "上忍エリート({elo} ELO以上)のプレイヤーのみが対象です。",
-    "rule4": "各国は、期間中に{games}戦以上のランク戦をプレイした上位{team}名(最高ELO)のプレイヤーで代表されます。",
-    "rule5": "スコアは、その{team}人の勝率、倒した相手の強さ、活動量を組み合わせます。自チームのELOではなく、相手のELOだけが影響します。放棄はマイナスに働きます。",
-    "subtitleSeason": "現在のシーズン:{period}。3か月ごとに新しいワールドカップが始まります。",
-    "subtitleWindow": "選択した期間の国別ランキング。",
-    "window_season": "シーズン(3か月)",
-    "window_30d": "30日",
-    "window_7d": "7日",
-    "window_24h": "24時間",
-    "colScore": "スコア",
-    "detailBeatenElo": "撃破した相手の平均ELO",
-    "detailForfeits": "放棄",
-    "factWinRate": "勝利",
-    "factStrength": "相手の強さ",
-    "factElo": "レベル",
-    "factActivity": "活動量",
-    "rule6": "3か月ごとに新しいワールドカップがゼロから始まります。同率の場合は試合数で決まります。",
-    "championTitle": "ワールドチャンピオン {month}",
-    "reigningNation": "現ワールドカップ王者国 {month}",
-    "lastChampionLabel": "現チャンピオン {month}",
-    "worldMapTitle": "ワールドビュー",
-    "comparatorTitle": "国の比較",
-    "progressionTitle": "シーズンの推移",
-    "progressionCollecting": "推移データはシーズンの経過とともに表示されます。",
-    "activityTitle": "時間帯別の活動(UTC)",
-    "worldMapHint": "国にカーソルを合わせるかタップ"
   },
   "adminReveal": {
     "title": "カード公開の管理",

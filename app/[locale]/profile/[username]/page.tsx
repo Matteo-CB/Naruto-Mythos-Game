@@ -14,7 +14,6 @@ import { ProfileModerationActions } from '@/components/social/ProfileModerationA
 import { getRankTier, PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
 import { UserBadges } from '@/components/badges/UserBadges';
 import { CountryFlag } from '@/components/CountryFlag';
-import { WorldcupChampionBadge } from '@/components/worldcup/WorldcupChampionBadge';
 import { EloHistoryChart } from '@/components/EloHistoryChart';
 import { DeckStatsPanel } from '@/components/profile/DeckStatsPanel';
 import { FollowButton } from '@/components/social/FollowButton';
@@ -93,8 +92,6 @@ interface ProfileData {
   badgePrefs?: string[];
   discordUsername: string | null;
   createdAt: string;
-  worldcupTitles?: Array<{ month: string; countryCode: string }>;
-  reigningChampionMonth?: string | null;
   modeStats?: Record<string, { games: number; wins: number; losses: number }>;
   decks: Array<{ id: string; name: string; createdAt: string; evolvingPoints?: number; evolvingCompatible?: boolean; isPublic?: boolean; cardIds?: string[]; missionIds?: string[] }>;
   canViewDeckContents?: boolean;
@@ -498,12 +495,6 @@ export default function ProfilePage({
                 size="md"
               />
             </div>
-
-            <WorldcupChampionBadge
-              titles={profile.worldcupTitles ?? []}
-              reigningChampionMonth={profile.reigningChampionMonth ?? null}
-              countryCode={profile.countryCode ?? null}
-            />
 
             <div className="flex items-baseline gap-2 mt-1">
               <div

@@ -625,7 +625,6 @@ describe('evolving points — flat versus per-copy cost modes', () => {
   it('the legendary and secret-variant printings of a hero are registered too', () => {
     expect(EVOLVING_CARDS.get('KS-133-L')?.pointCost).toBe(1);
     expect(EVOLVING_CARDS.get('KS-136-L')?.pointCost).toBe(1);
-    expect(EVOLVING_CARDS.get('KS-135-SV')?.pointCost).toBe(2);
     expect(computeDeckEvolvingPoints(['KS-133-S', 'KS-133-L'])).toBe(2);
   });
 

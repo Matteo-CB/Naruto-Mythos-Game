@@ -169,11 +169,6 @@
       "description": "Todos los resultados de los torneos comunitarios de Naruto Mythos TCG: ganadores, clasificaciones finales e historial de las ediciones pasadas del simulador en línea.",
       "ogAlt": "Naruto Mythos TCG, resultados de torneos"
     },
-    "worldcup": {
-      "title": "Copa del mundo: clasificación de países | Naruto Mythos TCG",
-      "description": "La Copa del mundo de Naruto Mythos TCG: una clasificación de países basada en las partidas clasificatorias de los últimos 7 días. Puntuación justa que equilibra comunidades pequeñas y grandes, tasas de victoria, mejores jugadores por país y el grupo de cartas más jugado de cada nación.",
-      "ogAlt": "Clasificación de países de la Copa del mundo de Naruto Mythos TCG"
-    },
     "feed": {
       "title": "Muro - Naruto Mythos TCG",
       "description": "Comparte tus mazos y repeticiones de partidas, sigue a jugadores y comenta en el muro de la comunidad del juego de cartas Naruto Mythos."
@@ -438,7 +433,6 @@
     "quests": "Misiones",
     "questsBadgeTooltip": "{count} recompensa(s) por reclamar",
     "socialBadgeTooltip": "{count} mensajes o solicitudes pendientes",
-    "worldcup": "Copa del mundo",
     "social": "Social"
   },
   "gamepad": {
@@ -3829,58 +3823,6 @@
       "closed": "Esta encuesta está cerrada.",
       "alreadyVoted": "Ya has votado en esta encuesta."
     }
-  },
-  "worldcup": {
-    "rewardsTitle": "Recompensas",
-    "rewardChampionCardTitle": "Carta exclusiva del campeón del mundo",
-    "rewardChampionCardDesc": "Sakura Haruno, El Cuerpo Médico de la Hoja: una carta Secreta que nunca aparece en los sobres. Solo los miembros del equipo campeón del mundo pueden conseguirla.",
-    "rewardChampion": "Equipo campeón: la carta exclusiva, 3 sobres de variantes y XP.",
-    "rewardPodium": "Países 2.º y 3.º del podio: sobres de variantes y XP.",
-    "rewardParticipation": "Otros jugadores de los países clasificados: XP de equipo.",
-    "title": "Copa del mundo",
-    "totalCountries": "Países",
-    "totalPlayers": "Jugadores",
-    "totalGames": "Partidas",
-    "colCountry": "País",
-    "colWinRate": "Tasa de victorias",
-    "colPlayers": "Jugadores",
-    "recordLine": "{wins}V - {losses}D",
-    "detailGames": "Partidas",
-    "detailAvgElo": "ELO medio",
-    "detailTopGroup": "Grupo más jugado",
-    "topPlayersTitle": "Mejores jugadores del país",
-    "emptyTitle": "Aún no hay partidas",
-    "emptyText": "No se ha jugado ninguna partida clasificatoria en los últimos 7 días. Juega partidas clasificatorias con una bandera elegida en tus opciones para situar a tu país en la clasificación.",
-    "unrankedTitle": "Fuera de la clasificación: equipo de menos de {min} jugadores elegibles",
-    "rulesTitle": "Reglas de la clasificación",
-    "rule1": "Solo cuentan las partidas clasificatorias, en el período elegido: 24h, 7 días, 30 días o la temporada de 3 meses.",
-    "rule2": "Solo se cuentan para su país los jugadores que eligieron una bandera en sus opciones.",
-    "rule3": "Solo se cuentan los jugadores de al menos Jonin de Élite ({elo} ELO o más).",
-    "rule4": "Cada país está representado por sus {team} mejores jugadores (mayor ELO), siempre que hayan jugado al menos {games} partidas clasificatorias en el período.",
-    "rule5": "La puntuación combina el porcentaje de victorias de estos {team} jugadores, la fuerza de los rivales vencidos y la actividad. Solo cuenta el ELO de los rivales, no el del propio equipo. Los abandonos penalizan.",
-    "subtitleSeason": "Temporada actual: {period}. Una nueva Copa del mundo cada 3 meses.",
-    "subtitleWindow": "Clasificación de países en el período elegido.",
-    "window_season": "Temporada (3 meses)",
-    "window_30d": "30 días",
-    "window_7d": "7 días",
-    "window_24h": "24 h",
-    "colScore": "Puntuación",
-    "detailBeatenElo": "ELO medio de los rivales vencidos",
-    "detailForfeits": "Abandonos",
-    "factWinRate": "Victorias",
-    "factStrength": "Rivales",
-    "factElo": "Nivel",
-    "factActivity": "Actividad",
-    "rule6": "Una nueva Copa del mundo comienza cada 3 meses, reiniciada a cero. Los empates se deciden por número de partidas.",
-    "championTitle": "Campeón del mundo {month}",
-    "reigningNation": "Nación campeona del mundo {month}",
-    "lastChampionLabel": "Campeón vigente {month}",
-    "worldMapTitle": "Vista del mundo",
-    "comparatorTitle": "Comparador de países",
-    "progressionTitle": "Progresión de la temporada",
-    "progressionCollecting": "Los datos de progresión aparecerán a lo largo de la temporada.",
-    "activityTitle": "Actividad por hora (UTC)",
-    "worldMapHint": "Pasa el ratón o toca un país"
   },
   "adminReveal": {
     "title": "Gestión de revelación de cartas",

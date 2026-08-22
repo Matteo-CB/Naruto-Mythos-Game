@@ -255,24 +255,6 @@ export async function GET(
     const modeStats: Record<string, { games: number; wins: number; losses: number }> = {};
     for (const r of modeStatRows) modeStats[r.mode] = { games: r.games, wins: r.wins, losses: r.losses };
 
-    const worldcupTitles = await prisma.worldcupTitle.findMany({
-      where: { userId: user.id, rank: 1 },
-      orderBy: { createdAt: 'desc' },
-      select: { seasonLabel: true, countryCode: true },
-    }).catch(() => [] as Array<{ seasonLabel: string; countryCode: string }>);
-
-    let reigningChampionMonth: string | null = null;
-    if (user.countryCode) {
-      const lastSeason = await prisma.worldcupSeason.findFirst({
-        where: { status: 'finalized' },
-        orderBy: { finalizedAt: 'desc' },
-        select: { championCode: true, endMonth: true },
-      }).catch(() => null);
-      if (lastSeason?.championCode && lastSeason.championCode === user.countryCode) {
-        reigningChampionMonth = lastSeason.endMonth;
-      }
-    }
-
     const { decks: _omit, ...userWithoutDecks } = user;
     void _omit;
     const follow = await getFollowState(viewerId, user.id);
@@ -293,8 +275,6 @@ export async function GET(
       consecutiveWinsRanked,
       consecutiveWinsEvolving,
       modeStats,
-      worldcupTitles: worldcupTitles.map((tt) => ({ month: tt.seasonLabel, countryCode: tt.countryCode })),
-      reigningChampionMonth,
       followerCount: follow.followerCount,
       followingCount: follow.followingCount,
       viewerFollowing: follow.following,

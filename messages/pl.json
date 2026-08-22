@@ -332,7 +332,6 @@
     "quests": "Zadania",
     "questsBadgeTooltip": "{count} nagród(y) do odebrania",
     "socialBadgeTooltip": "{count} wiadomości lub oczekujących próśb",
-    "worldcup": "Puchar Świata",
     "social": "Społeczność"
   },
   "settings": {
@@ -1981,11 +1980,6 @@
       "description": "Wszystkie wyniki turniejów społeczności Naruto Mythos TCG: zwycięzcy, końcowe klasyfikacje i historia poprzednich edycji symulatora online.",
       "ogAlt": "Naruto Mythos TCG, wyniki turniejów"
     },
-    "worldcup": {
-      "title": "Puchar Świata: Ranking Krajów | Naruto Mythos TCG",
-      "description": "Puchar Świata Naruto Mythos TCG: ranking krajów zbudowany na podstawie gier rankingowych z ostatnich 7 dni. Uczciwy wynik równoważący małe i duże społeczności, wskaźniki zwycięstw, najlepsi gracze na kraj i najczęściej grana grupa kart każdego narodu.",
-      "ogAlt": "Ranking krajów Pucharu Świata Naruto Mythos TCG"
-    },
     "feed": {
       "title": "Tablica - Naruto Mythos TCG",
       "description": "Udostępniaj swoje talie i powtórki gier, obserwuj graczy i rozmawiaj na tablicy społeczności gry karcianej Naruto Mythos."
@@ -2000,58 +1994,6 @@
       "description": "Dołącz do tablicy społeczności i serwerów Discord Naruto Mythos: talie, powtórki, gracze i dyskusje.",
       "ogAlt": "Społeczność Naruto Mythos TCG"
     }
-  },
-  "worldcup": {
-    "rewardsTitle": "Nagrody",
-    "rewardChampionCardTitle": "Ekskluzywna karta mistrza świata",
-    "rewardChampionCardDesc": "Sakura Haruno, The Leaf Medical Corps: karta Sekretna, której nigdy nie można wyciągnąć z boostera. Mogą ją zdobyć tylko członkowie zwycięskiej drużyny mistrzów świata.",
-    "rewardChampion": "Drużyna mistrzów: ekskluzywna karta, 3 boostery wariantów i XP.",
-    "rewardPodium": "Kraje z 2. i 3. miejsca na podium: boostery wariantów i XP.",
-    "rewardParticipation": "Pozostali gracze z zakwalifikowanych krajów: XP dla drużyny.",
-    "title": "Puchar Świata",
-    "totalCountries": "Kraje",
-    "totalPlayers": "Gracze",
-    "totalGames": "Gry",
-    "colCountry": "Kraj",
-    "colWinRate": "Wskaźnik zwycięstw",
-    "colPlayers": "Gracze",
-    "recordLine": "{wins}W - {losses}P",
-    "detailGames": "Gry",
-    "detailAvgElo": "Średnie ELO",
-    "detailTopGroup": "Najczęściej grana grupa",
-    "topPlayersTitle": "Najlepsi gracze kraju",
-    "emptyTitle": "Brak jeszcze gier",
-    "emptyText": "W ciągu ostatnich 7 dni nie rozegrano żadnych gier rankingowych. Zagraj gry rankingowe z wybraną flagą w opcjach, aby umieścić swój kraj na tablicy.",
-    "unrankedTitle": "Bez rankingu: drużyna z mniej niż {min} kwalifikującymi się graczami",
-    "rulesTitle": "Zasady rankingu",
-    "rule1": "Liczą się tylko gry rankingowe, w wybranym okresie: 24h, 7 dni, 30 dni lub sezon 3-miesięczny.",
-    "rule2": "Liczeni są tylko gracze, którzy wybrali flagę w swoich opcjach, do swojego kraju.",
-    "rule3": "Liczeni są tylko gracze co najmniej na poziomie Elitarnego Jonina ({elo} ELO lub więcej).",
-    "rule4": "Każdy kraj jest reprezentowany przez {team} najlepszych graczy (najwyższe ELO), pod warunkiem, że rozegrali co najmniej {games} gier rankingowych w danym okresie.",
-    "rule5": "Wynik łączy wskaźnik zwycięstw tych {team} graczy, siłę pokonanych przeciwników i aktywność. Liczy się tylko ELO przeciwników, nie własnej drużyny. Poddania liczą się na minus.",
-    "subtitleSeason": "Obecny sezon: {period}. Nowy Puchar Świata co 3 miesiące.",
-    "subtitleWindow": "Ranking krajów w wybranym okresie.",
-    "window_season": "Sezon (3 miesiące)",
-    "window_30d": "30 dni",
-    "window_7d": "7 dni",
-    "window_24h": "24 h",
-    "colScore": "Wynik",
-    "detailBeatenElo": "Średnie ELO pokonanych przeciwników",
-    "detailForfeits": "Poddania",
-    "factWinRate": "Zwycięstwa",
-    "factStrength": "Opozycja",
-    "factElo": "Poziom",
-    "factActivity": "Aktywność",
-    "rule6": "Nowy Puchar Świata rusza od zera co 3 miesiące. Remisy są rozstrzygane liczbą gier.",
-    "championTitle": "Mistrz Świata {month}",
-    "reigningNation": "Panujący naród Pucharu Świata {month}",
-    "lastChampionLabel": "Panujący mistrz {month}",
-    "worldMapTitle": "Przegląd świata",
-    "comparatorTitle": "Porównywarka krajów",
-    "progressionTitle": "Postęp sezonu",
-    "progressionCollecting": "Dane o postępie pojawią się w miarę trwania sezonu.",
-    "activityTitle": "Aktywność według godziny (UTC)",
-    "worldMapHint": "Najedź lub dotknij kraju"
   },
   "adminBoosterSim": {
     "title": "Symulator Boosterów",

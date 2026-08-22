@@ -144,7 +144,6 @@ export const effectDescriptionsPl: Record<string, string[]> = {
   "KS-133-S": ["[↯] Ukryj wrogą postać o Sile 5 lub mniej na tej misji oraz inną wrogą postać o Sile 2 lub mniej w grze.", "efekt: Zamiast tego pokonaj oba."],
   "KS-134-S": ["[⧗] Nie może zostać ukryty ani pokonany przez efekty wroga.", "[↯] Ukryj dowolną liczbę nieukrytych postaci w grze o łącznej Sile 6 lub mniej."],
   "KS-135-S": ["[↯] Zajrzyj do 3 wierzchnich kart twojej talii. Zagraj jedną postać gdziekolwiek i odrzuć pozostałe karty.", "efekt: Zamiast tego zagraj kartę, płacąc o 4 mniej."],
-  "KS-135-SV": ["[↯] Zajrzyj do 3 wierzchnich kart twojej talii. Zagraj jedną postać gdziekolwiek i odrzuć pozostałe karty.", "efekt: Zamiast tego zagraj kartę, płacąc o 4 mniej."],
   "KS-136-S": ["[⧗] Gdy postać zostaje pokonana, zyskaj 1 Czakrę.", "[↯] Musisz wybrać sojuszniczą nieukrytą postać oraz dowolną wrogą postać na tej misji i pokonać je, jeśli to możliwe."],
   "KS-135-MV": ["[↯] Zajrzyj do 3 wierzchnich kart twojej talii. Zagraj jedną postać gdziekolwiek i odrzuć pozostałe karty.", "efekt: Zamiast tego zagraj kartę, płacąc o 4 mniej."],
   "KS-136-MV": ["[⧗] Gdy postać zostaje pokonana, zyskaj 1 Czakrę.", "[↯] Musisz wybrać sojuszniczą nieukrytą postać oraz dowolną wrogą postać na tej misji i pokonać je, jeśli to możliwe."],

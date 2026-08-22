@@ -30,7 +30,7 @@ function sakura135MainHandler(ctx: EffectContext): EffectResult {
   };
 }
 
-const SAKURA_135_IMPRESSIONS = ['KS-135-S', 'KS-135-SV', 'KS-135-MV'];
+const SAKURA_135_IMPRESSIONS = ['KS-135-S', 'KS-135-MV'];
 
 export function registerSakura135Handlers(): void {
   for (const id of SAKURA_135_IMPRESSIONS) {

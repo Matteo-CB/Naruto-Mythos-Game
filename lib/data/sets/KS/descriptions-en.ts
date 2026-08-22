@@ -813,10 +813,6 @@ export const effectDescriptionsEn: Record<string, string[]> = {
     '[↯] Look at the top 3 cards of your deck. Play one character anywhere and discard the other cards.',
     'effect: Instead, play the card paying 4 less.',
   ],
-  'KS-135-SV': [
-    '[↯] Look at the top 3 cards of your deck. Play one character anywhere and discard the other cards.',
-    'effect: Instead, play the card paying 4 less.',
-  ],
 
   
   'KS-136-S': [

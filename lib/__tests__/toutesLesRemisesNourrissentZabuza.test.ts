@@ -10,7 +10,7 @@ const REMISES_CONNUES = [
   'KS-105-MV', 'KS-105-R', 'KS-105-RA',
   'KS-109-MV', 'KS-109-R', 'KS-109-RA',
   'KS-125-R', 'KS-125-RA', 'KS-132-S', 'KS-132-SV',
-  'KS-135-MV', 'KS-135-S', 'KS-135-SV',
+  'KS-135-MV', 'KS-135-S',
   'SS-008-C', 'SS-021-C', 'SS-022-UC',
   'SS-032-C', 'SS-034-C', 'SS-036-C', 'SS-039-C', 'SS-040-UC', 'SS-043-UC',
   'SS-051-UC', 'SS-067-C', 'SS-086-C',

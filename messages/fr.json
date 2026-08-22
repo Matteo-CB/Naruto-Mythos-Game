@@ -169,11 +169,6 @@
       "description": "Tous les résultats des tournois communautaires Naruto Mythos TCG : vainqueurs, classements finaux et historique des éditions passées du simulateur en ligne.",
       "ogAlt": "Naruto Mythos TCG, résultats de tournois"
     },
-    "worldcup": {
-      "title": "Coupe du monde : classement des pays | Naruto Mythos TCG",
-      "description": "La Coupe du monde Naruto Mythos TCG : un classement des pays construit sur les parties classées des 7 derniers jours. Score équitable qui équilibre petites et grandes communautés, taux de victoire, meilleurs joueurs par pays et groupe de cartes le plus joué de chaque nation.",
-      "ogAlt": "Classement des pays de la Coupe du monde Naruto Mythos TCG"
-    },
     "feed": {
       "title": "Fil - Naruto Mythos TCG",
       "description": "Partage tes decks et tes replays de parties, suis des joueurs et discute sur le fil de la communauté du jeu de cartes Naruto Mythos."
@@ -439,7 +434,6 @@
     "quests": "Quêtes",
     "questsBadgeTooltip": "{count} récompense(s) à réclamer",
     "socialBadgeTooltip": "{count} messages ou demandes en attente",
-    "worldcup": "Coupe du monde",
     "social": "Réseaux sociaux"
   },
   "gamepad": {
@@ -3830,58 +3824,6 @@
       "closed": "Ce sondage est clôturé.",
       "alreadyVoted": "Tu as déjà voté à ce sondage."
     }
-  },
-  "worldcup": {
-    "rewardsTitle": "Récompenses",
-    "rewardChampionCardTitle": "Carte exclusive du champion du monde",
-    "rewardChampionCardDesc": "Sakura Haruno, Le Corps Médical de la Feuille : une carte Secrète impossible à trouver en booster. Seuls les membres de l'équipe championne du monde peuvent l'obtenir.",
-    "rewardChampion": "Équipe championne : la carte exclusive, 3 boosters de variantes et de l'XP.",
-    "rewardPodium": "2e et 3e pays du podium : des boosters de variantes et de l'XP.",
-    "rewardParticipation": "Autres joueurs des pays qualifiés : de l'XP d'équipe.",
-    "title": "Coupe du monde",
-    "totalCountries": "Pays",
-    "totalPlayers": "Joueurs",
-    "totalGames": "Parties",
-    "colCountry": "Pays",
-    "colWinRate": "Taux de victoire",
-    "colPlayers": "Joueurs",
-    "recordLine": "{wins}V - {losses}D",
-    "detailGames": "Parties",
-    "detailAvgElo": "ELO moyen",
-    "detailTopGroup": "Groupe le plus joué",
-    "topPlayersTitle": "Meilleurs joueurs du pays",
-    "emptyTitle": "Aucune partie pour le moment",
-    "emptyText": "Aucune partie classée n'a été jouée ces 7 derniers jours. Jouez des parties classées avec un drapeau choisi dans vos options pour placer votre pays au classement.",
-    "unrankedTitle": "Hors classement : équipe de moins de {min} joueurs éligibles",
-    "rulesTitle": "Règles du classement",
-    "rule1": "Seules les parties classées comptent, sur la période choisie : 24h, 7 jours, 30 jours ou la saison de 3 mois.",
-    "rule2": "Seuls les joueurs ayant choisi un drapeau dans leurs options sont comptés pour leur pays.",
-    "rule3": "Seuls les joueurs au moins Jonin d'Élite ({elo} ELO ou plus) sont pris en compte.",
-    "rule4": "Chaque pays est représenté par ses {team} meilleurs joueurs (les plus haut ELO), à condition d'avoir joué au moins {games} parties classées sur la période.",
-    "rule5": "Le score combine le taux de victoire des {team} joueurs, la force des adversaires battus et l'activité. Seul l'ELO des adversaires compte, pas celui de l'équipe. Les abandons pèsent négativement.",
-    "subtitleSeason": "Saison en cours : {period}. Nouvelle Coupe du monde tous les 3 mois.",
-    "subtitleWindow": "Classement des pays sur la période choisie.",
-    "window_season": "Saison (3 mois)",
-    "window_30d": "30 jours",
-    "window_7d": "7 jours",
-    "window_24h": "24 h",
-    "colScore": "Score",
-    "detailBeatenElo": "ELO moyen des adversaires battus",
-    "detailForfeits": "Abandons",
-    "factWinRate": "Victoires",
-    "factStrength": "Adversité",
-    "factElo": "Niveau",
-    "factActivity": "Activité",
-    "rule6": "Une nouvelle Coupe du monde recommence tous les 3 mois, remise à zéro. Les égalités se départagent au nombre de parties.",
-    "championTitle": "Champion du monde {month}",
-    "reigningNation": "Nation championne du monde {month}",
-    "lastChampionLabel": "Champion en titre {month}",
-    "worldMapTitle": "Vue du monde",
-    "comparatorTitle": "Comparateur de pays",
-    "progressionTitle": "Progression de la saison",
-    "progressionCollecting": "Les données de progression apparaîtront au fil de la saison.",
-    "activityTitle": "Activité par heure (UTC)",
-    "worldMapHint": "Survolez ou touchez un pays"
   },
   "adminReveal": {
     "title": "Gestion des révélations de cartes",

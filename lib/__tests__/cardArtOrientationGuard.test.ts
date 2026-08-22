@@ -15,7 +15,6 @@ function fichierPivote(card: CardData): string | null {
 const ROOTS = ['components', 'app'];
 
 const ALLOWED_RAW_PATHS = new Set<string>([
-  'app/[locale]/worldcup/page.tsx',
   'app/[locale]/cards/[slug]/page.tsx',
   'components/cards/MissionCard.tsx',
   'components/game/MissionLane.tsx',

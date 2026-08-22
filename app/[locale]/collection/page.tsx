@@ -17,7 +17,6 @@ import { getCardName, getCardGroup, getRarityLabel } from '@/lib/utils/cardLocal
 import { ALL_SET_IDS, SET_REGISTRY, getSetName } from '@/lib/data/sets/registry';
 import type { CharacterCard, MissionCard, CardData, Rarity } from '@/lib/engine/types';
 import { isVariantCard, isLockedVariantCard } from '@/lib/variants/isVariant';
-import { WORLDCUP_CHAMPION_CARD } from '@/lib/variants/constants';
 import { holoIdFor, isHoloEligibleCard } from '@/lib/holo/holoId';
 import { matchesCollectionFilters } from '@/lib/collection/filter';
 import { facetOptions, isFacetWorthShowing } from '@/lib/collection/facets';
@@ -96,7 +95,7 @@ export default function CollectionPage() {
 
   useEffect(() => {
     import('@/lib/data/cardLoader').then((mod) => {
-      const cards = sortCardsForDisplay(mod.getAllCards().filter((c) => c.id !== WORLDCUP_CHAMPION_CARD));
+      const cards = sortCardsForDisplay(mod.getAllCards());
       setAllCards(cards);
       setCardsLoading(false);
     });
