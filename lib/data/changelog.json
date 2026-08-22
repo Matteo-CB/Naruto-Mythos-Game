@@ -1,6 +1,72 @@
 {
   "entries": [
     {
+      "date": "2026-08-22",
+      "title_fr": "Tournois fiables et coûts réduits corrigés",
+      "title_en": "Reliable tournaments and fixed cost reductions",
+      "title_es": "Torneos fiables y costes reducidos corregidos",
+      "title_pt": "Torneios fiáveis e custos reduzidos corrigidos",
+      "title_it": "Tornei affidabili e costi ridotti corretti",
+      "title_pl": "Niezawodne turnieje i poprawione zniżki kosztów",
+      "title_ja": "安定した大会とコスト軽減の修正",
+      "categories": [
+        "fix",
+        "fix",
+        "fix",
+        "fix",
+        "feature"
+      ],
+      "changes_fr": [
+        "Le compte à rebours d absence s arrête dès que votre partie de tournoi commence.",
+        "Un match de tournoi en cours n est plus remis à zéro pendant que vous jouez.",
+        "FUGAKU UCHIWA 058 ne cherche plus que de vrais Uchiwa, KIN TSUCHI n en fait pas partie.",
+        "KABUTO YAKUSHI 053 tient compte des réductions de coût déjà en jeu, comme celle de RASA 051.",
+        "L annonce du tournoi Chûnin part dans le salon Discord réservé aux joueurs qui ont le tag."
+      ],
+      "changes_en": [
+        "The absence countdown stops as soon as your tournament game begins.",
+        "A tournament match in progress is no longer reset while you are playing.",
+        "FUGAKU UCHIHA 058 only searches for real Uchiha, KIN TSUCHI is not one of them.",
+        "KABUTO YAKUSHI 053 now counts the cost reductions already in play, such as RASA 051.",
+        "The Chunin tournament announcement goes to the Discord channel reserved for tag holders."
+      ],
+      "changes_es": [
+        "La cuenta atrás por ausencia se detiene en cuanto empieza tu partida de torneo.",
+        "Una partida de torneo en curso ya no se reinicia mientras estás jugando.",
+        "FUGAKU UCHIHA 058 solo busca auténticos Uchiha, KIN TSUCHI no lo es.",
+        "KABUTO YAKUSHI 053 tiene en cuenta las reducciones de coste ya en juego, como la de RASA 051.",
+        "El anuncio del torneo Chunin se envía al canal de Discord reservado a quienes tienen la etiqueta."
+      ],
+      "changes_pt": [
+        "A contagem decrescente por ausência para assim que a tua partida de torneio começa.",
+        "Uma partida de torneio a decorrer deixa de ser reiniciada enquanto estás a jogar.",
+        "FUGAKU UCHIHA 058 só procura verdadeiros Uchiha, KIN TSUCHI não é um deles.",
+        "KABUTO YAKUSHI 053 passa a contar as reduções de custo já em jogo, como a de RASA 051.",
+        "O anúncio do torneio Chunin vai para o canal de Discord reservado a quem tem a etiqueta."
+      ],
+      "changes_it": [
+        "Il conto alla rovescia per assenza si ferma appena inizia la tua partita di torneo.",
+        "Una partita di torneo in corso non viene più azzerata mentre stai giocando.",
+        "FUGAKU UCHIHA 058 cerca solo veri Uchiha, KIN TSUCHI non lo è.",
+        "KABUTO YAKUSHI 053 tiene conto delle riduzioni di costo già in gioco, come quella di RASA 051.",
+        "L annuncio del torneo Chunin arriva nel canale Discord riservato a chi ha il tag."
+      ],
+      "changes_pl": [
+        "Odliczanie nieobecności zatrzymuje się, gdy tylko zacznie się twoja partia turniejowa.",
+        "Trwający mecz turniejowy nie jest już resetowany, gdy grasz.",
+        "FUGAKU UCHIHA 058 szuka już tylko prawdziwych Uchiha, KIN TSUCHI nim nie jest.",
+        "KABUTO YAKUSHI 053 uwzględnia zniżki kosztu już obecne w grze, na przykład RASA 051.",
+        "Ogłoszenie turnieju Chunin trafia na kanał Discord zarezerwowany dla graczy z tagiem."
+      ],
+      "changes_ja": [
+        "大会の対戦が始まった時点で、不在のカウントダウンが止まります。",
+        "進行中の大会の対戦が、プレイ中にやり直しになることはなくなりました。",
+        "うちはフガク 058 は本物のうちは一族だけを探します。ツチ キンは含まれません。",
+        "薬師カブト 053 が、ラサ 051 など場にあるコスト軽減を計算に入れるようになりました。",
+        "中忍大会の告知は、タグを持つプレイヤー専用の Discord チャンネルに送られます。"
+      ]
+    },
+    {
       "date": "2026-08-21",
       "title_fr": "Seize nouvelles impressions",
       "title_en": "Sixteen new printings",
