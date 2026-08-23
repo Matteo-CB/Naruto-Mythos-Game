@@ -1,6 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { allCardData } from '@/lib/data/sets';
-import type { CardData } from '@/lib/engine/types';
+import { initializeRegistry } from '@/lib/effects/EffectRegistry';
+import { buildSimState, simChar } from '@/lib/cards/sim/buildState';
+import { getCardById } from '@/lib/data/cardIndex';
+import { GameEngine } from '@/lib/engine/GameEngine';
+import type { CardData, CharacterCard, GameState } from '@/lib/engine/types';
+
+beforeAll(() => { initializeRegistry(); });
 
 const MOTIF_REMISE = /pay(?:ing|s)?\s+(?:\d+|X)\s+less|costs?\s+(?:\d+|X)\s+less|less to play/i;
 
@@ -54,5 +60,40 @@ describe('toute carte qui reduit un cout doit nourrir Zabuza 136', () => {
     for (const attendu of ['KS-053-UC', 'KS-135-S', 'KS-033-UC', 'KS-090-C', 'KS-075-C', 'SS-036-C']) {
       expect(actuelles, `${attendu} doit etre reconnu comme une carte a remise`).toContain(attendu);
     }
+  });
+});
+
+describe('la regle de l amelioration ne compte pas comme une remise de carte', () => {
+  function plateauAmelioration(avecRasa: boolean): GameState {
+    const p2 = [simChar('KS-077-C', { owner: 'player2', instanceId: 'kanku' })];
+    if (avecRasa) p2.push(simChar('SS-051-UC', { owner: 'player2', instanceId: 'rasa' }));
+    const s = buildSimState({ p1: [], p2, missions: 2, chakra1: 40, edgeHolder: 'player2' });
+    s.player2.chakra = 40;
+    s.phase = 'action';
+    s.activePlayer = 'player2';
+    s.player2.hand = [getCardById('KS-078-UC') as CharacterCard];
+    return s;
+  }
+
+  function ameliore(avecRasa: boolean) {
+    const apres = GameEngine.applyAction(plateauAmelioration(avecRasa), 'player2', {
+      type: 'UPGRADE_CHARACTER', cardIndex: 0, missionIndex: 0, targetInstanceId: 'kanku',
+    } as never);
+    return apres.activeMissions[0].player2Characters.find((c) => c.instanceId === 'kanku');
+  }
+
+  it('payer seulement la difference ne rend pas la carte vulnerable', () => {
+    expect(
+      ameliore(false)?.playedBelowPrintedCost,
+      'la carte dit "pour moins que son cout imprime a cause d un effet de carte": '
+      + 'payer la difference lors d une amelioration est une regle du jeu, pas un effet de carte',
+    ).toBe(false);
+  });
+
+  it('une vraie remise de carte la rend vulnerable, meme en amelioration', () => {
+    expect(
+      ameliore(true)?.playedBelowPrintedCost,
+      'RASA 051 retire 1 au cout du Sable: la carte a bien ete jouee sous son cout imprime',
+    ).toBe(true);
   });
 });
