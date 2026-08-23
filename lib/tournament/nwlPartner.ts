@@ -7,6 +7,7 @@ import {
 const DISCORD_API = 'https://discord.com/api/v10';
 
 export const NWL_PARTNER_KEY = 'nwl';
+export const NWL_TOURNAMENT_OWNER_USERNAME = 'New_World_Loot';
 export const NWL_GUILD_ID = '1396218672858534080';
 export const NWL_CHUNIN_ROLE_ID = '1504440900783308820';
 export const NWL_CHUNIN_SUBSCRIBER_ROLE_ID = '';

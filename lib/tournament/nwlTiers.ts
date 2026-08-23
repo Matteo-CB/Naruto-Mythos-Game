@@ -4,7 +4,7 @@ import { generateJoinCode } from '@/lib/tournament/tournamentEngine';
 import { parisDateParts, parisWallToUtc } from '@/lib/tournament/dailyTournament';
 import { NWL_REG_OPEN_HOUR } from '@/lib/tournament/nwlFridayTournament';
 import { NWL_PARTNER_KEY } from '@/lib/tournament/nwlPartner';
-import { findTournamentOwner } from '@/lib/tournament/tournamentOwner';
+import { findNwlTournamentOwner } from '@/lib/tournament/tournamentOwner';
 import {
   NWL_CHUNIN_ROLE_ID,
   NWL_CHUNIN_SUBSCRIBER_ROLE_ID,
@@ -148,7 +148,7 @@ async function creerTournoiPrive(
     return { created: false, reason: 'already_exists', tournamentId: existant.id, joinCode: existant.joinCode ?? undefined };
   }
 
-  const admin = await findTournamentOwner();
+  const admin = await findNwlTournamentOwner();
   if (!admin) return { created: false, reason: 'no_admin' };
 
   const scheduledStartAt = parisWallToUtc(p.year, p.month, p.day, spec.startHour, 0);
@@ -899,7 +899,7 @@ export async function creerChuninApresGenin(now: Date = new Date()): Promise<Nwl
     return { created: false, reason: 'already_exists', tournamentId: existant.id, joinCode: existant.joinCode ?? undefined };
   }
 
-  const admin = await findTournamentOwner();
+  const admin = await findNwlTournamentOwner();
   if (!admin) return { created: false, reason: 'no_admin' };
 
   const joinCode = generateJoinCode();

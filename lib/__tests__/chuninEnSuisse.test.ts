@@ -150,3 +150,102 @@ describe('le Chunin de quatre joueurs se joue proprement en suisse', () => {
     }
   });
 });
+
+describe('les tournois du partenaire sont crees a son nom, sans lui donner de pouvoir sur le site', () => {
+  const PROPRIETAIRE = readFileSync(join(RACINE, 'lib', 'tournament', 'tournamentOwner.ts'), 'utf8');
+  const GENIN_SRC = readFileSync(join(RACINE, 'lib', 'tournament', 'nwlFridayTournament.ts'), 'utf8');
+  const ADMINS = readFileSync(join(RACINE, 'lib', 'auth', 'admins.ts'), 'utf8');
+
+  it('les trois creations partenaires passent par le proprietaire partenaire', () => {
+    for (const [nom, source] of [['paliers', TIERS], ['Genin', GENIN_SRC]] as const) {
+      expect(source, `${nom}: la creation est au nom du partenaire`).toContain('findNwlTournamentOwner()');
+      expect(source, `${nom}: plus de creation au nom d un administrateur`).not.toContain('await findTournamentOwner()');
+    }
+  });
+
+  it('le tournoi quotidien du simulateur garde son proprietaire habituel', () => {
+    expect(QUOTIDIEN).toContain('await findTournamentOwner()');
+    expect(QUOTIDIEN).not.toContain('findNwlTournamentOwner');
+  });
+
+  it('si le compte du partenaire manque, la creation ne casse pas', () => {
+    const at = PROPRIETAIRE.indexOf('export async function findNwlTournamentOwner');
+    const corps = PROPRIETAIRE.slice(at, at + 500);
+    expect(corps, 'repli sur le proprietaire habituel').toContain('return findTournamentOwner();');
+  });
+
+  it('le compte du partenaire n est pas administrateur', async () => {
+    const { ADMIN_USERNAMES, ADMIN_EMAILS, isAdmin } = await import('@/lib/auth/admins');
+    const { NWL_TOURNAMENT_OWNER_USERNAME } = await import('@/lib/tournament/nwlPartner');
+    expect(ADMIN_USERNAMES as readonly string[]).not.toContain(NWL_TOURNAMENT_OWNER_USERNAME);
+    expect(ADMIN_EMAILS.length, 'aucune adresse partenaire cote administration').toBe(1);
+    expect(isAdmin({ username: NWL_TOURNAMENT_OWNER_USERNAME, email: null })).toBe(false);
+  });
+
+  it('la liste des administrateurs est celle voulue', () => {
+    expect(ADMINS).toContain("ADMIN_USERNAMES = ['Kutxyt', 'Daiki0'] as const");
+    expect(ADMINS, 'John Games ne fait plus partie des administrateurs').not.toContain('John_Games_TCG');
+  });
+});
+
+describe('le journal des nouveautes ne nomme plus le partenaire', () => {
+  it('aucune entree ne cite New World Loot', async () => {
+    const journal = JSON.parse(readFileSync(join(RACINE, 'lib', 'data', 'changelog.json'), 'utf8')) as {
+      entries: Array<Record<string, unknown>>;
+    };
+    const motif = /new\s*world\s*loot|newworldloot|NWL/i;
+    const fautifs: string[] = [];
+    for (const entree of journal.entries) {
+      for (const [cle, valeur] of Object.entries(entree)) {
+        if (typeof valeur === 'string' && cle.startsWith('title_') && motif.test(valeur)) {
+          fautifs.push(`${entree.date} ${cle}: ${valeur}`);
+        }
+        if (Array.isArray(valeur) && cle.startsWith('changes_')) {
+          valeur.forEach((ligne, i) => {
+            if (typeof ligne === 'string' && motif.test(ligne)) fautifs.push(`${entree.date} ${cle}[${i}]: ${ligne}`);
+          });
+        }
+      }
+    }
+    expect(fautifs, 'le partenaire ne doit plus etre nomme dans les nouveautes').toEqual([]);
+  });
+});
+
+describe('le partenaire suit ses tournois sans y jouer', () => {
+  const LISTE = readFileSync(join(RACINE, 'app', 'api', 'tournaments', 'route.ts'), 'utf8');
+  const DETAIL = readFileSync(join(RACINE, 'app', 'api', 'tournaments', '[id]', 'route.ts'), 'utf8');
+  const MATCHS = readFileSync(join(RACINE, 'app', 'api', 'tournaments', '[id]', 'matches', 'route.ts'), 'utf8');
+  const SOCKET = readFileSync(join(RACINE, 'lib', 'socket', 'tournamentHandlers.ts'), 'utf8');
+  const PAGE = readFileSync(join(RACINE, 'app', '[locale]', 'tournaments', '[id]', 'page.tsx'), 'utf8');
+
+  it('un tournoi prive apparait dans la liste pour celui qui l a cree', () => {
+    expect(LISTE).toContain('if (viewerId && t.creatorId === viewerId) return true;');
+  });
+
+  it('il ouvre la fiche du tournoi et voit le code d acces', () => {
+    expect(DETAIL).toContain('const isCreator = !!viewerId && tournament.creatorId === viewerId;');
+    expect(DETAIL, 'le code d acces reste visible pour le createur').toContain('(isCreator || viewerIsAdmin)');
+  });
+
+  it('il voit tous les matchs, donc les appariements et les resultats', () => {
+    expect(MATCHS).toContain('const isCreator = !!viewerId && tournament.creatorId === viewerId;');
+    expect(MATCHS).toContain('if (!isCreator && !viewerIsAdmin && !isParticipant)');
+  });
+
+  it('il recoit les mises a jour en direct', () => {
+    const at = SOCKET.indexOf("socket.on('tournament:subscribe'");
+    const corps = SOCKET.slice(at, at + 800);
+    expect(corps, 'le createur entre dans le salon du tournoi sans etre inscrit')
+      .toContain('if (tournament.creatorId !== authedUserId)');
+  });
+
+  it('le classement se calcule a partir des donnees qu il recoit', () => {
+    expect(PAGE, 'classement reconstruit depuis les participants et les matchs').toContain('computeStandings(players, results)');
+  });
+
+  it('il peut regarder les parties en cours puisqu il ne joue pas', async () => {
+    const { tournamentSpectateVerdictFor } = await import('@/lib/tournament/spectatePolicy');
+    expect(tournamentSpectateVerdictFor({ isSignedIn: true, isParticipant: false })).toEqual({ allowed: true });
+    expect(tournamentSpectateVerdictFor({ isSignedIn: true, isParticipant: true }).allowed).toBe(false);
+  });
+});

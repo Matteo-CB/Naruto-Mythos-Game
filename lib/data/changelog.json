@@ -55,7 +55,7 @@
         "feature"
       ],
       "changes_fr": [
-        "Les tournois Chûnin de New World Loot se jouent désormais en ronde suisse, le Genin et le Kage gardent leur arbre.",
+        "Les tournois Chûnin se jouent désormais en ronde suisse, le Genin et le Kage gardent leur arbre.",
         "Un tour suisse ne vous refait plus affronter le même adversaire quand un autre appariement est possible.",
         "Le podium d un tournoi suisse n annonce plus un joueur sorti pour absence.",
         "Dans un tournoi suisse, deux joueurs en pleine partie ne sont plus déclarés absents tous les deux.",
@@ -66,7 +66,7 @@
         "L annonce du tournoi Chûnin part dans le salon Discord réservé aux joueurs qui ont le tag."
       ],
       "changes_en": [
-        "New World Loot Chunin tournaments now run as Swiss rounds, Genin and Kage keep their bracket.",
+        "Chunin tournaments now run as Swiss rounds, Genin and Kage keep their bracket.",
         "A Swiss round no longer pairs you against the same opponent when another pairing is possible.",
         "The podium of a Swiss tournament no longer announces a player who was removed for absence.",
         "In a Swiss tournament, two players in the middle of a game are no longer both declared absent.",
@@ -77,7 +77,7 @@
         "The Chunin tournament announcement goes to the Discord channel reserved for tag holders."
       ],
       "changes_es": [
-        "Los torneos Chunin de New World Loot pasan a jugarse por sistema suizo, Genin y Kage mantienen su cuadro.",
+        "Los torneos Chunin pasan a jugarse por sistema suizo, Genin y Kage mantienen su cuadro.",
         "Una ronda suiza ya no te empareja con el mismo rival cuando existe otro emparejamiento posible.",
         "El podio de un torneo suizo ya no anuncia a un jugador excluido por ausencia.",
         "En un torneo suizo, dos jugadores en plena partida ya no son declarados ausentes ambos.",
@@ -88,7 +88,7 @@
         "El anuncio del torneo Chunin se envía al canal de Discord reservado a quienes tienen la etiqueta."
       ],
       "changes_pt": [
-        "Os torneios Chunin da New World Loot passam a jogar-se em sistema suíço, Genin e Kage mantêm o seu quadro.",
+        "Os torneios Chunin passam a jogar-se em sistema suíço, Genin e Kage mantêm o seu quadro.",
         "Uma ronda suíça deixa de te emparelhar com o mesmo adversário quando existe outro emparelhamento possível.",
         "O pódio de um torneio suíço deixa de anunciar um jogador excluído por ausência.",
         "Num torneio suíço, dois jogadores a meio de uma partida deixam de ser ambos declarados ausentes.",
@@ -99,7 +99,7 @@
         "O anúncio do torneio Chunin vai para o canal de Discord reservado a quem tem a etiqueta."
       ],
       "changes_it": [
-        "I tornei Chunin di New World Loot si giocano ora a gironi svizzeri, Genin e Kage mantengono il tabellone.",
+        "I tornei Chunin si giocano ora a gironi svizzeri, Genin e Kage mantengono il tabellone.",
         "Un turno svizzero non ti fa più affrontare lo stesso avversario quando esiste un altro accoppiamento.",
         "Il podio di un torneo svizzero non annuncia più un giocatore escluso per assenza.",
         "In un torneo svizzero, due giocatori in piena partita non vengono più dichiarati entrambi assenti.",
@@ -110,7 +110,7 @@
         "L annuncio del torneo Chunin arriva nel canale Discord riservato a chi ha il tag."
       ],
       "changes_pl": [
-        "Turnieje Chunin od New World Loot rozgrywane są teraz systemem szwajcarskim, Genin i Kage zachowują drabinkę.",
+        "Turnieje Chunin rozgrywane są teraz systemem szwajcarskim, Genin i Kage zachowują drabinkę.",
         "Runda systemu szwajcarskiego nie kojarzy cię już z tym samym przeciwnikiem, gdy możliwe jest inne parowanie.",
         "Podium turnieju szwajcarskiego nie ogłasza już gracza usuniętego za nieobecność.",
         "W turnieju szwajcarskim dwoje graczy w trakcie partii nie jest już uznawanych za nieobecnych.",
@@ -121,7 +121,7 @@
         "Ogłoszenie turnieju Chunin trafia na kanał Discord zarezerwowany dla graczy z tagiem."
       ],
       "changes_ja": [
-        "New World Loot の中忍大会はスイス式になりました。下忍と影はトーナメント表のままです。",
+        "中忍大会はスイス式になりました。下忍と影はトーナメント表のままです。",
         "スイス式のラウンドで、別の組み合わせが可能なときに同じ相手と再戦することはなくなりました。",
         "スイス式大会の表彰台に、不在で除外された選手が並ぶことはなくなりました。",
         "スイス式大会で、対戦中の二人がそろって不在扱いになることはなくなりました。",
@@ -2423,7 +2423,7 @@
         "Les titres anglais des cartes ont tous été revérifiés sur la carte imprimée et corrigés.",
         "Cinq cartes portaient un mauvais nom anglais, dont Gamabunta, Gamakichi et l’Araignée Géante.",
         "Le calendrier des tournois est plus compact et chaque jour se clique pour voir tout le détail.",
-        "Les récompenses du tournoi New World Loot sont expliquées dans le calendrier et sur Discord.",
+        "Les récompenses du tournoi partenaire sont expliquées dans le calendrier et sur Discord.",
         "Les cartes Mission et les cartes qui s’attachent à une mission s’affichent enfin en grand et à l’horizontale.",
         "Le détail d’un jour du calendrier explique maintenant toutes les règles du tournoi, simplement."
       ],
@@ -2438,7 +2438,7 @@
         "Every English card title was re-checked against the printed card and corrected.",
         "Five cards had the wrong English name, including Gamabunta, Gamakichi and the Giant Spider.",
         "The tournament calendar is more compact and each day opens full details when clicked.",
-        "The New World Loot tournament rewards are now explained in the calendar and on Discord.",
+        "The partner tournament rewards are now explained in the calendar and on Discord.",
         "Mission cards and cards that attach to a mission finally show large and horizontal.",
         "A calendar day now explains every rule of that tournament in plain words."
       ]
@@ -2494,7 +2494,7 @@
       "changes_fr": [
         "Le calendrier de la semaine s'affiche directement sur la page des tournois, en faisant défiler les jours sur le côté.",
         "Les horaires affichent le jour et l'heure de ton pays, même quand le tournoi tombe un autre jour chez toi.",
-        "Le tournoi New World Loot du vendredi soir apparaît dans le calendrier.",
+        "Le tournoi partenaire du vendredi soir apparaît dans le calendrier.",
         "Une petite finale désigne maintenant un seul troisième, au lieu de deux joueurs à égalité.",
         "Les annonces Discord présentent mieux le vainqueur et le podium.",
         "Les matchs de tournoi se lancent tout seuls à chaque tour, sans avoir à rafraîchir la page.",
@@ -2521,7 +2521,7 @@
       "changes_en": [
         "The weekly calendar is now shown directly on the tournaments page, scrolling sideways through the days.",
         "Times now show the day and hour of your own country, even when the tournament falls on another day where you live.",
-        "The Friday night New World Loot tournament now appears in the calendar.",
+        "The Friday night partner tournament now appears in the calendar.",
         "A playoff match now decides a single third place, instead of two tied players.",
         "Discord announcements now present the winner and the podium properly.",
         "Tournament matches now launch on their own every round, with no page refresh needed.",
@@ -2593,7 +2593,7 @@
         "Un deck contenant une carte pas encore révélée ne peut pas être partagé dans le fil.",
         "Les posts que tu publies apparaissent maintenant correctement dans le fil.",
         "Le haut de la page fil est plus clair et bien adapté au téléphone.",
-        "Nouveau tournoi New World Loot chaque vendredi soir en élimination directe : le top 3 gagne le rôle Chunin sur le Discord New World Loot.",
+        "Nouveau tournoi partenaire chaque vendredi soir en élimination directe : le top 3 gagne le rôle Chunin sur Discord.",
         "L'effet de Kabuto qui rejoue une carte de la défausse te demande maintenant de confirmer avant de l'activer."
       ],
       "changes_en": [
@@ -2607,7 +2607,7 @@
         "A deck with a card that is not revealed yet cannot be shared in the feed.",
         "The posts you publish now show up correctly in the feed.",
         "The top of the feed page is cleaner and fits phones properly.",
-        "New New World Loot tournament every Friday night in single elimination: the top 3 earn the Chunin role on the New World Loot Discord.",
+        "New partner tournament every Friday night in single elimination: the top 3 earn the Chunin role on Discord.",
         "Kabuto's effect that replays a card from the discard now asks you to confirm before it activates."
       ],
       "changes_es": [
@@ -2621,7 +2621,7 @@
         "Un mazo con una carta aún no revelada no se puede compartir en el muro.",
         "Las publicaciones que compartes ahora aparecen correctamente en el muro.",
         "La parte superior del muro es más clara y se adapta bien al móvil.",
-        "Nuevo torneo New World Loot cada viernes por la noche en eliminación directa: el top 3 gana un rol Chunin.",
+        "Nuevo torneo asociado cada viernes por la noche en eliminación directa: el top 3 gana un rol Chunin.",
         "El efecto de Kabuto que vuelve a jugar una carta del descarte ahora te pide confirmación antes de aplicarse."
       ],
       "changes_ja": [
@@ -2635,7 +2635,7 @@
         "未公開のカードを含むデッキはフィードで共有できません。",
         "投稿した内容がフィードに正しく表示されるようになりました。",
         "フィードページの上部が見やすくなり、スマートフォンに最適化されました。",
-        "毎週金曜の夜に New World Loot トーナメント（トーナメント形式はシングルエリミネーション）。上位3名に中忍ロールが与えられます。",
+        "毎週金曜の夜にパートナー大会（シングルエリミネーション）。上位3名に中忍ロールが与えられます。",
         "捨て札からカードを再度使う薬師カブトの効果は、適用前に確認を求めるようになりました。"
       ],
       "changes_pt": [
@@ -2649,7 +2649,7 @@
         "Um baralho com uma carta ainda não revelada não pode ser partilhado no mural.",
         "As publicações que partilhas aparecem agora corretamente no mural.",
         "O topo do mural está mais claro e adapta-se bem ao telemóvel.",
-        "Novo torneio New World Loot todas as sextas à noite em eliminação direta: o top 3 ganha um cargo Chunin.",
+        "Novo torneio parceiro todas as sextas à noite em eliminação direta: o top 3 ganha um cargo Chunin.",
         "O efeito do Kabuto que volta a jogar uma carta do descarte pede agora confirmação antes de ser aplicado."
       ],
       "changes_it": [
@@ -2663,7 +2663,7 @@
         "Un mazzo con una carta non ancora rivelata non può essere condiviso nella bacheca.",
         "I post che pubblichi ora appaiono correttamente nella bacheca.",
         "La parte superiore della bacheca è più chiara e ben adattata al telefono.",
-        "Nuovo torneo New World Loot ogni venerdì sera a eliminazione diretta: i primi 3 ottengono un ruolo Chunin.",
+        "Nuovo torneo partner ogni venerdì sera a eliminazione diretta: i primi 3 ottengono un ruolo Chunin.",
         "L'effetto di Kabuto che rigioca una carta dagli scarti ora chiede conferma prima di essere applicato."
       ],
       "changes_pl": [
@@ -2677,7 +2677,7 @@
         "Talii z jeszcze nieujawnioną kartą nie można udostępnić na tablicy.",
         "Publikowane posty pojawiają się teraz poprawnie na tablicy.",
         "Górna część tablicy jest czytelniejsza i lepiej dopasowana do telefonu.",
-        "Nowy turniej New World Loot w każdy piątkowy wieczór w systemie pucharowym: najlepsza trójka zdobywa rangę Chūnin.",
+        "Nowy turniej partnerski w każdy piątkowy wieczór w systemie pucharowym: najlepsza trójka zdobywa rangę Chūnin.",
         "Efekt Kabuto, który ponownie zagrywa kartę z odrzuconych, prosi teraz o potwierdzenie przed zastosowaniem."
       ],
       "categories": [
