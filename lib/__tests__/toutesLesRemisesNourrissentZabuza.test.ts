@@ -97,3 +97,76 @@ describe('la regle de l amelioration ne compte pas comme une remise de carte', (
     ).toBe(true);
   });
 });
+
+describe('le drapeau suit toujours la derniere pose, pas celle enfouie dessous', () => {
+  function avecRasa(): GameState {
+    const s = buildSimState({
+      p1: [], p2: [simChar('SS-051-UC', { owner: 'player2', instanceId: 'rasa' })],
+      missions: 2, chakra1: 40, edgeHolder: 'player2',
+    });
+    s.phase = 'action';
+    s.activePlayer = 'player2';
+    s.player2.chakra = 40;
+    s.player2.hand = [
+      getCardById('KS-077-C') as CharacterCard,
+      getCardById('KS-078-UC') as CharacterCard,
+    ];
+    return s;
+  }
+
+  function personnage(s: GameState) {
+    return s.activeMissions[0].player2Characters.find((c) => c.instanceId !== 'rasa');
+  }
+
+  it('la carte du dessous posee a prix reduit est bien marquee', () => {
+    const s = GameEngine.applyAction(avecRasa(), 'player2', {
+      type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0,
+    } as never);
+    expect(personnage(s)?.playedBelowPrintedCost, 'KANKURO 077 paye 2 au lieu de 3 grace a RASA').toBe(true);
+  });
+
+  it('une amelioration a plein tarif efface la vulnerabilite heritee du dessous', () => {
+    const pose = GameEngine.applyAction(avecRasa(), 'player2', {
+      type: 'PLAY_CHARACTER', cardIndex: 0, missionIndex: 0,
+    } as never);
+    const cible = personnage(pose)!;
+
+    const sansRasa = JSON.parse(JSON.stringify(pose)) as GameState;
+    sansRasa.activeMissions[0].player2Characters = sansRasa.activeMissions[0].player2Characters
+      .filter((c) => c.instanceId !== 'rasa');
+    sansRasa.activePlayer = 'player2';
+    sansRasa.phase = 'action';
+
+    const apres = GameEngine.applyAction(sansRasa, 'player2', {
+      type: 'UPGRADE_CHARACTER', cardIndex: 0, missionIndex: 0, targetInstanceId: cible.instanceId,
+    } as never);
+
+    expect(
+      personnage(apres)?.playedBelowPrintedCost,
+      "une amelioration garde le meme identifiant, donc le personnage compte comme pose au dernier tour: "
+      + 'si le drapeau du dessous survivait, ZABUZA tuerait une carte posee a plein tarif',
+    ).toBe(false);
+  });
+
+  it('une amelioration remisee reste vulnerable meme si le dessous ne l etait pas', () => {
+    const plein = buildSimState({
+      p1: [], p2: [simChar('SS-051-UC', { owner: 'player2', instanceId: 'rasa' })],
+      missions: 2, chakra1: 40, edgeHolder: 'player2',
+    });
+    plein.phase = 'action';
+    plein.activePlayer = 'player2';
+    plein.player2.chakra = 40;
+    plein.activeMissions[0].player2Characters.push(
+      simChar('KS-077-C', { owner: 'player2', instanceId: 'socle' }) as never,
+    );
+    plein.player2.hand = [getCardById('KS-078-UC') as CharacterCard];
+
+    const apres = GameEngine.applyAction(plein, 'player2', {
+      type: 'UPGRADE_CHARACTER', cardIndex: 0, missionIndex: 0, targetInstanceId: 'socle',
+    } as never);
+    expect(
+      apres.activeMissions[0].player2Characters.find((c) => c.instanceId === 'socle')?.playedBelowPrintedCost,
+      'RASA fait payer 3 pour une carte imprimee a 4',
+    ).toBe(true);
+  });
+});
