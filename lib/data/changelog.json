@@ -10,27 +10,43 @@
       "title_pl": "Naprawione odkrywanie wielu kart",
       "title_ja": "複数公開の修正",
       "categories": [
+        "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
+        "KIMIMARO 077 propose son sacrifice pour chaque exemplaire que vous avez en jeu, et ne meurt plus pour rien.",
+        "SAKON 062 peut copier un FIRST STRIKE quand vous le révélez en première action du tour.",
         "SAKON 037 révèle bien toutes les cartes que vous choisissez, et plus une seule."
       ],
       "changes_en": [
+        "KIMIMARO 077 offers its sacrifice for every copy you have in play, and no longer dies for nothing.",
+        "SAKON 062 can copy a FIRST STRIKE when you reveal him as your first play of the round.",
         "SAKON 037 now reveals every card you pick, instead of only one."
       ],
       "changes_es": [
+        "KIMIMARO 077 ofrece su sacrificio por cada copia que tengas en juego y ya no muere en vano.",
+        "SAKON 062 puede copiar un FIRST STRIKE cuando lo revelas como primera jugada de la ronda.",
         "SAKON 037 revela todas las cartas que eliges, ya no solo una."
       ],
       "changes_pt": [
+        "KIMIMARO 077 oferece o seu sacrifício por cada cópia que tens em jogo e deixa de morrer em vão.",
+        "SAKON 062 pode copiar um FIRST STRIKE quando o revelas como primeira jogada da ronda.",
         "SAKON 037 revela todas as cartas que escolhes, já não apenas uma."
       ],
       "changes_it": [
+        "KIMIMARO 077 propone il suo sacrificio per ogni copia che hai in gioco e non muore più per nulla.",
+        "SAKON 062 può copiare un FIRST STRIKE quando lo riveli come prima giocata del round.",
         "SAKON 037 rivela tutte le carte che scegli, non più una sola."
       ],
       "changes_pl": [
+        "KIMIMARO 077 proponuje swoje poświęcenie dla każdej kopii na stole i nie ginie już na darmo.",
+        "SAKON 062 może skopiować FIRST STRIKE, gdy odkryjesz go jako pierwsze zagranie w rundzie.",
         "SAKON 037 odkrywa wszystkie wybrane karty, a nie tylko jedną."
       ],
       "changes_ja": [
+        "君麻呂 077 は場にあるすべての一枚ごとに犠牲を提案し、無駄に倒れることはなくなりました。",
+        "サコン 062 は、そのラウンドの最初のプレイとして公開したとき FIRST STRIKE を複製できます。",
         "サコン 037 が、選んだカードをすべて公開するようになりました。これまでは一枚だけでした。"
       ]
     },

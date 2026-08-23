@@ -66,7 +66,7 @@ import { KABUTO_139_ID, KABUTO_139_NAME } from './handlers/SS/kabuto139';
 import { KABUTO_053_REDUCTION } from './handlers/KS/uncommon/kabuto053';
 import { kabuto139PiocheEtDefausse } from './ContinuousEffects';
 import { OROCHIMARU_127_ID, OROCHIMARU_127_NAME } from './handlers/SS/orochimaru127';
-import { KIMIMARO_077_ID, KIMIMARO_077_NAME, kimimaro077Targets, costOfTarget } from './handlers/SS/kimimaro077';
+import { KIMIMARO_077_ID, KIMIMARO_077_NAME, kimimaro077Targets, costOfTarget, kimimaro077HasAffordableTarget } from './handlers/SS/kimimaro077';
 import { DOSU_125_ID, DOSU_125_NAME } from './handlers/SS/soundMoves';
 import { AUTO_CONFIRM_INSTANT, envelopperResultat } from './autoConfirm';
 import { SAKURA_007_ID, SAKURA_007_NAME, SAKURA_007_POWERUP } from '@/lib/engine/rules/startOfRoundTriggers';
@@ -601,6 +601,7 @@ export class EffectEngine {
     player: PlayerID,
     character: CharacterInPlay,
     missionIndex: number,
+    wasRevealed: boolean = false,
   ): GameState {
     let newState = deepClone(state);
     const topCard = character.stack?.length > 0 ? character.stack[character.stack.length - 1] : character.card;
@@ -620,6 +621,8 @@ export class EffectEngine {
         sourceMissionIndex: missionIndex,
         triggerType: 'FIRST_STRIKE' as EffectType,
         isUpgrade: false,
+        wasRevealed,
+        wasFirstCard: true,
       };
       const result = envelopperResultat(handler(ctx), ctx, 'FIRST_STRIKE' as EffectType);
       if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
@@ -808,6 +811,7 @@ export class EffectEngine {
             triggerType: 'MAIN',
             isUpgrade: false,
             wasRevealed: true,
+            wasFirstCard: wasFirstCardOfReveal,
           };
           const result = envelopperResultat(handler(ctx), ctx, 'MAIN' as EffectType);
 
@@ -847,6 +851,7 @@ export class EffectEngine {
             triggerType: 'AMBUSH',
             isUpgrade: false,
             wasRevealed: true,
+            wasFirstCard: wasFirstCardOfReveal,
           };
           const result = envelopperResultat(handler(ctx), ctx, 'AMBUSH' as EffectType);
 
@@ -882,6 +887,7 @@ export class EffectEngine {
             triggerType: 'DUEL',
             isUpgrade: false,
             wasRevealed: true,
+            wasFirstCard: wasFirstCardOfReveal,
           };
           const result = duelHandler(ctx);
 
@@ -902,7 +908,7 @@ export class EffectEngine {
     if (firstStrikeArmed) {
       const fsChar = EffectEngine.findCharByInstanceId(newState, character.instanceId);
       if (fsChar) {
-        newState = EffectEngine.resolveFirstStrikeEffect(newState, player, fsChar.character, fsChar.missionIndex);
+        newState = EffectEngine.resolveFirstStrikeEffect(newState, player, fsChar.character, fsChar.missionIndex, true);
       }
     }
 
@@ -1044,7 +1050,7 @@ export class EffectEngine {
 
     const effId = generateInstanceId();
     const actId = generateInstanceId();
-    newState.pendingEffects.push({
+    newState.pendingEffects.unshift({
       id: effId,
       sourceCardId: pendingEffect.sourceCardId,
       sourceInstanceId: pendingEffect.sourceInstanceId,
@@ -1061,7 +1067,7 @@ export class EffectEngine {
       isUpgrade: pendingEffect.isUpgrade,
       remainingEffectTypes: undefined,
     });
-    newState.pendingActions.push({
+    newState.pendingActions.unshift({
       id: actId,
       type: 'SELECT_TARGET' as PendingAction['type'],
       player: pendingEffect.sourcePlayer,
@@ -12648,6 +12654,15 @@ export class EffectEngine {
         try { ss077Data = JSON.parse(pendingEffect.effectDescription); } catch {}
         const ss077Limite = ss077Data.limite ?? 5;
         const ss077Source = ss077Data.sourceInstanceId ?? pendingEffect.sourceInstanceId;
+
+        const ss077Vivant = EffectEngine.findCharByInstanceId(newState, ss077Source);
+        if (!ss077Vivant) break;
+        if (!kimimaro077HasAffordableTarget(newState, pendingEffect.sourcePlayer, ss077Limite)) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', 'Kimimaro (077): no enemy character left within the cost budget, he stays in play.',
+            'game.log.effect.noTarget', { card: KIMIMARO_077_NAME, id: KIMIMARO_077_ID });
+          break;
+        }
 
         newState = EffectEngine.defeatCharacter(newState, ss077Source, pendingEffect.sourcePlayer);
         newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
