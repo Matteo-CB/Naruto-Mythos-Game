@@ -13300,8 +13300,13 @@ export class EffectEngine {
       }
 
       case 'SS_DECK_SEARCH_SHOW': {
-        let metaVue: { depth?: number; sourceName?: string; sourceId?: string } = {};
+        let metaVue: { depth?: number; sourceName?: string; sourceId?: string; refus?: string } = {};
         try { metaVue = JSON.parse(pendingEffect.effectDescription); } catch {}
+        if (metaVue.refus) {
+          newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+            'EFFECT_NO_TARGET', `${metaVue.sourceName ?? ''} (${metaVue.sourceId ?? ''}): ${metaVue.refus}`,
+            'game.log.effect.noTarget', { card: metaVue.sourceName ?? '', id: metaVue.sourceId ?? '' });
+        }
         const profondeurVue = metaVue.depth ?? 3;
         const joueurVue = pendingEffect.sourcePlayer;
         const deckVue = [...newState[joueurVue].deck];

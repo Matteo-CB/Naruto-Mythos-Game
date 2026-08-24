@@ -57,17 +57,28 @@ describe('phase 3, la fouille de deck partagee par trois cartes', () => {
     expect(fin.player1.deck[0].id, 'la carte hors des trois premieres est passee devant').toBe('KS-005-C');
   });
 
-  it('une fouille sans candidat se contente de le dire', () => {
+  it('une fouille sans candidat reste refusable avant de montrer quoi que ce soit', () => {
     const fugaku = simChar('SS-058-UC', { owner: 'player1' });
     const base = buildSimState({ p1: [fugaku], p2: [], missions: 1 });
     const s = avecDeck(base, ['KS-009-C', 'KS-010-C', 'KS-005-C']);
 
     const joue = EffectEngine.resolvePlayEffects(s, 'player1', fugaku, 0, false);
+    const question = joue.pendingActions[0];
+    const effet = joue.pendingEffects.find((e) => e.id === question?.sourceEffectId);
+    expect(effet?.isMandatory, 'un effet instantane ne se force pas').not.toBe(true);
+    expect(effet?.isOptional || effet?.rootOptional, 'le joueur peut passer').toBe(true);
     expect(
-      joue.pendingActions[0]?.descriptionKey,
-      'les cartes regardees sont quand meme montrees au joueur',
+      joue.log.some((l) => l.messageKey === 'game.log.effect.noTarget'),
+      "tant que le joueur n a pas accepte, le journal ne dit rien de son deck",
+    ).toBe(false);
+
+    const accepte = GameEngine.applyAction(joue, 'player1', {
+      type: 'SELECT_TARGET', pendingActionId: question.id, selectedTargets: [question.options[0]],
+    } as never);
+    expect(
+      accepte.pendingActions[0]?.descriptionKey,
+      'les cartes regardees sont alors montrees au joueur',
     ).toBe('game.effect.desc.ssDeckSearchShow');
-    expect(joue.log.some((l) => l.messageKey === 'game.log.effect.noTarget'), 'le refus est journalise').toBe(true);
   });
 
   it('les textes de la fouille existent dans les sept langues', async () => {

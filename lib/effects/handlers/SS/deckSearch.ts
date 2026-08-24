@@ -69,28 +69,33 @@ function fouilleHandler(fouille: FouilleDeDeck) {
     const candidats = candidatsDeFouille(state, sourcePlayer, fouille);
     const regardees = cartesRegardees(state, sourcePlayer, fouille);
 
-    if (candidats.length === 0) {
-      const journal = logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
-        `${fouille.nom} (${fouille.id}): ${fouille.refus}`,
-        'game.log.effect.noTarget', { card: fouille.nom, id: fouille.id });
-
-      if (regardees.length === 0) return { state: { ...state, log: journal } };
-
+    if (regardees.length === 0) {
       return {
-        state: { ...state, log: journal },
+        state: {
+          ...state,
+          log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',
+            `${fouille.nom} (${fouille.id}): no card left in the deck to look at.`,
+            'game.log.effect.noTarget', { card: fouille.nom, id: fouille.id }),
+        },
+      };
+    }
+
+    if (candidats.length === 0) {
+      return confirmFirst({
+        state,
         requiresTargetSelection: true,
         targetSelectionType: 'SS_DECK_SEARCH_SHOW',
         validTargets: regardees.map((i) => `DECK_${i}`),
-        isOptional: false,
-        isMandatory: true,
+        isOptional: true,
         description: JSON.stringify({
           depth: fouille.profondeur,
           sourceName: fouille.nom,
           sourceId: fouille.id,
+          refus: fouille.refus,
           cards: apercuDeCartes(state, sourcePlayer, regardees),
         }),
         descriptionKey: 'game.effect.desc.ssDeckSearchShow',
-      };
+      }, sourceCard.instanceId, 'SS_DECK_SEARCH_CONFIRM');
     }
 
     return confirmFirst({

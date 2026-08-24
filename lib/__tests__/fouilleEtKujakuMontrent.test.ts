@@ -25,33 +25,38 @@ function jouer(s: GameState, id: string): GameState {
 const SANS_EQUIPEMENT = ['KS-009-C', 'KS-011-C', 'KS-013-C', 'KS-015-C', 'KS-019-C'];
 
 describe('une fouille de deck montre toujours les cartes regardees', () => {
-  it('SUIKO 074 sans equipement valide affiche quand meme les 5 cartes', () => {
+  it('SUIKO 074 sans equipement valide demande d abord si on active l effet', () => {
     const apres = jouer(plateau(SANS_EQUIPEMENT, []), 'SS-074-C');
     const question = apres.pendingActions[0];
     expect(question, 'une fenetre s ouvre malgre l absence de cible').toBeDefined();
-    expect(question.descriptionKey, 'c est bien la fenetre d information').toBe('game.effect.desc.ssDeckSearchShow');
-    expect(question.options.length, 'les cinq cartes regardees sont montrees').toBe(5);
-
-    const charge = JSON.parse(apres.pendingEffects[0].effectDescription);
-    expect(charge.cards.length, 'leur identite est transmise au client').toBe(5);
-    expect(
-      apres.log.some((l) => l.messageKey === 'game.log.effect.noTarget'),
-      'le refus reste journalise',
-    ).toBe(true);
+    const effet = apres.pendingEffects.find((e) => e.id === question.sourceEffectId)!;
+    expect(effet.isMandatory, 'un effet instantane reste refusable').not.toBe(true);
+    expect(effet.isOptional || effet.rootOptional).toBe(true);
   });
 
-  it('apres la fenetre, les cartes regardees repartent sous le deck', () => {
-    const depart = plateau(SANS_EQUIPEMENT, []);
-    const avecFenetre = jouer(depart, 'SS-074-C');
-    const question = avecFenetre.pendingActions[0];
-    const apres = GameEngine.applyAction(avecFenetre, 'player1', {
-      type: 'SELECT_TARGET', pendingActionId: question.id, selectedTargets: [question.options[0]],
+  it('en acceptant, les cinq cartes sont montrees puis repartent sous le deck', () => {
+    const avecFenetre = jouer(plateau(SANS_EQUIPEMENT, []), 'SS-074-C');
+    const confirmation = avecFenetre.pendingActions[0];
+    const montre = GameEngine.applyAction(avecFenetre, 'player1', {
+      type: 'SELECT_TARGET', pendingActionId: confirmation.id, selectedTargets: [confirmation.options[0]],
     } as never);
 
+    const fenetre = montre.pendingActions[0];
+    expect(fenetre?.descriptionKey, 'c est bien la fenetre d information').toBe('game.effect.desc.ssDeckSearchShow');
+    expect(fenetre.options.length, 'les cinq cartes regardees sont montrees').toBe(5);
+    const charge = JSON.parse(montre.pendingEffects.find((e) => e.id === fenetre.sourceEffectId)!.effectDescription);
+    expect(charge.cards.length, 'leur identite est transmise au client').toBe(5);
+    const apres = GameEngine.applyAction(montre, 'player1', {
+      type: 'SELECT_TARGET', pendingActionId: fenetre.id, selectedTargets: [fenetre.options[0]],
+    } as never);
     expect(apres.player1.deck.length, 'aucune carte perdue').toBe(5);
     expect(
       apres.log.some((l) => l.messageKey === 'game.log.effect.ssDeckSearchBottom'),
       'le journal dit ou elles sont parties',
+    ).toBe(true);
+    expect(
+      apres.log.some((l) => l.messageKey === 'game.log.effect.noTarget'),
+      'le refus reste journalise une fois l effet accepte',
     ).toBe(true);
   });
 });
@@ -83,7 +88,14 @@ describe('le PARCHEMIN DU SCEAU 095 montre aussi ce qu il a regarde', () => {
       controlledBy: 'player1', originalOwner: 'player1', missionIndex: 0,
     } as never);
     const apres = jouer(s, 'SS-095-UC');
-    const question = apres.pendingActions[0];
+    const confirmation = apres.pendingActions[0];
+    const effet = apres.pendingEffects.find((e) => e.id === confirmation.sourceEffectId)!;
+    expect(effet.isMandatory, 'le joueur peut refuser de regarder').not.toBe(true);
+
+    const montre = GameEngine.applyAction(apres, 'player1', {
+      type: 'SELECT_TARGET', pendingActionId: confirmation.id, selectedTargets: [confirmation.options[0]],
+    } as never);
+    const question = montre.pendingActions[0];
     expect(question?.descriptionKey, 'la fenetre d information s ouvre').toBe('game.effect.desc.ssDeckSearchShow');
     expect(question.options.length, 'les trois cartes du dessus sont montrees').toBe(3);
   });
