@@ -11,33 +11,41 @@
       "title_ja": "コピーは効果の条件に従います",
       "categories": [
         "fix",
+        "fix",
         "fix"
       ],
       "changes_fr": [
+        "JIRAYA 144 explique pourquoi aucune invocation ne peut être jouée au lieu de ne rien faire.",
         "Les cartes qui fouillent le dessus de votre deck peuvent être refusées, même quand aucune carte cherchée ne s y trouve.",
         "SAKON 062 peut copier un effet UPGRADE quand vous le posez lui-même en amélioration, KAKASHI ne le peut pas car sa carte l interdit."
       ],
       "changes_en": [
+        "JIRAYA 144 now explains why no Summon can be played instead of doing nothing.",
         "Cards that search the top of your deck can now be declined, even when none of the wanted cards are there.",
         "SAKON 062 can copy an UPGRADE effect when you play him as an upgrade, KAKASHI cannot because his card forbids it."
       ],
       "changes_es": [
+        "JIRAYA 144 explica por qué no se puede jugar ninguna invocación en lugar de no hacer nada.",
         "Las cartas que buscan en lo alto de tu mazo se pueden rechazar, incluso cuando no hay ninguna carta buscada.",
         "SAKON 062 puede copiar un efecto UPGRADE cuando lo juegas como mejora, KAKASHI no puede porque su carta lo prohíbe."
       ],
       "changes_pt": [
+        "JIRAYA 144 explica porque nenhuma invocação pode ser jogada, em vez de não fazer nada.",
         "As cartas que procuram no topo do teu baralho podem ser recusadas, mesmo quando não há nenhuma carta procurada.",
         "SAKON 062 pode copiar um efeito UPGRADE quando o jogas como melhoria, KAKASHI não pode porque a carta o proíbe."
       ],
       "changes_it": [
+        "JIRAYA 144 spiega perché nessuna evocazione può essere giocata invece di non fare nulla.",
         "Le carte che cercano in cima al tuo mazzo possono essere rifiutate, anche quando non c è nessuna carta cercata.",
         "SAKON 062 può copiare un effetto UPGRADE quando lo giochi come miglioramento, KAKASHI no perché la sua carta lo vieta."
       ],
       "changes_pl": [
+        "JIRAYA 144 wyjaśnia, dlaczego nie można zagrać żadnego przywołania, zamiast nic nie robić.",
         "Karty przeszukujące wierzch talii można teraz odrzucić, nawet gdy nie ma tam szukanej karty.",
         "SAKON 062 może skopiować efekt UPGRADE, gdy zagrasz go jako ulepszenie, KAKASHI nie może, bo zabrania tego jego karta."
       ],
       "changes_ja": [
+        "自来也 144 は、口寄せを出せない理由を説明するようになりました。これまでは何も起きませんでした。",
         "山札の上を探すカードは、目的のカードがなくても効果を使わない選択ができるようになりました。",
         "サコン 062 は、自身をアップグレードとして出したとき UPGRADE 効果をコピーできます。カカシはカードの文章で禁じられているためできません。"
       ]

@@ -15,7 +15,7 @@ export const REWIND_TARGET = '__rewind';
 type GameStateWithMoveGrant = GameState & { _ss117ChakraGranted?: Partial<Record<PlayerID, boolean>> };
 import { characterHasGroup } from './groupUtils';
 import { postMoveHide as choji018PostMoveHide } from './handlers/KS/uncommon/choji018';
-import { buildPlayLessTargets, type PlayLessCategory } from './handlers/shared/playLess';
+import { buildPlayLessTargets, playLessRevealBlockedName, type PlayLessCategory } from './handlers/shared/playLess';
 import { ss000DeckHounds, ss000FinalizeSearch, ss000HoundChoicePayload, SS000_NINJA_HOUND } from './handlers/SS/ss000Search';
 import { topmostHinataIndexInDiscard } from './handlers/SS/shinobi';
 import { missionCarries, SS_MISSION_LOW_PROFILE } from './missions/ssMissions';
@@ -7165,6 +7165,17 @@ export class EffectEngine {
         );
 
         if (j2Targets.targets.length === 0) {
+          const j2Bloque = playLessRevealBlockedName(
+            newState, j2Player, { kind: 'keyword', value: SUMMON_KEYWORD },
+          );
+          newState.log = j2Bloque
+            ? logAction(newState.log, newState.turn, newState.phase, j2Player,
+              'EFFECT_BLOCKED',
+              `Jiraiya (SS-002) UPGRADE: cannot reveal ${j2Bloque}, a character with that name is already visible on that mission.`,
+              'game.log.effect.duplicateNameReveal', { card: j2Bloque })
+            : logAction(newState.log, newState.turn, newState.phase, j2Player,
+              'EFFECT_NO_TARGET', 'Jiraiya (SS-002) UPGRADE: no Summon character can be played.',
+              'game.log.effect.noTarget', { card: JIRAIYA_GOLD_NAME, id: JIRAIYA_GOLD_ID });
           newState = EffectEngine.applyJiraiyaGoldSummonPowerup(newState, j2Player);
           break;
         }
