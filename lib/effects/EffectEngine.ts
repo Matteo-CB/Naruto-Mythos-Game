@@ -3699,7 +3699,7 @@ export class EffectEngine {
             if (topCard.chakra > 4) continue;
             const k016WasRevealed = pendingEffect.wasRevealed ?? false;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
-              return isCopyableEffect(eff, { wasRevealed: k016WasRevealed, wasFirstCard: pendingEffect.wasFirstCard });
+              return isCopyableEffect(eff, { wasRevealed: k016WasRevealed, wasFirstCard: pendingEffect.wasFirstCard, wasUpgrade: pendingEffect.isUpgrade, copieur: pendingEffect.sourceCardId });
             });
             if (hasInstant) k016Targets.push(char.instanceId);
           }
@@ -3749,7 +3749,7 @@ export class EffectEngine {
             if (!isCopyableCharacter(char)) continue;
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
-              return isCopyableEffect(eff, { wasRevealed: k016uWasRevealed, wasFirstCard: pendingEffect.wasFirstCard });
+              return isCopyableEffect(eff, { wasRevealed: k016uWasRevealed, wasFirstCard: pendingEffect.wasFirstCard, wasUpgrade: true, copieur: pendingEffect.sourceCardId });
             });
             if (hasInstant) k016uTargets.push(char.instanceId);
           }
@@ -6208,7 +6208,7 @@ export class EffectEngine {
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
               const hasInstant = topCard.effects?.some((eff: any) => {
-                return isCopyableEffect(eff, { wasRevealed: true, wasFirstCard: pendingEffect.wasFirstCard });
+                return isCopyableEffect(eff, { wasRevealed: true, wasFirstCard: pendingEffect.wasFirstCard, wasUpgrade: pendingEffect.isUpgrade, copieur: pendingEffect.sourceCardId });
               });
               if (hasInstant) s062Targets.push(char.instanceId);
             }
@@ -6230,7 +6230,7 @@ export class EffectEngine {
             ? s062AutoResult.character.stack[s062AutoResult.character.stack?.length - 1]
             : s062AutoResult.character.card;
           const s062Copyable = (s062TopCard.effects ?? []).filter((eff: any) => {
-            return isCopyableEffect(eff, { wasRevealed: true, wasFirstCard: pendingEffect.wasFirstCard });
+            return isCopyableEffect(eff, { wasRevealed: true, wasFirstCard: pendingEffect.wasFirstCard, wasUpgrade: pendingEffect.isUpgrade, copieur: pendingEffect.sourceCardId });
           });
           if (s062Copyable.length === 0) break;
           if (s062Copyable.length === 1) {
@@ -16648,7 +16648,7 @@ export class EffectEngine {
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
             if (!topCard.keywords || !topCard.keywords.includes('Team 7')) continue;
             const hasCopyableEffect = topCard.effects.some((effect: { type: string; description: string }) => {
-              return isCopyableEffect(effect, { wasRevealed: true, wasFirstCard: pendingEffect.wasFirstCard });
+              return isCopyableEffect(effect, { wasRevealed: true, wasFirstCard: pendingEffect.wasFirstCard, wasUpgrade: pendingEffect.isUpgrade, copieur: pendingEffect.sourceCardId });
             });
             if (hasCopyableEffect) {
               k148aValidTargets.push(char.instanceId);
@@ -17074,7 +17074,7 @@ export class EffectEngine {
         
         
         const k148Copyable = !isCopyableCharacter(k148Target.character) ? [] : (k148TopCard.effects ?? []).filter((eff) => {
-          return isCopyableEffect(eff, { wasRevealed: true, wasFirstCard: pendingEffect.wasFirstCard }) && (eff.type === 'MAIN' || eff.type === 'AMBUSH');
+          return isCopyableEffect(eff, { wasRevealed: true, wasFirstCard: pendingEffect.wasFirstCard, wasUpgrade: pendingEffect.isUpgrade, copieur: pendingEffect.sourceCardId }) && (eff.type === 'MAIN' || eff.type === 'AMBUSH');
         });
 
         if (k148Copyable.length === 0) {
@@ -18978,7 +18978,7 @@ export class EffectEngine {
         
         const copierWasRevealed = pendingEffect.wasRevealed ?? false;
         const copyableEffects = !isCopyableCharacter(copyTargetResult.character) ? [] : (copyTargetTopCard.effects ?? []).filter((eff) => {
-          return isCopyableEffect(eff, { wasRevealed: copierWasRevealed, wasFirstCard: pendingEffect.wasFirstCard });
+          return isCopyableEffect(eff, { wasRevealed: copierWasRevealed, wasFirstCard: pendingEffect.wasFirstCard, wasUpgrade: pendingEffect.isUpgrade, copieur: pendingEffect.sourceCardId });
         });
 
         if (copyableEffects.length === 0) {
@@ -20320,7 +20320,7 @@ export class EffectEngine {
       const texteEfface106 = textIsBlanked(targetChar);
       const copyableEffects = (texteEfface106 || !isCharacterCopyable(discardedCard)) ? [] : (discardedCard.effects ?? []).filter(
         (e) => {
-          return isCopyableEffect(e, { wasRevealed: copier106WasRevealed, wasFirstCard: pending.wasFirstCard });
+          return isCopyableEffect(e, { wasRevealed: copier106WasRevealed, wasFirstCard: pending.wasFirstCard, wasUpgrade: pending.isUpgrade, copieur: pending.sourceCardId });
         },
       );
       if (copyableEffects.length === 1) {

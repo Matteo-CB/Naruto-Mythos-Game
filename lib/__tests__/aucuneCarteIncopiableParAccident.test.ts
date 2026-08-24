@@ -21,17 +21,21 @@ function estContinu(e: EffetImprime): boolean {
 
 function raisonDeNonCopie(e: EffetImprime): string | null {
   if (e.type === 'SCORE') return 'SCORE';
-  if (e.type === 'UPGRADE') return 'UPGRADE';
   if (estContinu(e)) return 'continu';
   if (isEffectAlteration(e.description)) return 'alteration';
   return null;
 }
 
+function contexteQuiRemplitLaCondition(e: EffetImprime) {
+  if (e.type === 'AMBUSH') return { wasRevealed: true };
+  if (e.type === 'FIRST_STRIKE') return { wasFirstCard: true };
+  if (e.type === 'UPGRADE') return { wasUpgrade: true };
+  return {};
+}
+
 const TOUS_LES_CONTEXTES = [
-  { wasRevealed: false, wasFirstCard: false },
-  { wasRevealed: true, wasFirstCard: false },
-  { wasRevealed: false, wasFirstCard: true },
-  { wasRevealed: true, wasFirstCard: true },
+  { wasRevealed: false, wasFirstCard: false, wasUpgrade: false },
+  { wasRevealed: true, wasFirstCard: true, wasUpgrade: true },
 ];
 
 describe('aucune carte ne devient incopiable par accident', () => {
@@ -42,13 +46,7 @@ describe('aucune carte ne devient incopiable par accident', () => {
       for (const effet of carte.effects ?? []) {
         if (raisonDeNonCopie(effet)) continue;
 
-        const contexte = effet.type === 'AMBUSH'
-          ? { wasRevealed: true, wasFirstCard: true }
-          : effet.type === 'FIRST_STRIKE'
-            ? { wasRevealed: false, wasFirstCard: true }
-            : { wasRevealed: false, wasFirstCard: false };
-
-        if (!isCopyableEffect(effet, contexte)) {
+        if (!isCopyableEffect(effet, contexteQuiRemplitLaCondition(effet))) {
           fautifs.push(`${carte.id} ${carte.name_fr}: ${effet.type} refuse alors que rien ne l interdit`);
         }
       }
@@ -56,8 +54,8 @@ describe('aucune carte ne devient incopiable par accident', () => {
 
     expect(
       fautifs,
-      'un effet instantane qui n est ni SCORE, ni UPGRADE, ni continu, ni une alteration doit '
-      + 'toujours pouvoir etre copie dans le bon contexte:\n' + fautifs.join('\n'),
+      'un effet instantane qui n est ni SCORE, ni continu, ni une alteration doit '
+      + 'toujours pouvoir etre copie par un copieur qui remplit sa condition:\n' + fautifs.join('\n'),
     ).toEqual([]);
   });
 
@@ -98,13 +96,16 @@ describe('aucune carte ne devient incopiable par accident', () => {
           continue;
         }
         if (effet.type === 'AMBUSH') {
-          expect(isCopyableEffect(effet, { wasRevealed: false, wasFirstCard: true }), `${carte.id} AMBUSH sans revelation`).toBe(false);
-          expect(isCopyableEffect(effet, { wasRevealed: true, wasFirstCard: false }), `${carte.id} AMBUSH apres revelation`).toBe(true);
+          expect(isCopyableEffect(effet, { wasRevealed: false, wasFirstCard: true, wasUpgrade: true }), `${carte.id} AMBUSH sans revelation`).toBe(false);
+          expect(isCopyableEffect(effet, { wasRevealed: true }), `${carte.id} AMBUSH apres revelation`).toBe(true);
         } else if (effet.type === 'FIRST_STRIKE') {
-          expect(isCopyableEffect(effet, { wasRevealed: true, wasFirstCard: false }), `${carte.id} FIRST STRIKE hors premiere carte`).toBe(false);
-          expect(isCopyableEffect(effet, { wasRevealed: false, wasFirstCard: true }), `${carte.id} FIRST STRIKE en premiere carte`).toBe(true);
+          expect(isCopyableEffect(effet, { wasRevealed: true, wasFirstCard: false, wasUpgrade: true }), `${carte.id} FIRST STRIKE hors premiere carte`).toBe(false);
+          expect(isCopyableEffect(effet, { wasFirstCard: true }), `${carte.id} FIRST STRIKE en premiere carte`).toBe(true);
+        } else if (effet.type === 'UPGRADE') {
+          expect(isCopyableEffect(effet, { wasRevealed: true, wasFirstCard: true, wasUpgrade: false }), `${carte.id} UPGRADE sans amelioration`).toBe(false);
+          expect(isCopyableEffect(effet, { wasUpgrade: true }), `${carte.id} UPGRADE apres amelioration`).toBe(true);
         } else {
-          expect(isCopyableEffect(effet, { wasRevealed: false, wasFirstCard: false }), `${carte.id} ${effet.type} toujours copiable`).toBe(true);
+          expect(isCopyableEffect(effet, {}), `${carte.id} ${effet.type} toujours copiable`).toBe(true);
         }
       }
     }
@@ -165,5 +166,65 @@ describe('SAKON 062 offre exactement les Sound Four que la regle autorise', () =
       apres.log.some((l) => l.messageKey === 'game.log.effect.noTarget'),
       'TAYUYA 125 ne porte quun MAIN continu et un UPGRADE, le refus doit etre annonce',
     ).toBe(true);
+  });
+});
+
+describe('SAKON 062 pose en amelioration peut copier un UPGRADE', () => {
+  function plateauAmelioration(autre: string): GameState {
+    const s = buildSimState({ p1: [], p2: [], missions: 2, chakra1: 40, edgeHolder: 'player1' });
+    s.phase = 'action';
+    s.activePlayer = 'player1';
+    s.player1.hand = [];
+    s.firstStrike = { player1: 'available', player2: 'available' };
+    s.activeMissions[1].player1Characters.push(
+      simChar(autre, { owner: 'player1', instanceId: 'autre', missionIndex: 1 }) as never,
+    );
+    s.activeMissions[0].player1Characters.push(
+      simChar('KS-061-C', { owner: 'player1', instanceId: 'socle' }) as never,
+    );
+    s.activeMissions[0].player1Characters.push({
+      ...simChar('KS-062-UC', { owner: 'player1', instanceId: 'sakon' }),
+      isHidden: true,
+    } as never);
+    return s;
+  }
+
+  function reveleEnAmelioration(autre: string): GameState {
+    return GameEngine.applyAction(plateauAmelioration(autre), 'player1', {
+      type: 'REVEAL_CHARACTER', missionIndex: 0, characterInstanceId: 'sakon',
+      upgradeTargetInstanceId: 'socle',
+    } as never);
+  }
+
+  function proposeLaCopie(s: GameState): boolean {
+    return s.pendingActions.some((p) => p.descriptionKey === 'game.effect.desc.sakon062ConfirmAmbush');
+  }
+
+  it('TAYUYA 125, dont seul l UPGRADE est copiable, devient une cible', () => {
+    expect(
+      proposeLaCopie(reveleEnAmelioration('KS-125-R')),
+      'son MAIN est continu et son UPGRADE demande une amelioration: SAKON ameliore remplit la condition',
+    ).toBe(true);
+  });
+
+  it('la meme TAYUYA reste refusee quand SAKON est revele sans ameliorer', () => {
+    const sansSocle = plateauAmelioration('KS-125-R');
+    sansSocle.activeMissions[0].player1Characters =
+      sansSocle.activeMissions[0].player1Characters.filter((c) => c.instanceId !== 'socle');
+    const apres = GameEngine.applyAction(sansSocle, 'player1', {
+      type: 'REVEAL_CHARACTER', missionIndex: 0, characterInstanceId: 'sakon',
+    } as never);
+    expect(proposeLaCopie(apres), 'sans amelioration, aucun UPGRADE n est copiable').toBe(false);
+  });
+
+  it('KAKASHI 016 refuse les UPGRADE meme en amelioration, son texte l interdit', async () => {
+    const { isCopyableEffect: predicat } = await import('@/lib/effects/handlers/KS/shared/copyExclusions');
+    const upgradeDeTayuya = (allCardData.cards as Record<string, CardData & { effects?: EffetImprime[] }>)['KS-125-R']
+      .effects!.find((e) => e.type === 'UPGRADE')!;
+    expect(predicat(upgradeDeTayuya, { wasUpgrade: true, copieur: 'KS-062-UC' })).toBe(true);
+    expect(
+      predicat(upgradeDeTayuya, { wasUpgrade: true, copieur: 'KS-016-UC' }),
+      'KAKASHI 016 imprime "non-upgrade"',
+    ).toBe(false);
   });
 });

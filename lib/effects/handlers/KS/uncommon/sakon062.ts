@@ -21,7 +21,7 @@ function handleSakon062Ambush(ctx: EffectContext): EffectResult {
       if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
         
         const hasInstantEffect = topCard.effects?.some((eff) => {
-          return isCopyableEffect(eff, { wasRevealed: ctx.wasRevealed, wasFirstCard: ctx.wasFirstCard });
+          return isCopyableEffect(eff, { wasRevealed: ctx.wasRevealed, wasFirstCard: ctx.wasFirstCard, wasUpgrade: ctx.isUpgrade, copieur: 'KS-062-UC' });
         });
         if (hasInstantEffect) {
           validTargets.push(char.instanceId);

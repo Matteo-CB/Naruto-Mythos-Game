@@ -1,5 +1,6 @@
 import type { CharacterCard, CharacterInPlay } from '@/lib/engine/types';
 import { textIsBlanked } from '@/lib/effects/handlers/SS/attachmentStatics';
+import { getCardById } from '@/lib/data/cardIndex';
 
 
 const UNCOPYABLE_KS_CARD_NUMBERS = new Set<number>([
@@ -32,19 +33,41 @@ export function isEffectAlteration(description: string | undefined | null): bool
 
 
 export function isCopyableEffectType(effectType: string | undefined | null): boolean {
-  return effectType !== 'SCORE' && effectType !== 'UPGRADE';
+  return effectType !== 'SCORE';
+}
+
+
+const MOTIF_SANS_UPGRADE = /non[- ]upgrade/i;
+
+export function copieurRefuseLesUpgrades(copieurCardId: string | undefined | null): boolean {
+  if (!copieurCardId) return false;
+  const carte = getCardById(copieurCardId) as { effects?: Array<{ description?: string }> } | undefined;
+  if (!carte?.effects) return false;
+  return carte.effects.some((e) => MOTIF_SANS_UPGRADE.test(e.description ?? ''));
+}
+
+
+export interface ContexteDeCopie {
+  wasRevealed?: boolean;
+  wasFirstCard?: boolean;
+  wasUpgrade?: boolean;
+  copieur?: string;
 }
 
 
 export function isCopyableEffect(
   effect: { type: string; description?: string } | undefined | null,
-  context: { wasRevealed?: boolean; wasFirstCard?: boolean },
+  context: ContexteDeCopie,
 ): boolean {
   if (!effect) return false;
   if (!isCopyableEffectType(effect.type)) return false;
-  if (effect.type === 'AMBUSH' && !context.wasRevealed) return false;
-  if (effect.type === 'FIRST_STRIKE' && !context.wasFirstCard) return false;
   if (effect.description?.includes('[⧗]')) return false;
   if (isEffectAlteration(effect.description)) return false;
+  if (effect.type === 'AMBUSH' && !context.wasRevealed) return false;
+  if (effect.type === 'FIRST_STRIKE' && !context.wasFirstCard) return false;
+  if (effect.type === 'UPGRADE') {
+    if (!context.wasUpgrade) return false;
+    if (copieurRefuseLesUpgrades(context.copieur)) return false;
+  }
   return true;
 }

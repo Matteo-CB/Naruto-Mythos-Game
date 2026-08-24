@@ -22,7 +22,7 @@ function handleKakashi016Main(ctx: EffectContext): EffectResult {
 
       
       const hasInstantEffect = topCard.effects?.some(effect => {
-        return isCopyableEffect(effect, { wasRevealed: ctx.wasRevealed, wasFirstCard: ctx.wasFirstCard });
+        return isCopyableEffect(effect, { wasRevealed: ctx.wasRevealed, wasFirstCard: ctx.wasFirstCard, wasUpgrade: ctx.isUpgrade, copieur: ctx.sourceCard.card.id });
       });
 
       if (hasInstantEffect) {
