@@ -4,6 +4,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { moveWouldViolateNameUniqueness } from '@/lib/effects/moveNameUniqueness';
 import { sideKey, topOf } from './sandMove';
+import { coutsDesSonQuatreDansMission, estSonQuatreReel } from '@/lib/effects/soundFourCount';
 
 export const KIDOMARU_035_ID = 'SS-035-UC';
 export const KIDOMARU_035_NAME = 'KIDÔMARU';
@@ -20,7 +21,7 @@ export function friendlySoundFourIn(
   return mission[sideKey(player)].filter((c) => {
     if (c.isHidden) return false;
     if (c.instanceId === sourceInstanceId) return false;
-    return (topOf(c).keywords ?? []).includes('Sound Four');
+    return estSonQuatreReel(c);
   });
 }
 
@@ -63,12 +64,11 @@ function refuse(state: GameState, player: PlayerID, texte: string): EffectResult
 function kidomaru035Upgrade(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
 
-  const allies = friendlySoundFourIn(state, sourcePlayer, sourceMissionIndex, sourceCard.instanceId);
-  if (allies.length === 0) {
+  const limites = coutsDesSonQuatreDansMission(state, sourcePlayer, sourceMissionIndex, sourceCard.instanceId);
+  if (limites.length === 0) {
     return refuse(state, sourcePlayer, 'Kidomaru (035) UPGRADE: no other friendly Sound Four character in this mission.');
   }
 
-  const limites = allies.map((a) => targetedCostOf(a));
   const limiteMax = Math.max(...limites);
   if (movableUnderCost(state, limiteMax).length === 0) {
     return refuse(state, sourcePlayer, 'Kidomaru (035) UPGRADE: no character can be moved within the cost limits of the friendly Sound Four characters.');

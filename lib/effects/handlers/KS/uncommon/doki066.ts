@@ -1,7 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
-import { virtualSoundFourCount } from '@/lib/effects/handlers/SS/attachmentStatics';
+import { missionADuSonQuatre } from '@/lib/effects/soundFourCount';
 
 
 
@@ -9,19 +9,12 @@ function handleDoki066Main(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceMissionIndex } = ctx;
   const mission = state.activeMissions[sourceMissionIndex];
   const friendlySide = sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
-  const friendlyChars = mission[friendlySide];
   const opponentPlayer = sourcePlayer === 'player1' ? 'player2' : 'player1';
+  void friendlySide;
 
-  
-  const hasSoundFour = friendlyChars.some((char) => {
-    if (char.instanceId === ctx.sourceCard.instanceId) return false; // Don't count self
-    if (char.isHidden) return false;
-    const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-    return topCard.keywords && topCard.keywords.includes('Sound Four');
-  });
-  const laboratoireSon4 = virtualSoundFourCount(mission, sourcePlayer) > 0;
+  const aDuSonQuatre = missionADuSonQuatre(state, sourcePlayer, sourceMissionIndex, ctx.sourceCard.instanceId);
 
-  if (!hasSoundFour && !laboratoireSon4) {
+  if (!aDuSonQuatre) {
     const log = logAction(
       state.log,
       state.turn,

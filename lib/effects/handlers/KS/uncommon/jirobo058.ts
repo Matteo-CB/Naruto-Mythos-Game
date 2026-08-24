@@ -1,6 +1,7 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { estSonQuatreReel } from '@/lib/effects/soundFourCount';
 
 
 
@@ -16,7 +17,7 @@ function handleJirobo058Main(ctx: EffectContext): EffectResult {
     if (char.instanceId === sourceCard.instanceId) continue;
     if (char.isHidden) continue;
     const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-    if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
+    if (estSonQuatreReel(char)) {
       hasTarget = true;
       break;
     }
@@ -54,7 +55,7 @@ function handleJirobo058Upgrade(ctx: EffectContext): EffectResult {
       if (char.instanceId === sourceCard.instanceId) continue;
       if (char.isHidden) continue;
       const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-      if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
+      if (estSonQuatreReel(char)) {
         hasTarget = true;
         break;
       }

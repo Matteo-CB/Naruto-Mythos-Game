@@ -2,7 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { isMovementBlockedByKurenai } from '@/lib/effects/ContinuousEffects';
-import { virtualSoundFourCount } from '@/lib/effects/handlers/SS/attachmentStatics';
+import { compterMissionsAvecSonQuatre } from '@/lib/effects/soundFourCount';
 
 
 function handleKidomaru059Main(ctx: EffectContext): EffectResult {
@@ -11,17 +11,7 @@ function handleKidomaru059Main(ctx: EffectContext): EffectResult {
     sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
 
   
-  let soundFourMissionCount = 0;
-  for (const mission of state.activeMissions) {
-    const hasSoundFour = mission[friendlySide].some((char) => {
-      if (char.instanceId === ctx.sourceCard.instanceId) return false;
-      if (char.isHidden) return false; // Hidden chars are anonymous - can't identify keyword
-      const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-      return topCard.keywords && topCard.keywords.includes('Sound Four');
-    });
-  const laboratoireSon4 = virtualSoundFourCount(mission, sourcePlayer) > 0;
-    if (hasSoundFour || laboratoireSon4) soundFourMissionCount++;
-  }
+  const soundFourMissionCount = compterMissionsAvecSonQuatre(state, sourcePlayer, ctx.sourceCard.instanceId);
 
   if (soundFourMissionCount === 0) {
     return { state: { ...state, log: logAction(state.log, state.turn, state.phase, sourcePlayer, 'EFFECT_NO_TARGET',

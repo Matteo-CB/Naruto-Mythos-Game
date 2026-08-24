@@ -16,6 +16,7 @@ type GameStateWithMoveGrant = GameState & { _ss117ChakraGranted?: Partial<Record
 import { characterHasGroup } from './groupUtils';
 import { postMoveHide as choji018PostMoveHide } from './handlers/KS/uncommon/choji018';
 import { buildPlayLessTargets, playLessRevealBlockedName, type PlayLessCategory } from './handlers/shared/playLess';
+import { compterMissionsAvecSonQuatre, missionADuSonQuatre, estSonQuatreReel } from './soundFourCount';
 import { ss000DeckHounds, ss000FinalizeSearch, ss000HoundChoicePayload, SS000_NINJA_HOUND } from './handlers/SS/ss000Search';
 import { topmostHinataIndexInDiscard } from './handlers/SS/shinobi';
 import { missionCarries, SS_MISSION_LOW_PROFILE } from './missions/ssMissions';
@@ -5796,16 +5797,8 @@ export class EffectEngine {
         const j057Player = pendingEffect.sourcePlayer;
         const j057FriendlySide = j057Player === 'player1' ? 'player1Characters' : 'player2Characters';
 
-        let j057Count = 0;
-        for (const mission of newState.activeMissions) {
-          const hasSF = (mission as any)[j057FriendlySide].some((char: CharacterInPlay) => {
-            if (char.instanceId === pendingEffect.sourceInstanceId) return false;
-            if (char.isHidden) return false;
-            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-            return topCard.keywords && topCard.keywords.includes('Sound Four');
-          });
-          if (hasSF) j057Count++;
-        }
+        void j057FriendlySide;
+        const j057Count = compterMissionsAvecSonQuatre(newState, j057Player, pendingEffect.sourceInstanceId);
 
         if (j057Count === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, j057Player,
@@ -5844,8 +5837,7 @@ export class EffectEngine {
           for (const char of (j058Mission as any)[j058FriendlySide] as CharacterInPlay[]) {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             if (char.isHidden) continue;
-            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-            if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
+            if (estSonQuatreReel(char)) {
               j058Targets.push({ missionIndex: pendingEffect.sourceMissionIndex, instanceId: char.instanceId });
             }
           }
@@ -5889,8 +5881,7 @@ export class EffectEngine {
           for (const char of (mission as any)[j058uFriendlySide] as CharacterInPlay[]) {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             if (char.isHidden) continue;
-            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-            if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
+            if (estSonQuatreReel(char)) {
               j058uTargets.push({ missionIndex: mIdx, instanceId: char.instanceId });
             }
           }
@@ -5928,16 +5919,7 @@ export class EffectEngine {
           k059Player === 'player1' ? 'player1Characters' : 'player2Characters';
 
         
-        let k059X = 0;
-        for (const mission of newState.activeMissions) {
-          const hasSF = (mission as any)[k059FriendlySide].some((char: CharacterInPlay) => {
-            if (char.instanceId === pendingEffect.sourceInstanceId) return false;
-            if (char.isHidden) return false;
-            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-            return topCard.keywords && topCard.keywords.includes('Sound Four');
-          });
-          if (hasSF) k059X++;
-        }
+        const k059X = compterMissionsAvecSonQuatre(newState, k059Player, pendingEffect.sourceInstanceId);
 
         if (k059X === 0 || newState.activeMissions.length < 2) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, k059Player,
@@ -6160,17 +6142,7 @@ export class EffectEngine {
       case 'SAKON061_CONFIRM_MAIN': {
         
         const s061Player = pendingEffect.sourcePlayer;
-        const s061FriendlySide = s061Player === 'player1' ? 'player1Characters' : 'player2Characters';
-        let s061Count = 0;
-        for (const mission of newState.activeMissions) {
-          const hasSF = (mission as any)[s061FriendlySide].some((char: CharacterInPlay) => {
-            if (char.instanceId === pendingEffect.sourceInstanceId) return false;
-            if (char.isHidden) return false;
-            const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-            return topCard.keywords && topCard.keywords.includes('Sound Four');
-          });
-          if (hasSF) s061Count++;
-        }
+        const s061Count = compterMissionsAvecSonQuatre(newState, s061Player, pendingEffect.sourceInstanceId);
 
         if (s061Count === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, s061Player,
@@ -6206,7 +6178,7 @@ export class EffectEngine {
             if (char.instanceId === pendingEffect.sourceInstanceId) continue;
             if (!isCopyableCharacter(char)) continue;
             const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-            if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
+            if (estSonQuatreReel(char)) {
               const hasInstant = topCard.effects?.some((eff: any) => {
                 return isCopyableEffect(eff, { wasRevealed: true, wasFirstCard: pendingEffect.wasFirstCard, wasUpgrade: pendingEffect.isUpgrade, copieur: pendingEffect.sourceCardId });
               });
@@ -6469,14 +6441,10 @@ export class EffectEngine {
         if (!d066SrcChar) break;
         const d066Mission = newState.activeMissions[d066SrcChar.missionIndex];
         if (!d066Mission) break;
-        const d066FriendlySide = d066Player === 'player1' ? 'player1Characters' : 'player2Characters';
-
-        const d066HasSF = (d066Mission as any)[d066FriendlySide].some((char: CharacterInPlay) => {
-          if (char.instanceId === pendingEffect.sourceInstanceId) return false;
-          if (char.isHidden) return false;
-          const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-          return topCard.keywords && topCard.keywords.includes('Sound Four');
-        });
+        void d066Mission;
+        const d066HasSF = missionADuSonQuatre(
+          newState, d066Player, d066SrcChar.missionIndex, pendingEffect.sourceInstanceId,
+        );
 
         if (!d066HasSF) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, d066Player,

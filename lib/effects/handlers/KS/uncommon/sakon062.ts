@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { isCopyableCharacter, isCopyableEffect } from '@/lib/effects/handlers/KS/shared/copyExclusions';
+import { estSonQuatreReel } from '@/lib/effects/soundFourCount';
 
 
 
@@ -18,7 +19,7 @@ function handleSakon062Ambush(ctx: EffectContext): EffectResult {
       if (char.instanceId === sourceCard.instanceId) continue;
       if (!isCopyableCharacter(char)) continue;
       const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-      if (topCard.keywords && topCard.keywords.includes('Sound Four')) {
+      if (estSonQuatreReel(char)) {
         
         const hasInstantEffect = topCard.effects?.some((eff) => {
           return isCopyableEffect(eff, { wasRevealed: ctx.wasRevealed, wasFirstCard: ctx.wasFirstCard, wasUpgrade: ctx.isUpgrade, copieur: 'KS-062-UC' });

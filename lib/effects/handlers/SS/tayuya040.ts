@@ -4,7 +4,7 @@ import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { playLessSelectionResult } from '../shared/playLess';
 import { sideKey, topOf } from './sandMove';
-import { virtualSoundFourCount } from '@/lib/effects/handlers/SS/attachmentStatics';
+import { compterSonQuatreDansMission } from '@/lib/effects/soundFourCount';
 
 export const TAYUYA_040_ID = 'SS-040-UC';
 export const TAYUYA_040_NAME = 'TAYUYA';
@@ -42,13 +42,8 @@ export function tayuya040Reductions(
   for (const i of missions) {
     const mission = state.activeMissions[i];
     if (!mission) continue;
-    let compte = 0;
-    for (const char of mission[side]) {
-      if (char.isHidden) continue;
-      if (sourceInstanceId && char.instanceId === sourceInstanceId) continue;
-      if ((topOf(char).keywords ?? []).includes('Sound Four')) compte += 1;
-    }
-    table[i] = compte + virtualSoundFourCount(mission, player);
+    void side;
+    table[i] = compterSonQuatreDansMission(state, player, i, sourceInstanceId);
   }
   return table;
 }
