@@ -13,11 +13,13 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "feature",
         "fix",
         "fix"
       ],
       "changes_fr": [
+        "Un équipement de mission s'affiche pivoté et en entier dans la liste du deck, au même format que les autres cartes.",
         "Export PDF : les équipements de mission sortent couchés comme les missions, et toutes les cartes remplissent la même case.",
         "KING OF THE HILL : un personnage caché compte pour désigner le plus fort, et prend le +3 s'il est seul devant.",
         "ZABUZA MOMOCHI 136 : une carte révélée par-dessus une autre grâce à une remise reste une cible valide.",
@@ -26,6 +28,7 @@
         "Un personnage sous BOMBE AVEUGLANTE 083 n a plus aucun effet : ROCK LEE et GAÏ perdent leurs jetons en fin de tour, les auras, immunités et blocages s éteignent."
       ],
       "changes_en": [
+        "A mission attachment now shows rotated and in full in the deck list, at the same size as the other cards.",
         "PDF export: mission attachments come out landscape like missions, and every card fills the same slot exactly.",
         "KING OF THE HILL: a face-down character counts when finding the strongest, and takes the +3 if it is alone in front.",
         "ZABUZA MOMOCHI 136: a card revealed on top of another thanks to a discount stays a valid target.",
@@ -34,6 +37,7 @@
         "A character under FLASH BOMB 083 has no effect left: ROCK LEE and GAI lose their tokens at end of round, and auras, immunities and locks all switch off."
       ],
       "changes_es": [
+        "Un equipo de misión se muestra girado y completo en la lista del mazo, al mismo tamaño que las demás cartas.",
         "Exportar PDF: los equipos de misión salen apaisados como las misiones, y todas las cartas llenan la misma casilla.",
         "KING OF THE HILL: un personaje bocabajo cuenta para hallar al más fuerte, y se lleva el +3 si está solo al frente.",
         "ZABUZA MOMOCHI 136: una carta revelada encima de otra gracias a una rebaja sigue siendo un objetivo válido.",
@@ -42,6 +46,7 @@
         "Un personaje bajo BOMBA CEGADORA 083 ya no tiene ningún efecto: ROCK LEE y GAI pierden sus fichas al final de la ronda, y auras, inmunidades y bloqueos se apagan."
       ],
       "changes_pt": [
+        "Um equipamento de missão aparece girado e inteiro na lista do deck, no mesmo formato das outras cartas.",
         "Exportar PDF: os equipamentos de missão saem deitados como as missões, e todas as cartas preenchem a mesma casa.",
         "KING OF THE HILL: um personagem virado conta para achar o mais forte, e leva o +3 se estiver sozinho na frente.",
         "ZABUZA MOMOCHI 136: uma carta revelada por cima de outra graças a um desconto continua sendo um alvo válido.",
@@ -50,6 +55,7 @@
         "Uma personagem sob BOMBA OFUSCANTE 083 deixa de ter qualquer efeito: ROCK LEE e GAI perdem as fichas no fim da ronda, e auras, imunidades e bloqueios desligam-se."
       ],
       "changes_it": [
+        "Un equipaggiamento missione appare ruotato e per intero nella lista del mazzo, nello stesso formato delle altre carte.",
         "Esportazione PDF: gli equipaggiamenti missione escono orizzontali come le missioni, e ogni carta riempie la stessa casella.",
         "KING OF THE HILL: un personaggio coperto conta per trovare il più forte, e prende il +3 se è solo in testa.",
         "ZABUZA MOMOCHI 136: una carta rivelata sopra un'altra grazie a uno sconto resta un bersaglio valido.",
@@ -58,6 +64,7 @@
         "Un personaggio sotto BOMBA ACCECANTE 083 non ha più alcun effetto: ROCK LEE e GAI perdono i gettoni a fine round, e aure, immunità e blocchi si spengono."
       ],
       "changes_pl": [
+        "Wyposażenie misji wyświetla się obrócone i w całości na liście talii, w tym samym formacie co inne karty.",
         "Eksport PDF: wyposażenie misji drukuje się poziomo jak misje, a każda karta wypełnia dokładnie to samo pole.",
         "KING OF THE HILL: zakryta postać liczy się przy wyborze najsilniejszej i bierze +3, gdy jest sama na czele.",
         "ZABUZA MOMOCHI 136: karta odkryta na innej dzięki zniżce nadal jest prawidłowym celem.",
@@ -66,6 +73,7 @@
         "Postać pod BOMBĄ OŚLEPIAJĄCĄ 083 nie ma już żadnego efektu: ROCK LEE i GAI tracą żetony na koniec rundy, a aury, odporności i blokady wygasają."
       ],
       "changes_ja": [
+        "ミッション用の装備がデッキ一覧で回転して全体表示され、他のカードと同じ形になりました。",
         "PDF書き出し：ミッション用の装備がミッションと同じ横向きで出力され、すべてのカードが同じ枠をぴったり埋めます。",
         "KING OF THE HILL：裏向きのキャラクターも最強を決める対象に入り、単独で先頭なら+3を得ます。",
         "ZABUZA MOMOCHI 136：割引で別のカードの上に表向きにしたカードも、正しい対象のままになりました。",

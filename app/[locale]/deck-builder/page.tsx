@@ -336,7 +336,7 @@ const DeckCard = memo(function DeckCard({
   holoAvailable?: boolean;
   holoLabel?: string;
 }) {
-  const imgPath = normalizeImagePath(card.image_file);
+  const imgPath = portraitImagePath(card);
   const showHoloButton = !!onToggleHolo && (holoAvailable || card.isHolo);
   return (
     <div

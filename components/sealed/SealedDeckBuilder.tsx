@@ -7,7 +7,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import type { BoosterCard } from '@/lib/sealed/boosterGenerator';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { MIN_DECK_SIZE, MISSION_CARDS_PER_PLAYER } from '@/lib/engine/types';
-import { normalizeImagePath } from '@/lib/utils/imagePath';
+import { normalizeImagePath, portraitImagePath } from '@/lib/utils/imagePath';
 import { isLandscapeCard } from '@/lib/cards/orientation';
 import { getCardName, getCardTitle, getCardGroup, getCardKeyword, getRarityLabel } from '@/lib/utils/cardLocale';
 import { getCardEffectDescription } from '@/lib/data/effectDescriptions';
@@ -528,7 +528,7 @@ export function SealedDeckBuilder({
                 const inDeck = deckCardCounts.get(card.id) ?? 0;
                 const inPool = poolAvailability.get(card.id) ?? 0;
                 const canAdd = canAddChar(card);
-                const imgPath = normalizeImagePath(card.image_file);
+                const imgPath = portraitImagePath(card);
                 const rarityColor = rarityColors[card.rarity] ?? '#888';
 
                 return (
