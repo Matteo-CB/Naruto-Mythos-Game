@@ -103,23 +103,12 @@ export function referenceOfficielle(carte: CarteImprimee, index: IndexDesTirages
   const total = index.comptages.get(setId) ?? 0;
 
   if (estUneMission(carte)) {
-    const ordinal = ordinalDuTirage(carte.cardId ?? carte.id);
-    const suffixe = ordinal > 1 ? `-${ordinal}` : '';
-    return `${numeroSet}-MSS${String(numero).padStart(2, '0')}${suffixe}`;
+    return `${numeroSet}-MSS${String(numero).padStart(2, '0')}`;
   }
 
   const base = `${numeroSet}-${numero}/${total}`;
-  if (estLeTirageDeBase(carte, index)) return base;
-
   const lettre = lettreDeVariante(carte.rarity);
-  const liste = index.parEmplacement.get(emplacement(carte)) ?? [];
-  const memeLettre = liste.filter(
-    (c) => !estLeTirageDeBase(c, index) && lettreDeVariante(c.rarity) === lettre,
-  );
-
-  if (lettre && memeLettre.length <= 1) return `${base} ${lettre}`;
-  const precis = codeDeTirage(carte);
-  return lettre ? `${base} ${lettre}-${precis}` : `${base} ${precis}`;
+  return lettre ? `${base} ${lettre}` : base;
 }
 
 const SEPARATEUR = '   ';
@@ -132,7 +121,6 @@ export function nomAffiche(carte: CarteImprimee): string {
 }
 
 export function construireDecklist(
-  nomDuDeck: string,
   personnages: CarteImprimee[],
   missions: CarteImprimee[],
   toutesLesCartes: CarteImprimee[],
@@ -151,8 +139,6 @@ export function construireDecklist(
   };
 
   const lignes: string[] = [];
-  if (nomDuDeck.trim()) lignes.push(nomDuDeck.trim(), '');
-
   lignes.push(`Main Deck: ${personnages.length}`);
   for (const { carte, quantite } of compter(personnages)) {
     lignes.push(
@@ -173,8 +159,22 @@ export interface LigneAnalysee {
   setNumero: number;
   carteNumero: number;
   marqueur: string;
+  libelle: string;
   mission: boolean;
   brut: string;
+}
+
+export function normaliserLibelle(texte: string): string {
+  return texte
+    .replace(/[‘’“”]/g, '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, ' ')
+    .trim();
+}
+
+function libelleDeLaLigne(brut: string): string {
+  const avantParenthese = brut.slice(0, brut.lastIndexOf('('));
+  return normaliserLibelle(avantParenthese.replace(QUANTITE, ''));
 }
 
 const LIGNE_MISSION = /\(\s*(\d+)\s*-\s*MSS\s*(\d+)\s*(?:-\s*(\d+))?\s*\)/i;
@@ -192,6 +192,7 @@ export function analyserLigne(ligne: string): LigneAnalysee | null {
       setNumero: parseInt(mission[1], 10),
       carteNumero: parseInt(mission[2], 10),
       marqueur: mission[3] ?? '',
+      libelle: libelleDeLaLigne(brut),
       mission: true,
       brut,
     };
@@ -206,6 +207,7 @@ export function analyserLigne(ligne: string): LigneAnalysee | null {
     setNumero: parseInt(carte[1], 10),
     carteNumero: parseInt(carte[2], 10),
     marqueur: (carte[4] ?? '').trim().toUpperCase(),
+    libelle: libelleDeLaLigne(brut),
     mission: false,
     brut,
   };
@@ -235,14 +237,24 @@ export function resoudreLigne(
   const liste = index.parEmplacement.get(cle);
   if (!liste || liste.length === 0) return null;
 
+  const parLeLibelle = (candidats: CarteImprimee[]): CarteImprimee => {
+    if (candidats.length === 1 || !ligne.libelle) return candidats[0];
+    return candidats.find((c) => normaliserLibelle(nomAffiche(c)) === ligne.libelle) ?? candidats[0];
+  };
+
   if (ligne.mission) {
     const missions = liste.filter(estUneMission);
     if (missions.length === 0) return null;
-    const voulu = ligne.marqueur ? parseInt(ligne.marqueur, 10) : 1;
-    return missions.find((c) => ordinalDuTirage(c.cardId ?? c.id) === voulu) ?? missions[0];
+    return parLeLibelle(missions);
   }
 
-  if (!ligne.marqueur) return liste[0];
+  const personnages = liste.filter((c) => !estUneMission(c));
+  if (personnages.length === 0) return null;
+
+  if (!ligne.marqueur) {
+    const sansLettre = personnages.filter((c) => !lettreDeVariante(c.rarity));
+    return parLeLibelle(sansLettre.length > 0 ? sansLettre : personnages);
+  }
 
   const morceaux = ligne.marqueur.split('-').filter(Boolean);
   for (const morceau of morceaux) {
@@ -251,9 +263,8 @@ export function resoudreLigne(
   }
 
   const lettre = morceaux[0] ?? '';
-  const variantes = liste.filter((c) => !estLeTirageDeBase(c, index));
-  const parLettre = variantes.filter((c) => lettreDeVariante(c.rarity) === lettre);
-  if (parLettre.length > 0) return parLettre[0];
+  const parLettre = personnages.filter((c) => lettreDeVariante(c.rarity) === lettre);
+  if (parLettre.length > 0) return parLeLibelle(parLettre);
 
-  return liste[0];
+  return parLeLibelle(personnages);
 }

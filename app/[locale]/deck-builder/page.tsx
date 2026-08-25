@@ -825,10 +825,6 @@ export default function DeckBuilderPage() {
       const persosLus: CharacterCard[] = [];
       const missionsLues: MissionCard[] = [];
       const introuvables: string[] = [];
-      const premiereLigne = (code.split('\n')[0] ?? '').trim();
-      const nomLu = /\(/.test(premiereLigne) || /^(main deck|missions)/i.test(premiereLigne)
-        ? '' : premiereLigne;
-
       for (const ligne of analyserDecklist(code)) {
         const carte = resoudreLigne(ligne, index, setParNumero);
         if (!carte) { introuvables.push(ligne.brut); continue; }
@@ -840,7 +836,6 @@ export default function DeckBuilderPage() {
       }
 
       clearDeck();
-      if (nomLu) setDeckName(nomLu);
       const charParId = new Map(allChars.map((c) => [c.cardId, c]));
       const remplacerParLaBase = (carte: CharacterCard): CharacterCard => {
         if (isLockedVariantCard(carte) && !unlockedVariantIds.has(carte.id)) {
@@ -855,7 +850,7 @@ export default function DeckBuilderPage() {
       if (introuvables.length > 0) {
         setImportMessage({ type: "error", text: t("deckBuilder.importNotFound", { count: introuvables.length, ids: introuvables.join(", ") }) });
       } else {
-        setImportMessage({ type: "success", text: t("deckBuilder.importSuccess", { name: nomLu || "Deck", chars: persosLus.length, missions: missionsLues.length }) });
+        setImportMessage({ type: "success", text: t("deckBuilder.importSuccess", { name: deckName || "Deck", chars: persosLus.length, missions: missionsLues.length }) });
       }
       setImportCode("");
       return;
@@ -968,12 +963,11 @@ export default function DeckBuilderPage() {
 
   const exportCode = useMemo(
     () => construireDecklist(
-      deckName,
       deckChars as unknown as CarteImprimee[],
       deckMissions as unknown as CarteImprimee[],
       [...allChars, ...allMissions] as unknown as CarteImprimee[],
     ),
-    [deckName, deckChars, deckMissions, allChars, allMissions],
+    [deckChars, deckMissions, allChars, allMissions],
   );
 
   const handleCopyExportCode = useCallback(() => {

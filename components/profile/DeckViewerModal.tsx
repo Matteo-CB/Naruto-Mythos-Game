@@ -106,7 +106,6 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, isOwner,
       .map((id) => getMissionById(id))
       .filter((m): m is NonNullable<typeof m> => m != null);
     return construireDecklist(
-      deck.name,
       chars as unknown as CarteImprimee[],
       miss as unknown as CarteImprimee[],
       getAllCards() as unknown as CarteImprimee[],

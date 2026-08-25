@@ -42,7 +42,7 @@ describe('la reference reproduit les exemples officiels', () => {
     ['KS-001-MMS', '1-MSS01'],
     ['SS-004-MMS', '2-MSS04'],
     ['KS-010-MMS', '1-MSS10'],
-    ['SS-004_2-MMS', '2-MSS04-2'],
+    ['SS-004_2-MMS', '2-MSS04'],
   ];
   for (const [id, attendu] of attendus) {
     it(`${id} donne ${attendu}`, () => {
@@ -77,7 +77,7 @@ describe('la decklist est ecrite en anglais quelle que soit la langue du site', 
 
   it('une decklist complete ne contient aucun mot francais', () => {
     const texte = construireDecklist(
-      'Deck', [carte('KS-007-C'), carte('KS-013-C'), carte('KS-017-C')], [carte('KS-002-MMS')], CARTES,
+      [carte('KS-007-C'), carte('KS-013-C'), carte('KS-017-C')], [carte('KS-002-MMS')], CARTES,
     );
     for (const fr of ['Ermite des Crapauds', 'UCHIWA', 'Décuplement', 'CHÔJI']) {
       expect(texte, `le francais ne doit pas apparaitre: ${fr}`).not.toContain(fr);
@@ -112,31 +112,23 @@ describe('la lettre de variante suit la rarete imprimee', () => {
   });
 });
 
-describe('le marqueur discret ne sert que quand la lettre ne suffit pas', () => {
-  it('deux variantes de meme lettre sont distinguees par leur rarete', () => {
-    const a = reference('SS-121-SPV');
-    const b = reference('SS-121-MV');
-    expect(a).not.toBe(b);
-    expect(a, 'la lettre officielle reste en tete').toContain('2-121/140 V');
-    expect(a, 'la precision suit, discrete').toContain('SPV');
+describe('la reference ne porte que ce que le format officiel prevoit', () => {
+  it('aucune reference ne porte de code interne au simulateur', () => {
+    const bavardes = CARTES
+      .map((c) => referenceOfficielle(c, INDEX))
+      .filter((ref) => !/^\d+-(\d+\/\d+( [AVG])?|MSS\d\d)$/.test(ref));
+    expect(
+      [...new Set(bavardes)].slice(0, 10),
+      'le document decrit "(B-CC/DDD E)" et "(B-MSSFF)", rien d autre: '
+      + 'une precision ajoutee par nos soins ne serait pas comprise par les organisateurs',
+    ).toEqual([]);
   });
 
-  it('deux tirages de meme rarete au meme numero sont numerotes', () => {
-    expect(reference('SS-121-SPV')).toBe('2-121/140 V-SPV');
-    expect(reference('SS-121_2-SPV')).toBe('2-121/140 V-SPV2');
-  });
-
-  it('aucune reference du catalogue ne designe deux cartes differentes', () => {
-    const vues = new Map<string, string>();
-    const collisions: string[] = [];
-    for (const c of CARTES) {
-      const ref = referenceOfficielle(c, INDEX);
-      const id = c.cardId ?? c.id;
-      const deja = vues.get(ref);
-      if (deja && deja !== id) collisions.push(`${ref}: ${deja} et ${id}`);
-      else vues.set(ref, id);
+  it('toutes les impressions speciales d un numero partagent la meme lettre', () => {
+    for (const id of ['SS-121-SPV', 'SS-121-MV', 'SS-149-CHIBIV', 'SS-149-SPV']) {
+      expect(reference(id).split(' ')[1], `${id} porte la lettre officielle seule`).toBe('V');
     }
-    expect(collisions.slice(0, 10), `${collisions.length} references ambigues`).toEqual([]);
+    expect(reference('SS-149-L'), 'la dorée porte G').toBe('2-149/140 G');
   });
 });
 
@@ -150,10 +142,32 @@ describe('chaque carte du jeu se relit telle qu elle a ete ecrite', () => {
       if (!analysee) { perdues.push(`${id}: ligne illisible`); continue; }
       const relue = resoudreLigne(analysee, INDEX, SET_PAR_NUMERO);
       const idRelu = relue ? (relue.cardId ?? relue.id) : 'aucune';
-      if (idRelu !== id) perdues.push(`${id} relu en ${idRelu}`);
+      const memeCarte = idRelu === id;
+      const memeTexte = relue ? nomAffiche(relue) === nomAffiche(c) : false;
+      if (!memeCarte && !memeTexte) perdues.push(`${id} relu en ${idRelu}`);
     }
     expect(CARTES.length, 'le catalogue est bien charge').toBeGreaterThan(400);
-    expect(perdues.slice(0, 10), `${perdues.length} cartes mal relues`).toEqual([]);
+    expect(
+      perdues.slice(0, 10),
+      `${perdues.length} cartes mal relues. Plusieurs impressions partagent la meme reference `
+      + 'officielle: c est le nom et la version de la ligne qui doivent retrouver la bonne',
+    ).toEqual([]);
+  });
+
+  it('deux impressions de meme reference sont departagees par leur version', () => {
+    const chibi = carte('SS-149-CHIBIV');
+    const ligne = analyserLigne(`2x   ${nomAffiche(chibi)}   (${referenceOfficielle(chibi, INDEX)})`)!;
+    const relue = resoudreLigne(ligne, INDEX, SET_PAR_NUMERO)!;
+    expect(
+      relue.cardId ?? relue.id,
+      'la reference seule ne suffit pas, mais la version imprimee sur la ligne, oui',
+    ).toBe('SS-149-CHIBIV');
+  });
+
+  it('une reference nue donne le tirage sans lettre, jamais une variante', () => {
+    const ligne = analyserLigne('2x   KAKASHI HATAKE Peu importe   (2-149/140)')!;
+    const relue = resoudreLigne(ligne, INDEX, SET_PAR_NUMERO)!;
+    expect(lettreDeVariante(relue.rarity), 'aucune lettre, donc aucune variante').toBe('');
   });
 
   it('la quantite est respectee', () => {
@@ -202,10 +216,17 @@ describe('le lecteur accepte les variations tolerees par le reglement', () => {
 describe('la decklist complete se lit comme le document officiel', () => {
   const persos = [carte('KS-027-C'), carte('KS-027-C'), carte('KS-072-C')];
   const missions = [carte('KS-004-MMS'), carte('SS-004-MMS')];
-  const texte = construireDecklist('Mon deck', persos, missions, CARTES);
+  const texte = construireDecklist(persos, missions, CARTES);
 
-  it('elle annonce le total de cartes principales', () => {
-    expect(texte).toContain('Main Deck: 3');
+  it('elle commence directement par le total de cartes principales', () => {
+    expect(texte.split('\n')[0], 'aucun nom de deck en tete').toBe('Main Deck: 3');
+  });
+
+  it('aucune ligne ne porte de nom de deck', () => {
+    for (const ligne of texte.split('\n')) {
+      const attendue = ligne === '' || /^(Main Deck|Missions): \d+$/.test(ligne) || /\(.+\)$/.test(ligne);
+      expect(attendue, `ligne inattendue: ${ligne}`).toBe(true);
+    }
   });
 
   it('elle annonce le total de missions', () => {
@@ -251,6 +272,18 @@ describe('une reference sans precision retombe sur la carte que tout le monde po
         estLeTirageDeBase(c, INDEX),
         `${setNum}-${numero} sans lettre doit donner le tirage de base, obtenu ${c.cardId ?? c.id}`,
       ).toBe(true);
+    }
+  });
+
+  it('une variante exportee sans lettre revient sur la carte que tout le monde possede', () => {
+    for (const id of ['SS-149-CHIBIV', 'SS-121-SPV', 'KS-113-RA']) {
+      const v = carte(id);
+      const nu = referenceOfficielle(v, INDEX).replace(/ [AVG]$/, '');
+      const relue = resoudreLigne(analyserLigne(`2x ${nomAffiche(v)} (${nu})`)!, INDEX, SET_PAR_NUMERO)!;
+      expect(
+        lettreDeVariante(relue.rarity),
+        `${id} ecrit sans sa lettre doit donner un tirage de base, obtenu ${relue.cardId ?? relue.id}`,
+      ).toBe('');
     }
   });
 
