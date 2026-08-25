@@ -17,49 +17,49 @@
         "fix"
       ],
       "changes_fr": [
-        "KING OF THE HILL : le +3 va au personnage le plus fort de la mission, ennemi ou caché compris, et rien en cas d'égalité.",
+        "KING OF THE HILL : un personnage caché compte pour désigner le plus fort, et prend le +3 s'il est seul devant.",
         "ZABUZA MOMOCHI 136 : une carte révélée par-dessus une autre grâce à une remise reste une cible valide.",
         "Nouveau : exportez votre deck en PDF prêt à imprimer, 9 cartes par page A4, à la taille réelle et collées pour la découpe.",
         "SHINO ABURAME 033 : sa réduction de coût devient un effet MAIN permanent et ne s applique qu en le révélant depuis sa position cachée.",
         "Un personnage sous BOMBE AVEUGLANTE 083 n a plus aucun effet : ROCK LEE et GAÏ perdent leurs jetons en fin de tour, les auras, immunités et blocages s éteignent."
       ],
       "changes_en": [
-        "KING OF THE HILL: the +3 goes to the strongest character in the mission, enemy or face-down included, nothing on a tie.",
+        "KING OF THE HILL: a face-down character counts when finding the strongest, and takes the +3 if it is alone in front.",
         "ZABUZA MOMOCHI 136: a card revealed on top of another thanks to a discount stays a valid target.",
         "New: export your deck as a print-ready PDF, 9 cards per A4 sheet, at real size and edge to edge for cutting.",
         "SHINO ABURAME 033: its cost reduction becomes a permanent MAIN effect and only applies when revealing it from its hidden position.",
         "A character under FLASH BOMB 083 has no effect left: ROCK LEE and GAI lose their tokens at end of round, and auras, immunities and locks all switch off."
       ],
       "changes_es": [
-        "KING OF THE HILL: el +3 va al personaje más fuerte de la misión, incluidos enemigos y bocabajo, nada si hay empate.",
+        "KING OF THE HILL: un personaje bocabajo cuenta para hallar al más fuerte, y se lleva el +3 si está solo al frente.",
         "ZABUZA MOMOCHI 136: una carta revelada encima de otra gracias a una rebaja sigue siendo un objetivo válido.",
         "Nuevo: exporta tu mazo en PDF listo para imprimir, 9 cartas por hoja A4, a tamaño real y pegadas para recortar.",
         "SHINO ABURAME 033: su reducción de coste pasa a ser un efecto MAIN permanente y solo se aplica al revelarlo desde su posición oculta.",
         "Un personaje bajo BOMBA CEGADORA 083 ya no tiene ningún efecto: ROCK LEE y GAI pierden sus fichas al final de la ronda, y auras, inmunidades y bloqueos se apagan."
       ],
       "changes_pt": [
-        "KING OF THE HILL: o +3 vai para o personagem mais forte da missão, incluindo inimigos e virados, nada em caso de empate.",
+        "KING OF THE HILL: um personagem virado conta para achar o mais forte, e leva o +3 se estiver sozinho na frente.",
         "ZABUZA MOMOCHI 136: uma carta revelada por cima de outra graças a um desconto continua sendo um alvo válido.",
         "Novo: exporta o teu baralho em PDF pronto a imprimir, 9 cartas por folha A4, em tamanho real e encostadas para recortar.",
         "SHINO ABURAME 033: a sua redução de custo passa a ser um efeito MAIN permanente e só se aplica ao revelá-lo da sua posição virada para baixo.",
         "Uma personagem sob BOMBA OFUSCANTE 083 deixa de ter qualquer efeito: ROCK LEE e GAI perdem as fichas no fim da ronda, e auras, imunidades e bloqueios desligam-se."
       ],
       "changes_it": [
-        "KING OF THE HILL: il +3 va al personaggio più forte della missione, nemici e coperti inclusi, niente in caso di parità.",
+        "KING OF THE HILL: un personaggio coperto conta per trovare il più forte, e prende il +3 se è solo in testa.",
         "ZABUZA MOMOCHI 136: una carta rivelata sopra un'altra grazie a uno sconto resta un bersaglio valido.",
         "Novità: esporta il tuo mazzo in PDF pronto da stampare, 9 carte per foglio A4, a grandezza reale e attaccate per il ritaglio.",
         "SHINO ABURAME 033: la sua riduzione di costo diventa un effetto MAIN permanente e si applica solo rivelandolo dalla sua posizione nascosta.",
         "Un personaggio sotto BOMBA ACCECANTE 083 non ha più alcun effetto: ROCK LEE e GAI perdono i gettoni a fine round, e aure, immunità e blocchi si spengono."
       ],
       "changes_pl": [
-        "KING OF THE HILL: +3 trafia do najsilniejszej postaci w misji, także wrogiej lub zakrytej, nic przy remisie.",
+        "KING OF THE HILL: zakryta postać liczy się przy wyborze najsilniejszej i bierze +3, gdy jest sama na czele.",
         "ZABUZA MOMOCHI 136: karta odkryta na innej dzięki zniżce nadal jest prawidłowym celem.",
         "Nowość: eksportuj talię do PDF gotowego do druku, 9 kart na arkusz A4, w rzeczywistym rozmiarze i jedna przy drugiej.",
         "SHINO ABURAME 033: jego zniżka kosztu staje się stałym efektem MAIN i działa tylko przy odkrywaniu go z pozycji zakrytej.",
         "Postać pod BOMBĄ OŚLEPIAJĄCĄ 083 nie ma już żadnego efektu: ROCK LEE i GAI tracą żetony na koniec rundy, a aury, odporności i blokady wygasają."
       ],
       "changes_ja": [
-        "KING OF THE HILL：+3はミッションで最も強いキャラクターに入ります。相手や裏向きのカードも含み、同値なら誰も得ません。",
+        "KING OF THE HILL：裏向きのキャラクターも最強を決める対象に入り、単独で先頭なら+3を得ます。",
         "ZABUZA MOMOCHI 136：割引で別のカードの上に表向きにしたカードも、正しい対象のままになりました。",
         "新機能: デッキを印刷用 PDF に書き出せます。A4 一枚に 9 枚、実寸で、切り取りやすいよう隙間なく並びます。",
         "油女シノ 033 のコスト軽減は常時の MAIN 効果になり、伏せた状態から公開するときだけ適用されます。",

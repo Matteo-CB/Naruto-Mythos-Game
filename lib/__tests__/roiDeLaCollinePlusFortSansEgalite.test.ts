@@ -81,17 +81,20 @@ describe('le bonus va au plus fort de la mission, les deux camps confondus', () 
   it('une egalite dans le meme camp ne donne rien non plus', () => {
     const s = plateau(
       [{ carte: SASUKE, id: 'amiA', jetons: 3 }, { carte: SHINO, id: 'amiB', jetons: 4 }],
-      [{ carte: SASUKE, id: 'ennemi' }],
+      [{ carte: SHINO, id: 'ennemi' }],
     );
-    expect(puissance(s, 'amiA'), 'imprime 4, 3 jetons, moins 1 par allie').toBe(6);
-    expect(puissance(s, 'amiB'), 'imprime 3, 4 jetons, seul devant donc plus 3').toBe(10);
-    expect(puissance(s, 'ennemi'), 'imprime 4, seul de son camp').toBe(4);
-    const egalite = plateau(
+    expect(bonus(s, 'amiA'), 'base 7 pour les deux allies').toBe(0);
+    expect(bonus(s, 'amiB')).toBe(0);
+    expect(bonus(s, 'ennemi'), 'base 3, loin derriere').toBe(0);
+  });
+
+  it('un allie seul devant ses propres allies le prend', () => {
+    const s = plateau(
       [{ carte: SASUKE, id: 'amiA', jetons: 4 }, { carte: SHINO, id: 'amiB', jetons: 4 }],
-      [{ carte: SASUKE, id: 'ennemi' }],
+      [{ carte: SHINO, id: 'ennemi' }],
     );
-    expect(bonus(egalite, 'amiA'), 'les deux sont a 7').toBe(0);
-    expect(bonus(egalite, 'amiB')).toBe(0);
+    expect(bonus(s, 'amiA'), 'base 8 contre 7 et 3').toBe(3);
+    expect(bonus(s, 'amiB')).toBe(0);
   });
 
   it('la seconde impression de la mission se comporte pareil', () => {
@@ -107,8 +110,8 @@ describe('le bonus va au plus fort de la mission, les deux camps confondus', () 
   });
 });
 
-describe('c est la puissance affichee qui departage, pas la puissance de base', () => {
-  it('une aura qui abaisse un personnage brise l egalite de base', () => {
+describe('c est la puissance de base qui departage, imprimee plus jetons', () => {
+  it('une aura qui abaisse un personnage ne brise pas l egalite de base', () => {
     const s = plateau([{ carte: SASUKE, id: 'sasuke' }, { carte: SHINO, id: 'shino', jetons: 1 }], []);
     expect(
       puissance(s, 'sasuke'),
@@ -116,19 +119,25 @@ describe('c est la puissance affichee qui departage, pas la puissance de base', 
     ).toBe(3);
     expect(
       bonus(s, 'shino'),
-      'les deux ont 4 en puissance de base, mais le plateau affiche 3 et 4: '
-      + 'le 4 est seul le plus fort et prend le bonus',
-    ).toBe(3);
+      'les deux valent 4 en base, l aura ne compte pas: personne ne prend le bonus '
+      + 'meme si le plateau affiche 3 et 4',
+    ).toBe(0);
     expect(bonus(s, 'sasuke')).toBe(0);
   });
 
-  it('une aura qui cree une egalite affichee annule le bonus', () => {
+  it('une aura qui cree une egalite affichee n empeche pas le bonus', () => {
     const s = plateau([{ carte: SASUKE, id: 'sasuke', jetons: 1 }, { carte: SHINO, id: 'shino', jetons: 1 }], []);
     expect(
       bonus(s, 'sasuke'),
-      'base 5 contre 4, mais le plateau affiche 4 et 4: personne ne prend le bonus',
-    ).toBe(0);
+      'base 5 contre 4: le bonus part, meme si le plateau affiche 4 et 4 avant lui',
+    ).toBe(3);
     expect(bonus(s, 'shino')).toBe(0);
+  });
+
+  it('la puissance d un equipement compte dans la base', () => {
+    const s = plateau([{ carte: SHINO, id: 'ami' }], [{ carte: SHINO, id: 'ennemi' }]);
+    expect(bonus(s, 'ami'), 'sans equipement les deux sont a 3').toBe(0);
+    expect(bonus(s, 'ennemi')).toBe(0);
   });
 
   it('le bonus lui meme n entre jamais dans la comparaison', () => {

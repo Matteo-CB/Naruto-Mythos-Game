@@ -44,11 +44,17 @@ export function honorableDuelBonus(mission: ActiveMission, player: PlayerID, cha
   return visible[0].instanceId === char.instanceId ? 4 : 0;
 }
 
+export function puissanceDeBase(char: CharacterInPlay, attachmentPower: number): number {
+  if (char.isHidden) return char.powerTokens;
+  const sommet = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  return (sommet?.power ?? 0) + char.powerTokens + attachmentPower;
+}
+
 export function kingOfTheHillBonus(
   state: GameState,
   mission: ActiveMission,
   char: CharacterInPlay,
-  puissanceDe: (c: CharacterInPlay, cote: PlayerID) => number,
+  attachmentPowerOf: (c: CharacterInPlay, cote: PlayerID) => number,
 ): number {
   if (state.phase !== 'mission') return 0;
   if (!missionCarries(mission, SS_MISSION_KING_OF_THE_HILL)) return 0;
@@ -63,7 +69,7 @@ export function kingOfTheHillBonus(
   let combien = 0;
   let meilleurId: string | null = null;
   for (const { personnage, cote } of pretendants) {
-    const valeur = puissanceDe(personnage, cote);
+    const valeur = puissanceDeBase(personnage, attachmentPowerOf(personnage, cote));
     if (valeur > meilleure) {
       meilleure = valeur;
       combien = 1;

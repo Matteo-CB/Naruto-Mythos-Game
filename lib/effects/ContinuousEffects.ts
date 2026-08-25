@@ -195,24 +195,14 @@ export function attachedPowerOf(
   return total;
 }
 
-let classementDuRoiEnCours = false;
-
-function puissanceSansRoiDeLaColline(
+function bonusDuRoiDeLaColline(
   state: GameState,
+  mission: ActiveMission,
   char: CharacterInPlay,
-  cote: PlayerID,
   missionIndex: number,
 ): number {
-  const precedent = classementDuRoiEnCours;
-  classementDuRoiEnCours = true;
-  try {
-    const modificateur = calculateContinuousPowerModifier(state, cote, missionIndex, char);
-    if (char.isHidden) return char.powerTokens + modificateur;
-    const sommet = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-    return (sommet?.power ?? 0) + char.powerTokens + modificateur;
-  } finally {
-    classementDuRoiEnCours = precedent;
-  }
+  return kingOfTheHillBonus(state, mission, char, (c, cote) =>
+    attachedPowerOf(c, state, cote, missionIndex));
 }
 
 export function calculateContinuousPowerModifier(
@@ -318,12 +308,7 @@ export function calculateContinuousPowerModifier(
       }
     }
 
-    const bonusDuRoiPourUnCache = classementDuRoiEnCours
-      ? 0
-      : kingOfTheHillBonus(state, mission, char, (c, cote) =>
-        puissanceSansRoiDeLaColline(state, c, cote, missionIndex));
-
-    return hiddenBonus + bonusDuRoiPourUnCache;
+    return hiddenBonus + bonusDuRoiDeLaColline(state, mission, char, missionIndex);
   }
 
   const mission = state.activeMissions[missionIndex];
@@ -468,10 +453,7 @@ export function calculateContinuousPowerModifier(
   
   
   
-  const bonusDuRoi = classementDuRoiEnCours
-    ? 0
-    : kingOfTheHillBonus(state, mission, char, (c, cote) =>
-      puissanceSansRoiDeLaColline(state, c, cote, missionIndex));
+  const bonusDuRoi = bonusDuRoiDeLaColline(state, mission, char, missionIndex);
 
   if (textIsBlanked(char)) {
     return attachmentPower + missionAttachmentPowerModifier(state, char, player, missionIndex) + bonusDuRoi;
