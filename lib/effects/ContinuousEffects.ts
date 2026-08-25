@@ -195,6 +195,26 @@ export function attachedPowerOf(
   return total;
 }
 
+let classementDuRoiEnCours = false;
+
+function puissanceSansRoiDeLaColline(
+  state: GameState,
+  char: CharacterInPlay,
+  cote: PlayerID,
+  missionIndex: number,
+): number {
+  const precedent = classementDuRoiEnCours;
+  classementDuRoiEnCours = true;
+  try {
+    const modificateur = calculateContinuousPowerModifier(state, cote, missionIndex, char);
+    if (char.isHidden) return char.powerTokens + modificateur;
+    const sommet = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+    return (sommet?.power ?? 0) + char.powerTokens + modificateur;
+  } finally {
+    classementDuRoiEnCours = precedent;
+  }
+}
+
 export function calculateContinuousPowerModifier(
   state: GameState,
   player: PlayerID,
@@ -298,7 +318,12 @@ export function calculateContinuousPowerModifier(
       }
     }
 
-    return hiddenBonus;
+    const bonusDuRoiPourUnCache = classementDuRoiEnCours
+      ? 0
+      : kingOfTheHillBonus(state, mission, char, (c, cote) =>
+        puissanceSansRoiDeLaColline(state, c, cote, missionIndex));
+
+    return hiddenBonus + bonusDuRoiPourUnCache;
   }
 
   const mission = state.activeMissions[missionIndex];
@@ -443,12 +468,19 @@ export function calculateContinuousPowerModifier(
   
   
   
-  if (textIsBlanked(char)) return attachmentPower + missionAttachmentPowerModifier(state, char, player, missionIndex);
+  const bonusDuRoi = classementDuRoiEnCours
+    ? 0
+    : kingOfTheHillBonus(state, mission, char, (c, cote) =>
+      puissanceSansRoiDeLaColline(state, c, cote, missionIndex));
+
+  if (textIsBlanked(char)) {
+    return attachmentPower + missionAttachmentPowerModifier(state, char, player, missionIndex) + bonusDuRoi;
+  }
 
   modifier += ss2StaticPowerModifier(state, char, player, missionIndex);
   modifier += missionAttachmentPowerModifier(state, char, player, missionIndex);
   modifier += honorableDuelBonus(mission, player, char);
-  modifier += kingOfTheHillBonus(state, mission, char, attachedPowerOf);
+  modifier += bonusDuRoi;
 
   for (const mEffect of mission.card.effects ?? []) {
     if (mEffect.type !== 'MAIN' || !mEffect.description.includes('[⧗]')) continue;

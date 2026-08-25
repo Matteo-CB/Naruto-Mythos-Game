@@ -44,40 +44,36 @@ export function honorableDuelBonus(mission: ActiveMission, player: PlayerID, cha
   return visible[0].instanceId === char.instanceId ? 4 : 0;
 }
 
-function coreOf(char: CharacterInPlay, attachmentPower: number): number {
-  const top = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
-  if (char.isHidden) return char.powerTokens;
-  return (top?.power ?? 0) + char.powerTokens + attachmentPower;
-}
-
 export function kingOfTheHillBonus(
   state: GameState,
   mission: ActiveMission,
   char: CharacterInPlay,
-  attachmentPowerOf: (c: CharacterInPlay) => number,
+  puissanceDe: (c: CharacterInPlay, cote: PlayerID) => number,
 ): number {
   if (state.phase !== 'mission') return 0;
   if (!missionCarries(mission, SS_MISSION_KING_OF_THE_HILL)) return 0;
-  if (char.isHidden) return 0;
 
-  const contenders = [...mission.player1Characters, ...mission.player2Characters].filter((c) => !c.isHidden);
-  if (contenders.length === 0) return 0;
+  const pretendants: Array<{ personnage: CharacterInPlay; cote: PlayerID }> = [
+    ...mission.player1Characters.map((c) => ({ personnage: c, cote: 'player1' as PlayerID })),
+    ...mission.player2Characters.map((c) => ({ personnage: c, cote: 'player2' as PlayerID })),
+  ];
+  if (pretendants.length === 0) return 0;
 
-  let best = -Infinity;
-  let bestCount = 0;
-  let bestId: string | null = null;
-  for (const c of contenders) {
-    const value = coreOf(c, attachmentPowerOf(c));
-    if (value > best) {
-      best = value;
-      bestCount = 1;
-      bestId = c.instanceId;
-    } else if (value === best) {
-      bestCount += 1;
+  let meilleure = -Infinity;
+  let combien = 0;
+  let meilleurId: string | null = null;
+  for (const { personnage, cote } of pretendants) {
+    const valeur = puissanceDe(personnage, cote);
+    if (valeur > meilleure) {
+      meilleure = valeur;
+      combien = 1;
+      meilleurId = personnage.instanceId;
+    } else if (valeur === meilleure) {
+      combien += 1;
     }
   }
 
-  if (bestCount !== 1 || bestId !== char.instanceId) return 0;
+  if (combien !== 1 || meilleurId !== char.instanceId) return 0;
   return 3;
 }
 
