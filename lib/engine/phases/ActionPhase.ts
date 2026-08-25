@@ -571,6 +571,7 @@ function handleRevealCharacter(
     const upgraded = { ...upgradeTarget };
     upgraded.stack = [...upgraded.stack, ...char.stack];
     upgraded.card = charTopCard;
+    upgraded.playedBelowPrintedCost = char.playedBelowPrintedCost;
     upgraded.powerTokens += char.powerTokens; // Transfer power tokens
     const carriedAttachments = [...(upgraded.attachments ?? [])];
     for (const carried of char.attachments ?? []) {
