@@ -450,7 +450,7 @@ export const effectDescriptionsFr: Record<string, string[]> = {
 
   
   'KS-033-UC': [
-    '[⧗] Jouez ce personnage en payant 4 de moins s\'il y a un personnage Jutsu ennemi dans cette mission.',
+    "[⧗] S'il y a un personnage Jutsu ennemi dans cette mission, vous pouvez jouer ce personnage alors qu'il est caché en payant 4 de moins.",
     '[↯] Deplacez ce personnage.',
   ],
 

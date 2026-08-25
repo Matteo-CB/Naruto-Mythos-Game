@@ -370,7 +370,7 @@ export const effectDescriptionsEn: Record<string, string[]> = {
 
   
   'KS-033-UC': [
-    '[⧗] Play this character paying 4 less if there is an enemy Jutsu character in this mission.',
+    '[⧗] If there is an enemy Jutsu character in this mission, you can play this character while hidden paying 4 less.',
     '[↯] Move this character.',
   ],
 

@@ -67,7 +67,7 @@ export const effectDescriptionsPt: Record<string, string[]> = {
   "KS-028-UC": ["[⧗] No fim do turno, você pode devolver este personagem à sua mão.", "[↯] POWERUP 2 em um Kiba Inuzuka aliado nesta missão."],
   "KS-029-UC": ["[⧗] Você pode jogar este personagem como uma evolução sobre Kiba Inuzuka.", "[↯] Oculte o personagem inimigo não-oculto com o menor custo nesta missão."],
   "KS-031-UC": ["[⧗] Quando um personagem inimigo não-oculto é jogado nesta missão, ganhe 1 Chakra."],
-  "KS-033-UC": ["[⧗] Jogue este personagem pagando 4 a menos se houver um personagem inimigo Jutsu nesta missão.", "[↯] Mova este personagem."],
+  "KS-033-UC": ["[⧗] Se houver um personagem inimigo Jutsu nesta missão, podes jogar este personagem enquanto está virado para baixo pagando 4 a menos.", "[↯] Mova este personagem."],
   "KS-035-UC": ["[⧗] Personagens inimigos não podem ser movidos desta missão.", "[↯] Derrote um personagem inimigo com Poder 1 ou menos nesta missão."],
   "KS-037-UC": ["[⧗] Quando um personagem inimigo não-oculto é jogado nesta missão, POWERUP 1.", "[↯] Remova todas as fichas de Poder de um personagem inimigo nesta missão."],
   "KS-039-UC": ["[⧗] Este personagem não perde suas fichas de Poder no fim da rodada.", "[↯] POWERUP 2."],

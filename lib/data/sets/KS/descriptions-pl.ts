@@ -67,7 +67,7 @@ export const effectDescriptionsPl: Record<string, string[]> = {
   "KS-028-UC": ["[⧗] Na koniec tury możesz zwrócić tę postać do ręki.", "[↯] POWERUP 2 na sojuszniczym Kibie Inuzuce na tej misji."],
   "KS-029-UC": ["[⧗] Możesz zagrać tę postać jako ulepszenie na Kibie Inuzuce.", "[↯] Ukryj wrogą nieukrytą postać o najniższym koszcie na tej misji."],
   "KS-031-UC": ["[⧗] Gdy nieukryta wroga postać zostaje zagrana na tej misji, zyskaj 1 Czakrę."],
-  "KS-033-UC": ["[⧗] Zagraj tę postać, płacąc o 4 mniej, jeśli na tej misji jest wroga postać Jutsu.", "[↯] Przenieś tę postać."],
+  "KS-033-UC": ["[⧗] Jeśli na tej misji jest wroga postać Jutsu, możesz zagrać tę postać, gdy jest zakryta, płacąc o 4 mniej.", "[↯] Przenieś tę postać."],
   "KS-035-UC": ["[⧗] Wrogie postacie nie mogą zostać przeniesione z tej misji.", "[↯] Pokonaj wrogą postać o Sile 1 lub mniej na tej misji."],
   "KS-037-UC": ["[⧗] Gdy nieukryta wroga postać zostaje zagrana na tej misji, POWERUP 1.", "[↯] Usuń wszystkie żetony Siły z wrogiej postaci na tej misji."],
   "KS-039-UC": ["[⧗] Ta postać nie traci swoich żetonów Siły na koniec rundy.", "[↯] POWERUP 2."],

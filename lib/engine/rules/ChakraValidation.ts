@@ -258,14 +258,24 @@ export function calculateEffectiveCost(
   }
 
   
-  if (isReveal && (card.set === 'KS' && card.number === 33)) {
-    const hasEnemyJutsu = enemyChars?.some((c: any) => {
-      if (c.isHidden) return false;
-      const cTop = getTopCard(c);
-      return cTop?.keywords?.includes('Jutsu');
-    });
-    if (hasEnemyJutsu) {
-      cost = Math.max(0, cost - 4);
+  if (isReveal) {
+    const remiseCachee = (card.effects ?? []).find(
+      (e: { type: string; description: string }) =>
+        e.type === 'MAIN'
+        && e.description.includes('[⧗]')
+        && /enemy Jutsu character in this mission/i.test(e.description)
+        && /while hidden/i.test(e.description),
+    );
+    if (remiseCachee) {
+      const montant = Number(/paying (\d+) less/i.exec(remiseCachee.description)?.[1] ?? 0);
+      const hasEnemyJutsu = enemyChars?.some((c: any) => {
+        if (c.isHidden) return false;
+        const cTop = getTopCard(c);
+        return cTop?.keywords?.includes('Jutsu');
+      });
+      if (montant > 0 && hasEnemyJutsu) {
+        cost = Math.max(0, cost - montant);
+      }
     }
   }
 
