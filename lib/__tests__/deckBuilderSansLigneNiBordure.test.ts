@@ -87,3 +87,35 @@ describe('l export en image reprend le fond du site', () => {
     expect(source).not.toContain("'/images/icons/uzumaki-spiral.png'");
   });
 });
+
+describe('l export en image reste sobre: rien que des cartes centrees', () => {
+  const source = readFileSync(join(RACINE, 'lib', 'utils', 'exportDeckImage.ts'), 'utf8');
+
+  it('aucun trait dans les coins', () => {
+    expect(source, 'les equerres decoratives sont retirees').not.toContain('drawCornerBrackets');
+  });
+
+  it('aucun trait sous les textes', () => {
+    expect(source, 'le filet sous le titre du deck a disparu').not.toContain('ctx.lineTo(PADDING + contentW - 20, sepY)');
+    expect(source, 'le filet sous MISSIONS a disparu').not.toContain('ctx.lineTo(PADDING + 200, mSepY)');
+  });
+
+  it('aucun losange', () => {
+    expect(source, 'le carre pivote a 45 degres est retire').not.toContain('ctx.rotate(Math.PI / 4)');
+  });
+
+  it('aucun fond ni cadre derriere le texte du haut', () => {
+    expect(source, 'plus de panneau sous le titre').not.toContain('drawRoundedRect(ctx, PADDING, PADDING, contentW, HEADER_H, 4)');
+    expect(source, 'la couleur de panneau ne sert plus').not.toContain('const BG_PANEL');
+  });
+
+  it('les deux titres sont centres sur la largeur de l image', () => {
+    expect(source).toContain("ctx.fillText(deckName || 'Deck', centreX,");
+    expect(source).toContain("ctx.fillText('MISSIONS', canvasW / 2, missionLabelY)");
+  });
+
+  it('le fond du site et ses volutes restent, eux', () => {
+    expect(source).toContain("'/images/bgmenu/seigaiha.webp'");
+    expect(source).toContain("'/images/footer-curls-gold.svg'");
+  });
+});

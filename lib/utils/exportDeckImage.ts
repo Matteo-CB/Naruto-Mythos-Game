@@ -20,11 +20,8 @@ const PATTERN_ALPHA = 0.5;
 const PATTERN_VEIL = 'rgba(6, 6, 10, 0.55)';
 const CURLS_ALPHA = 0.85;
 const CURLS_VISIBLE_RATIO = 82 / 144;
-const BG_PANEL = '#0e0e16';
 const GOLD = '#c4a35a';
-const GOLD_DIM = 'rgba(196, 163, 90, 0.15)';
 const GOLD_LINE = 'rgba(196, 163, 90, 0.3)';
-const TEXT_PRIMARY = '#e0e0e0';
 const TEXT_MUTED = '#888888';
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -51,18 +48,6 @@ function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w:
   ctx.closePath();
 }
 
-function drawCornerBrackets(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, size: number, color: string) {
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 2;
-  
-  ctx.beginPath(); ctx.moveTo(x, y + size); ctx.lineTo(x, y); ctx.lineTo(x + size, y); ctx.stroke();
-  
-  ctx.beginPath(); ctx.moveTo(x + w - size, y); ctx.lineTo(x + w, y); ctx.lineTo(x + w, y + size); ctx.stroke();
-  
-  ctx.beginPath(); ctx.moveTo(x, y + h - size); ctx.lineTo(x, y + h); ctx.lineTo(x + size, y + h); ctx.stroke();
-  
-  ctx.beginPath(); ctx.moveTo(x + w - size, y + h); ctx.lineTo(x + w, y + h); ctx.lineTo(x + w, y + h - size); ctx.stroke();
-}
 
 
 type ArtlessCard = CharacterCard | MissionCard;
@@ -173,10 +158,9 @@ export async function exportDeckAsImage(
   ctx.fillStyle = BG_DARK;
   ctx.fillRect(0, 0, canvasW, canvasH);
 
-  const [motifFond, volutesBas, kunaiImg] = await Promise.all([
+  const [motifFond, volutesBas] = await Promise.all([
     loadImage(SEIGAIHA_PATTERN).catch(() => null),
     loadImage(FOOTER_CURLS).catch(() => null),
-    loadImage('/images/icons/kunai.png').catch(() => null),
   ]);
 
   if (motifFond) {
@@ -199,55 +183,24 @@ export async function exportDeckAsImage(
   }
 
   
-  drawCornerBrackets(ctx, 12, 12, canvasW - 24, canvasH - 24, 30, GOLD_LINE);
+  const centreX = canvasW / 2;
 
-  
-  ctx.fillStyle = BG_PANEL;
-  drawRoundedRect(ctx, PADDING, PADDING, contentW, HEADER_H, 4);
-  ctx.fill();
-  ctx.strokeStyle = GOLD_LINE;
-  ctx.lineWidth = 1;
-  drawRoundedRect(ctx, PADDING, PADDING, contentW, HEADER_H, 4);
-  ctx.stroke();
-
-  
+  ctx.textAlign = 'center';
   ctx.fillStyle = GOLD;
   ctx.font = 'bold 28px "NJNaruto", "Arial Black", sans-serif';
   ctx.textBaseline = 'middle';
-  ctx.fillText(deckName || 'Deck', PADDING + 20, PADDING + HEADER_H / 2 - 12);
+  ctx.fillText(deckName || 'Deck', centreX, PADDING + HEADER_H / 2 - 12);
 
-  
   ctx.fillStyle = TEXT_MUTED;
   ctx.font = '13px "Nevanta", "Segoe UI", sans-serif';
   ctx.fillText(
     `${characters.length} characters  |  ${missions.length} missions`,
-    PADDING + 20,
+    centreX,
     PADDING + HEADER_H / 2 + 16,
   );
+  ctx.textAlign = 'left';
 
-  
-  if (kunaiImg) {
-    ctx.globalAlpha = 0.08;
-    ctx.drawImage(kunaiImg, PADDING + contentW - 100, PADDING + 10, 80, 80);
-    ctx.globalAlpha = 1;
-  }
-
-  
   const sepY = PADDING + HEADER_H + 12;
-  ctx.strokeStyle = GOLD_LINE;
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(PADDING + 20, sepY);
-  ctx.lineTo(PADDING + contentW - 20, sepY);
-  ctx.stroke();
-  
-  const diamX = PADDING + contentW / 2;
-  ctx.fillStyle = GOLD;
-  ctx.save();
-  ctx.translate(diamX, sepY);
-  ctx.rotate(Math.PI / 4);
-  ctx.fillRect(-4, -4, 8, 8);
-  ctx.restore();
 
   
   const charImgs = await Promise.all(
@@ -309,16 +262,11 @@ export async function exportDeckAsImage(
   ctx.fillStyle = GOLD;
   ctx.font = 'bold 18px "NJNaruto", "Arial Black", sans-serif';
   ctx.textBaseline = 'alphabetic';
-  ctx.fillText('MISSIONS', PADDING + 20, missionLabelY);
+  ctx.textAlign = 'center';
+  ctx.fillText('MISSIONS', canvasW / 2, missionLabelY);
+  ctx.textAlign = 'left';
 
-  
   const mSepY = missionLabelY + 8;
-  ctx.strokeStyle = GOLD_DIM;
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(PADDING + 20, mSepY);
-  ctx.lineTo(PADDING + 200, mSepY);
-  ctx.stroke();
 
   
   const missionStartY = mSepY + 16;
