@@ -13,7 +13,13 @@ const HEADER_H = 90;
 const SECTION_GAP = 40;
 
 
-const BG_DARK = '#080810';
+const BG_DARK = '#0a0a0a';
+const SEIGAIHA_PATTERN = '/images/bgmenu/seigaiha.webp';
+const FOOTER_CURLS = '/images/footer-curls-gold.svg';
+const PATTERN_ALPHA = 0.5;
+const PATTERN_VEIL = 'rgba(6, 6, 10, 0.55)';
+const CURLS_ALPHA = 0.85;
+const CURLS_VISIBLE_RATIO = 82 / 144;
 const BG_PANEL = '#0e0e16';
 const GOLD = '#c4a35a';
 const GOLD_DIM = 'rgba(196, 163, 90, 0.15)';
@@ -167,33 +173,28 @@ export async function exportDeckAsImage(
   ctx.fillStyle = BG_DARK;
   ctx.fillRect(0, 0, canvasW, canvasH);
 
-  
-  for (let py = 0; py < canvasH; py += 4) {
-    for (let px = 0; px < canvasW; px += 4) {
-      if ((px + py) % 8 === 0) {
-        ctx.fillStyle = 'rgba(255,255,255,0.008)';
-        ctx.fillRect(px, py, 2, 2);
-      }
-    }
-  }
-
-  
-  const [shurikenImg, kunaiImg, spiralImg] = await Promise.all([
-    loadImage('/images/icons/shuriken.png').catch(() => null),
+  const [motifFond, volutesBas, kunaiImg] = await Promise.all([
+    loadImage(SEIGAIHA_PATTERN).catch(() => null),
+    loadImage(FOOTER_CURLS).catch(() => null),
     loadImage('/images/icons/kunai.png').catch(() => null),
-    loadImage('/images/icons/uzumaki-spiral.png').catch(() => null),
   ]);
 
-  
-  if (shurikenImg) {
-    ctx.globalAlpha = 0.06;
-    ctx.drawImage(shurikenImg, -30, -30, 180, 180);
-    ctx.drawImage(shurikenImg, canvasW - 150, canvasH - 150, 180, 180);
+  if (motifFond) {
+    const echelle = canvasW / motifFond.width;
+    const tuileH = motifFond.height * echelle;
+    ctx.globalAlpha = PATTERN_ALPHA;
+    for (let y = 0; y < canvasH; y += tuileH) {
+      ctx.drawImage(motifFond, 0, y, canvasW, tuileH);
+    }
     ctx.globalAlpha = 1;
+    ctx.fillStyle = PATTERN_VEIL;
+    ctx.fillRect(0, 0, canvasW, canvasH);
   }
-  if (spiralImg) {
-    ctx.globalAlpha = 0.04;
-    ctx.drawImage(spiralImg, canvasW - 160, -20, 140, 140);
+
+  if (volutesBas) {
+    const hauteur = canvasW * (volutesBas.height / volutesBas.width);
+    ctx.globalAlpha = CURLS_ALPHA;
+    ctx.drawImage(volutesBas, 0, canvasH - hauteur * CURLS_VISIBLE_RATIO, canvasW, hauteur);
     ctx.globalAlpha = 1;
   }
 
@@ -208,10 +209,6 @@ export async function exportDeckAsImage(
   ctx.lineWidth = 1;
   drawRoundedRect(ctx, PADDING, PADDING, contentW, HEADER_H, 4);
   ctx.stroke();
-
-  
-  ctx.fillStyle = GOLD;
-  ctx.fillRect(PADDING, PADDING, 4, HEADER_H);
 
   
   ctx.fillStyle = GOLD;

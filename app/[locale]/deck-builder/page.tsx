@@ -32,7 +32,7 @@ import { isAlternateArtwork } from "@/lib/cards/versionKey";
 import { exportDeckAsImage } from "@/lib/utils/exportDeckImage";
 import {
   PopupOverlay, PopupCornerFrame, PopupTitle, PopupActionButton,
-  PopupDismissLink, SectionDivider, AngularButton,
+  PopupDismissLink, AngularButton,
 } from "@/components/game/PopupPrimitives";
 import { EvolvingCostMeter } from "@/components/deckBuilder/EvolvingCostMeter";
 import { EvolvingBuilderHelper } from "@/components/deckBuilder/EvolvingBuilderHelper";
@@ -1303,14 +1303,11 @@ export default function DeckBuilderPage() {
         </div>
       </div>
 
-      <SectionDivider width={100} />
-
       <div className="flex items-center gap-2 mb-2 flex-wrap">
         <button onClick={deckChars.length > 1 ? sortCharsByCost : undefined}
           className="px-2 py-0.5 text-[9px] uppercase font-bold inline-flex items-center gap-1"
           style={{
             backgroundColor: deckChars.length > 1 ? 'var(--t-accent-tint)' : 'rgba(255,255,255,0.02)',
-            borderLeft: deckChars.length > 1 ? '2px solid rgba(196,163,90,0.4)' : '2px solid var(--t-divider)',
             color: deckChars.length > 1 ? 'var(--t-accent)' : 'var(--t-border-strong)',
             cursor: deckChars.length > 1 ? 'pointer' : 'default',
           }}>
@@ -1321,7 +1318,6 @@ export default function DeckBuilderPage() {
           className="px-2 py-0.5 text-[9px] uppercase font-bold"
           style={{
             backgroundColor: deckChars.length > 1 ? 'var(--t-accent-tint)' : 'rgba(255,255,255,0.02)',
-            borderLeft: deckChars.length > 1 ? '2px solid rgba(196,163,90,0.4)' : '2px solid var(--t-divider)',
             color: deckChars.length > 1 ? 'var(--t-accent)' : 'var(--t-border-strong)',
             cursor: deckChars.length > 1 ? 'pointer' : 'default',
           }}>
@@ -1558,7 +1554,7 @@ export default function DeckBuilderPage() {
         <div className="flex flex-col flex-shrink-0 overflow-hidden" style={{
           width: '540px',
           backgroundColor: 'rgba(10, 10, 10, 0.95)',
-          borderLeft: '1px solid var(--t-divider)',
+          boxShadow: '-12px 0 32px rgba(0,0,0,0.4)',
         }}>
           
           <div className="px-3 pt-3 pb-1 flex-shrink-0">
@@ -2137,9 +2133,6 @@ export default function DeckBuilderPage() {
               border: !validation.valid
                 ? '1px solid var(--t-divider)'
                 : `1px solid ${loadedDeckId && isDirty ? '#c47a1a' : 'var(--t-success)'}`,
-              borderLeft: !validation.valid
-                ? '3px solid var(--t-divider)'
-                : `3px solid ${loadedDeckId && isDirty ? '#c47a1a' : 'var(--t-success)'}`,
               color: !validation.valid
                 ? 'var(--t-dim)'
                 : (loadedDeckId && isDirty ? '#c47a1a' : 'var(--t-success)'),
