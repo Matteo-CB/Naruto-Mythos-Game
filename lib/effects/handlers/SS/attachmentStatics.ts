@@ -45,6 +45,15 @@ export function textIsBlanked(char: CharacterInPlay): boolean {
   return hostCarries(char, FLASH_BOMB);
 }
 
+export function effetsActifsDe(
+  char: CharacterInPlay | undefined | null,
+): Array<{ type: string; description: string }> {
+  if (!char) return [];
+  if (textIsBlanked(char)) return [];
+  const haut = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+  return (haut?.effects ?? []) as Array<{ type: string; description: string }>;
+}
+
 export function cannotReceivePowerTokens(char: CharacterInPlay): boolean {
   return hostCarries(char, POISON_NEEDLES);
 }

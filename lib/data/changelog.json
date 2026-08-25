@@ -1,6 +1,40 @@
 {
   "entries": [
     {
+      "date": "2026-08-25",
+      "title_fr": "La Bombe Aveuglante efface vraiment tout",
+      "title_en": "Flash Bomb truly blanks everything",
+      "title_es": "La Bomba Cegadora borra de verdad todo",
+      "title_pt": "A Bomba Ofuscante apaga mesmo tudo",
+      "title_it": "La Bomba Accecante cancella davvero tutto",
+      "title_pl": "Bomba Oślepiająca naprawdę wymazuje wszystko",
+      "title_ja": "閃光弾がすべての文章を消します",
+      "categories": [
+        "fix"
+      ],
+      "changes_fr": [
+        "Un personnage sous BOMBE AVEUGLANTE 083 n a plus aucun effet : ROCK LEE et GAÏ perdent leurs jetons en fin de tour, les auras, immunités et blocages s éteignent."
+      ],
+      "changes_en": [
+        "A character under FLASH BOMB 083 has no effect left: ROCK LEE and GAI lose their tokens at end of round, and auras, immunities and locks all switch off."
+      ],
+      "changes_es": [
+        "Un personaje bajo BOMBA CEGADORA 083 ya no tiene ningún efecto: ROCK LEE y GAI pierden sus fichas al final de la ronda, y auras, inmunidades y bloqueos se apagan."
+      ],
+      "changes_pt": [
+        "Uma personagem sob BOMBA OFUSCANTE 083 deixa de ter qualquer efeito: ROCK LEE e GAI perdem as fichas no fim da ronda, e auras, imunidades e bloqueios desligam-se."
+      ],
+      "changes_it": [
+        "Un personaggio sotto BOMBA ACCECANTE 083 non ha più alcun effetto: ROCK LEE e GAI perdono i gettoni a fine round, e aure, immunità e blocchi si spengono."
+      ],
+      "changes_pl": [
+        "Postać pod BOMBĄ OŚLEPIAJĄCĄ 083 nie ma już żadnego efektu: ROCK LEE i GAI tracą żetony na koniec rundy, a aury, odporności i blokady wygasają."
+      ],
+      "changes_ja": [
+        "閃光弾 083 を受けたキャラクターの効果はすべて消えます。ロック・リーとガイはラウンド終了時にトークンを失い、オーラや耐性、制限も働かなくなります。"
+      ]
+    },
+    {
       "date": "2026-08-24",
       "title_fr": "La copie suit la condition de l effet",
       "title_en": "Copying follows the effect condition",

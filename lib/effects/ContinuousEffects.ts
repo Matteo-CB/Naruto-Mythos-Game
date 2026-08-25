@@ -6,7 +6,7 @@ import { isSummonPlay, jiraiyaGoldSources, JIRAIYA_GOLD_ID, JIRAIYA_GOLD_NAME } 
 import { characterHasGroup } from './groupUtils';
 import { kabuto139Triggers, KABUTO_139_ID, KABUTO_139_NAME } from './handlers/SS/kabuto139';
 import { ss2StaticPowerModifier, ss2StaticChakraBonus } from './handlers/SS/staticAuras';
-import { attachmentPowerBonus, missionAttachmentPowerModifier, hostChakraBonus, cannotReceivePowerTokens, textIsBlanked, virtualSoundFourCount } from './handlers/SS/attachmentStatics';
+import { attachmentPowerBonus, missionAttachmentPowerModifier, hostChakraBonus, cannotReceivePowerTokens, textIsBlanked, virtualSoundFourCount, effetsActifsDe } from './handlers/SS/attachmentStatics';
 
 
 
@@ -32,7 +32,7 @@ export function calculateContinuousChakraBonus(
   const friendlyChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
   const enemyChars = player === 'player1' ? mission.player2Characters : mission.player1Characters;
 
-  for (const effect of topCard.effects ?? []) {
+  for (const effect of effetsActifsDe(char)) {
     if (effect.type !== 'MAIN') continue;
     if (!effect.description.includes('[⧗]')) continue;
 
@@ -180,7 +180,7 @@ export function attachedPowerOf(
   if (char.isHidden || !char.attachments || char.attachments.length === 0) return 0;
   const hostTop = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
   const doublesFood = hostTop.id?.startsWith('SS-128')
-    && (hostTop.effects ?? []).some((e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('Food'));
+    && effetsActifsDe(char).some((e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('Food'));
   let total = 0;
   for (const att of char.attachments) {
     if (att.powerOverride !== undefined) { total += att.powerOverride; continue; }
@@ -231,7 +231,7 @@ export function calculateContinuousPowerModifier(
         if (enemy_zc.isHidden) continue;
         const enemyTop_zc = enemy_zc.stack?.length > 0 ? enemy_zc.stack[enemy_zc.stack.length - 1] : enemy_zc.card;
         if (enemyTop_zc.set !== 'KS' || enemyTop_zc.number !== 67) continue;
-        const hasRempart_zc = (enemyTop_zc.effects ?? []).some(
+        const hasRempart_zc = effetsActifsDe(enemy_zc).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
         );
         if (!hasRempart_zc) continue;
@@ -263,7 +263,7 @@ export function calculateContinuousPowerModifier(
       const fTop = friendly.stack?.length > 0 ? friendly.stack[friendly.stack?.length - 1] : friendly.card;
       
       if ((fTop.set === 'KS' && fTop.number === 35)) {
-        const hasEffect = (fTop.effects ?? []).some(
+        const hasEffect = effetsActifsDe(friendly).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('+2 Power'),
         );
         if (hasEffect) hiddenBonus += 2;
@@ -271,7 +271,7 @@ export function calculateContinuousPowerModifier(
 
       
       if ((fTop.set === 'KS' && fTop.number === 145)) {
-        const hasEffect = (fTop.effects ?? []).some(
+        const hasEffect = effetsActifsDe(friendly).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('+1 Power'),
         );
         if (hasEffect && state.edgeHolder === player) hiddenBonus += 1;
@@ -283,9 +283,8 @@ export function calculateContinuousPowerModifier(
     const ownerOfEnemyChars = player === 'player1' ? 'player2' : 'player1';
     for (const enemy of enemyCharsHidden) {
       if (enemy.isHidden) continue;
-      if (textIsBlanked(enemy)) continue;
       const eTop = enemy.stack?.length > 0 ? enemy.stack[enemy.stack?.length - 1] : enemy.card;
-      for (const effect of eTop.effects ?? []) {
+      for (const effect of effetsActifsDe(enemy)) {
         if (!effect.description.includes('[⧗]')) continue;
 
         if (((eTop.set === 'KS' && eTop.number === 128) && (effect.type === 'UPGRADE' || effect.type === 'MAIN')) || (eTop.set === 'KS' && eTop.number === 152)) {
@@ -319,7 +318,7 @@ export function calculateContinuousPowerModifier(
 
     const topCard = otherChar.stack?.length > 0 ? otherChar.stack[otherChar.stack?.length - 1] : otherChar.card;
 
-    for (const effect of topCard.effects ?? []) {
+    for (const effect of effetsActifsDe(otherChar)) {
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
       
@@ -343,10 +342,9 @@ export function calculateContinuousPowerModifier(
   
   for (const enemy of enemyChars) {
     if (enemy.isHidden) continue;
-    if (textIsBlanked(enemy)) continue;
     const enemyTopCard = enemy.stack?.length > 0 ? enemy.stack[enemy.stack?.length - 1] : enemy.card;
 
-    for (const effect of enemyTopCard.effects ?? []) {
+    for (const effect of effetsActifsDe(enemy)) {
       if (!effect.description.includes('[⧗]')) continue;
 
       
@@ -366,7 +364,7 @@ export function calculateContinuousPowerModifier(
 
 
   const selfTopCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-  for (const effect of selfTopCard.effects ?? []) {
+  for (const effect of effetsActifsDe(char)) {
     if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
     
@@ -495,7 +493,7 @@ export function isRempartZeroed(
     if (enemy.isHidden) continue;
     const enemyTopCard = enemy.stack?.length > 0 ? enemy.stack[enemy.stack?.length - 1] : enemy.card;
     if ((enemyTopCard.set === 'KS' && enemyTopCard.number === 67)) {
-      const hasRempartEffect = (enemyTopCard.effects ?? []).some(
+      const hasRempartEffect = effetsActifsDe(enemy).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
       );
       if (hasRempartEffect) {
@@ -529,19 +527,9 @@ export function shouldRetainPowerTokens(char: CharacterInPlay): boolean {
   
   if (char.isHidden) return false;
 
-  const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-
-  
-  if ((topCard.set === 'KS' && (topCard.number === 39 || topCard.number === 43)) || (topCard.set === 'SS' && topCard.number === 115)) {
-    const hasRetention = (topCard.effects ?? []).some(
-      (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('lose Power tokens'),
-    );
-    if (hasRetention) {
-      return true;
-    }
-  }
-
-  return false;
+  return effetsActifsDe(char).some(
+    (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('lose Power tokens'),
+  );
 }
 
 
@@ -563,15 +551,10 @@ export function isProtectedFromEnemyHide(
   for (const char of mission[friendlySide]) {
     if (char.isHidden) continue;
     if (char.instanceId === targetChar.instanceId) continue; // A character is not friendly to itself
-    const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-
-    
-    if ((topCard.set === 'KS' && topCard.number === 115)) {
-      const hasProtection = (topCard.effects ?? []).some(
-        (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('cannot be hidden by enemy effects'),
-      );
-      if (hasProtection) return true;
-    }
+    const hasProtection = effetsActifsDe(char).some(
+      (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('cannot be hidden by enemy effects'),
+    );
+    if (hasProtection) return true;
   }
 
   return false;
@@ -584,8 +567,7 @@ export function isProtectedFromEnemyHide(
 
 export function isImmuneToEnemyHideOrDefeat(char: CharacterInPlay): boolean {
   if (char.isHidden) return false;
-  const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-  return (topCard.effects ?? []).some(
+  return effetsActifsDe(char).some(
     (e) =>
       e.type === 'MAIN' &&
       e.description.includes('[⧗]') &&
@@ -617,8 +599,7 @@ export function isHiddenRevealBlocked(
   const opponentChars = opponent === 'player1' ? mission.player1Characters : mission.player2Characters;
   for (const oc of opponentChars) {
     if (oc.isHidden) continue;
-    const top = oc.stack?.length > 0 ? oc.stack[oc.stack.length - 1] : oc.card;
-    const hasLock = (top.effects ?? []).some(
+    const hasLock = effetsActifsDe(oc).some(
       (e) =>
         e.type === 'MAIN' &&
         typeof e.description === 'string' &&
@@ -642,7 +623,7 @@ export function isMovementBlockedByKurenai(
     if (ch.isHidden) continue;
     const chTop = ch.stack?.length > 0 ? ch.stack[ch.stack?.length - 1] : ch.card;
     if ((chTop.set === 'KS' && chTop.number === 35) || (chTop.set === 'SS' && chTop.number === 147)) {
-      const hasRestriction = (chTop.effects ?? []).some(
+      const hasRestriction = effetsActifsDe(ch).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
           (e.description.includes('cannot move') || e.description.includes("can't be moved")),
       );
@@ -916,7 +897,7 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
     const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
     const topCardNumber = typeof topCard.number === 'string' ? parseInt(topCard.number, 10) : topCard.number;
 
-    for (const effect of topCard.effects ?? []) {
+    for (const effect of effetsActifsDe(char)) {
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
 
@@ -968,7 +949,7 @@ export function triggerOnPlayReactions(state: GameState, playingPlayer: PlayerID
           if (enemyChar.isHidden) continue;
           const eTop = enemyChar.stack?.length > 0 ? enemyChar.stack[enemyChar.stack.length - 1] : enemyChar.card;
           if (eTop.set !== 'KS' || eTop.number !== 56) continue;
-          const hasProtection = (eTop.effects ?? []).some(
+          const hasProtection = effetsActifsDe(enemyChar).some(
             (e: { type: string; description: string }) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('chakra'),
           );
           if (!hasProtection) continue;
@@ -1034,7 +1015,7 @@ export function applyRempartTokenRemoval(state: GameState): GameState {
       const rempartChar = missions[mIdx][friendlySide].find((c) => {
         if (c.isHidden) return false;
         const top = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-        return (top.set === 'KS' && top.number === 67) && (top.effects ?? []).some(
+        return (top.set === 'KS' && top.number === 67) && effetsActifsDe(c).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
         );
       });
