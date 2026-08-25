@@ -156,7 +156,7 @@ export function construireDecklist(
   lignes.push(`Main Deck: ${personnages.length}`);
   for (const { carte, quantite } of compter(personnages)) {
     lignes.push(
-      `${quantite}${SEPARATEUR}${nomAffiche(carte)}${SEPARATEUR}(${referenceOfficielle(carte, index)})`,
+      `${quantite}x${SEPARATEUR}${nomAffiche(carte)}${SEPARATEUR}(${referenceOfficielle(carte, index)})`,
     );
   }
 

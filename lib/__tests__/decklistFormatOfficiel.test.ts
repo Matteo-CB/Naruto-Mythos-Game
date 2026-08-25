@@ -145,7 +145,7 @@ describe('chaque carte du jeu se relit telle qu elle a ete ecrite', () => {
     const perdues: string[] = [];
     for (const c of CARTES) {
       const id = c.cardId ?? c.id;
-      const ligne = `2   ${nomAffiche(c)}   (${referenceOfficielle(c, INDEX)})`;
+      const ligne = `2x   ${nomAffiche(c)}   (${referenceOfficielle(c, INDEX)})`;
       const analysee = analyserLigne(ligne);
       if (!analysee) { perdues.push(`${id}: ligne illisible`); continue; }
       const relue = resoudreLigne(analysee, INDEX, SET_PAR_NUMERO);
@@ -213,14 +213,15 @@ describe('la decklist complete se lit comme le document officiel', () => {
   });
 
   it('une ligne suit la forme quantite, nom, version, reference', () => {
-    expect(texte).toContain('2   AKAMARU Ninja Hound   (1-27/130)');
+    expect(texte).toContain('2x   AKAMARU Ninja Hound   (1-27/130)');
     expect(texte.split('AKAMARU Ninja Hound').length - 1, 'une seule ligne pour les deux').toBe(1);
   });
 
-  it('la quantite est un nombre nu, sans la lettre x', () => {
-    const ligne = texte.split('\n').find((l) => l.includes('1-27/130'))!;
-    expect(ligne.startsWith('2   '), `obtenu: ${ligne}`).toBe(true);
-    expect(ligne, 'le document ecrit la quantite seule').not.toContain('2x ');
+  it('la quantite porte toujours le x, meme pour un seul exemplaire', () => {
+    const deux = texte.split('\n').find((l) => l.includes('1-27/130'))!;
+    expect(deux.startsWith('2x'), `obtenu: ${deux}`).toBe(true);
+    const un = texte.split('\n').find((l) => l.includes('1-72/130'))!;
+    expect(un.startsWith('1x'), `obtenu: ${un}`).toBe(true);
   });
 
   it('les missions n ont pas de quantite, comme dans le document', () => {
