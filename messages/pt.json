@@ -1888,7 +1888,9 @@
       "all": "Todas",
       "score": "Score",
       "continuous": "Contínuo"
-    }
+    },
+    "exportAsPdf": "Exportar em PDF",
+    "exportPdfDesc": "O PDF imprime as cartas no tamanho real, 9 por folha A4, encostadas umas às outras para facilitar o recorte."
   },
   "seoPages": {
     "collection": {

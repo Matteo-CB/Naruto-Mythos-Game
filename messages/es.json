@@ -2017,7 +2017,9 @@
       "all": "Todas",
       "score": "Score",
       "continuous": "Continuo"
-    }
+    },
+    "exportAsPdf": "Exportar en PDF",
+    "exportPdfDesc": "El PDF imprime las cartas a tamaño real, 9 por hoja A4, pegadas entre sí para recortarlas fácilmente."
   },
   "discord": {
     "linkDiscord": "Vincular Discord",

@@ -30,6 +30,7 @@ import {
 import { getCardEffectDescription } from "@/lib/data/effectDescriptions";
 import { isAlternateArtwork } from "@/lib/cards/versionKey";
 import { exportDeckAsImage } from "@/lib/utils/exportDeckImage";
+import { exportDeckAsPdf } from "@/lib/utils/exportDeckPdf";
 import {
   PopupOverlay, PopupCornerFrame, PopupTitle, PopupActionButton,
   PopupDismissLink, AngularButton,
@@ -2360,7 +2361,13 @@ export default function DeckBuilderPage() {
               <PopupActionButton accentColor="var(--t-accent)" onClick={() => { exportDeckAsImage(deckName, deckChars, deckMissions); trackUiHook('deck.exported'); setShowExportModal(false); }}>
                 {t("deckBuilder.exportAsImage")}
               </PopupActionButton>
+              <PopupActionButton accentColor="var(--t-accent)" onClick={() => { exportDeckAsPdf(deckName, deckChars, deckMissions); trackUiHook('deck.exported'); setShowExportModal(false); }}>
+                {t("deckBuilder.exportAsPdf")}
+              </PopupActionButton>
             </div>
+            <p className="text-xs mb-3" style={{ color: 'var(--t-muted)', paddingLeft: '8px' }}>
+              {t("deckBuilder.exportPdfDesc")}
+            </p>
             <p className="text-xs mb-2" style={{ color: 'var(--t-muted)', paddingLeft: '8px' }}>
               {t("deckBuilder.exportTextDesc")}
             </p>

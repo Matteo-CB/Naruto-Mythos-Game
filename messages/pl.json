@@ -1888,7 +1888,9 @@
       "all": "Wszystkie",
       "score": "Score",
       "continuous": "Ciągłe"
-    }
+    },
+    "exportAsPdf": "Eksportuj do PDF",
+    "exportPdfDesc": "PDF drukuje karty w rzeczywistym rozmiarze, 9 na arkusz A4, jedna przy drugiej, aby ułatwić wycinanie."
   },
   "seoPages": {
     "collection": {

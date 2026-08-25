@@ -2016,7 +2016,9 @@
       "all": "すべて",
       "score": "SCORE",
       "continuous": "継続"
-    }
+    },
+    "exportAsPdf": "PDF で書き出す",
+    "exportPdfDesc": "PDF はカードを実寸で、A4 一枚に 9 枚、切り取りやすいように隙間なく並べて印刷します。"
   },
   "discord": {
     "linkDiscord": "Discordを連携",

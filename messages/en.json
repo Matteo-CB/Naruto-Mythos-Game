@@ -2012,7 +2012,9 @@
       "all": "All",
       "score": "Score",
       "continuous": "Ongoing"
-    }
+    },
+    "exportAsPdf": "Export as PDF",
+    "exportPdfDesc": "The PDF prints the cards at their real size, 9 per A4 sheet, edge to edge so they are easy to cut out."
   },
   "discord": {
     "linkDiscord": "Link Discord",
