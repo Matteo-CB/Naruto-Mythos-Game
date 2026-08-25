@@ -61,7 +61,6 @@ export function BanNotification() {
       <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.9)' }}>
         <div className="flex flex-col items-center gap-4 max-w-md w-full text-center px-6 py-8" style={{
           backgroundColor: 'var(--t-panel)', }}>
-          <div className="w-16 h-px" style={{ backgroundColor: 'rgba(179,62,62,0.4)' }} />
           <h2 className="text-lg font-bold uppercase tracking-wider" style={{ color: 'var(--t-danger)' }}>
             {t('gameBanned')}
           </h2>
@@ -73,7 +72,6 @@ export function BanNotification() {
             style={{ backgroundColor: 'rgba(179,62,62,0.1)', color: 'var(--t-danger)' }}>
             {t('understood')}
           </button>
-          <div className="w-16 h-px" style={{ backgroundColor: 'rgba(179,62,62,0.4)' }} />
         </div>
       </div>
     );

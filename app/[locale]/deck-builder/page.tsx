@@ -998,7 +998,6 @@ export default function DeckBuilderPage() {
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="flex flex-col items-center gap-6 max-w-md w-full text-center relative z-10">
             <h1 className="text-2xl font-bold tracking-wider uppercase" style={{ color: "var(--t-accent)" }}>{t("deckBuilder.title")}</h1>
-            <div className="w-16 h-px mx-auto" style={{ backgroundColor: 'rgba(196, 163, 90, 0.3)' }} />
             <p className="text-sm" style={{ color: "var(--t-muted)" }}>{t("online.signInRequired")}</p>
             <div className="flex gap-3">
               <Link href="/login" className="px-6 py-2.5 text-sm font-bold uppercase tracking-wider" style={{ backgroundColor: "var(--t-accent)", color: "var(--t-bg)", }}>{t("common.signIn")}</Link>

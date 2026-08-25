@@ -106,12 +106,6 @@ export function MissionDeckIntro() {
             >
               {t('game.missionDeckIntro.title')}
             </motion.h2>
-            <motion.div
-              initial={{ scaleX: 0, opacity: 0 }}
-              animate={{ scaleX: 1, opacity: 1 }}
-              transition={{ duration: 0.45, ease: 'easeOut', delay: 0.2 }}
-              className="mt-1 h-[1px] w-32 origin-center bg-gradient-to-r from-transparent via-[#c4a35a]/60 to-transparent"
-            />
           </div>
 
           <div className="flex flex-row items-end justify-center gap-3 md:gap-5">

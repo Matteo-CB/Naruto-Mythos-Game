@@ -40,7 +40,6 @@ export default function Error({
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
       <div className="flex flex-col items-center gap-4 max-w-md w-full text-center px-4">
-        <div className="w-12 h-px" style={{ backgroundColor: 'color-mix(in srgb, var(--t-danger) 40%, transparent)' }} />
         <h2 className="text-lg font-bold uppercase tracking-wider" style={{ color: 'var(--t-danger)' }}>
           {obsolete ? t('staleTitle') : t('title')}
         </h2>
@@ -74,7 +73,6 @@ export default function Error({
             {t('home')}
           </a>
         </div>
-        <div className="w-12 h-px mt-2" style={{ backgroundColor: 'color-mix(in srgb, var(--t-danger) 40%, transparent)' }} />
       </div>
     </div>
   );

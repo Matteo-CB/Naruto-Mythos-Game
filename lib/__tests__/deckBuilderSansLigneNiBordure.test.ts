@@ -5,6 +5,68 @@ import { join } from 'path';
 const RACINE = join(__dirname, '..', '..');
 const DECK_BUILDER = join(RACINE, 'app', '[locale]', 'deck-builder', 'page.tsx');
 
+describe('aucun filet court ne flotte au milieu du vide, nulle part', () => {
+  function fichiers(dossier: string): string[] {
+    const complet = join(RACINE, dossier);
+    let entrees: string[] = [];
+    try { entrees = readdirSync(complet); } catch { return []; }
+    const trouves: string[] = [];
+    for (const e of entrees) {
+      if (e === 'node_modules' || e === '.next') continue;
+      const chemin = join(complet, e);
+      if (statSync(chemin).isDirectory()) trouves.push(...fichiers(join(dossier, e)));
+      else if (e.endsWith('.tsx')) trouves.push(join(dossier, e));
+    }
+    return trouves;
+  }
+
+  const LARGEUR_FIXE = /\bw-(\d+|\[[^\]]+\])/;
+  const HAUTEUR_FILET = /\bh-px\b|h-\[1px\]/;
+
+  it('un filet doit occuper toute sa ligne, ou ne pas exister', () => {
+    const fautifs: string[] = [];
+    for (const fichier of [...fichiers('app'), ...fichiers('components')]) {
+      const lignes = readFileSync(join(RACINE, fichier), 'utf8').split('\n');
+      lignes.forEach((ligne, i) => {
+        if (!HAUTEUR_FILET.test(ligne)) return;
+        if (!LARGEUR_FIXE.test(ligne)) return;
+        if (/w-full/.test(ligne) || /flex-1/.test(ligne)) return;
+        fautifs.push(`${fichier}:${i + 1}: ${ligne.trim().slice(0, 90)}`);
+      });
+    }
+    expect(
+      fautifs,
+      'un trait de largeur fixe pose sous un titre centre ne separe rien: il flotte au milieu '
+      + 'du vide. Soit le filet remplit sa ligne (w-full, flex-1) et separe vraiment deux blocs, '
+      + 'soit il n existe pas',
+    ).toEqual([]);
+  });
+
+  it('la garde balaie bien les deux dossiers', () => {
+    expect(fichiers('app').length, 'des pages sont analysees').toBeGreaterThan(50);
+    expect(fichiers('components').length, 'des composants sont analyses').toBeGreaterThan(50);
+  });
+});
+
+describe('les ecrans qui demandent une connexion restent nus', () => {
+  const ecrans = [
+    join('app', '[locale]', 'deck-builder', 'page.tsx'),
+    join('app', '[locale]', 'play', 'online', 'page.tsx'),
+    join('app', '[locale]', 'deck-builder', 'manage', 'page.tsx'),
+    join('components', 'social', 'FriendsSection.tsx'),
+  ];
+
+  for (const ecran of ecrans) {
+    it(`${ecran} n ajoute aucun trait sous son titre`, () => {
+      const source = readFileSync(join(RACINE, ecran), 'utf8');
+      const at = source.indexOf('signInRequired');
+      expect(at, 'l ecran demande bien une connexion').toBeGreaterThan(-1);
+      const bloc = source.slice(Math.max(0, at - 900), at + 400);
+      expect(bloc, 'le message et le bouton suffisent').not.toMatch(/h-px|h-\[1px\]/);
+    });
+  }
+});
+
 describe('le deck builder ne porte plus de trait flottant', () => {
   const source = readFileSync(DECK_BUILDER, 'utf8');
 

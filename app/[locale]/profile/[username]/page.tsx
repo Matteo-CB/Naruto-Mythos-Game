@@ -479,9 +479,7 @@ export default function ProfilePage({
                   : '...'}
             </div>
 
-            <div className="h-px w-12 sm:w-16 my-1.5" style={{ backgroundColor: 'var(--t-surface-2)' }} />
-
-            <div className="flex items-center gap-2 max-w-full">
+            <div className="flex items-center gap-2 max-w-full mt-3">
               <CountryFlag code={profile.countryCode} size={26} />
               <h1
                 className="font-display text-lg sm:text-2xl leading-tight wrap-break-word"
