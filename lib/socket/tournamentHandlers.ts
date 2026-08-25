@@ -1209,10 +1209,20 @@ async function autoForfeitIfEliminated(
   if (!m || !m.player1Id || !m.player2Id) return false;
   if (m.status === 'completed' || m.status === 'forfeit') return false;
   if ((m.bracket ?? MAIN_BRACKET) === THIRD_PLACE_BRACKET) return false;
-  const elim = await prisma.tournamentParticipant.findMany({
+  const elimBruts = await prisma.tournamentParticipant.findMany({
     where: { tournamentId, userId: { in: [m.player1Id, m.player2Id] }, eliminated: true },
-    select: { userId: true },
+    select: { userId: true, eliminatedRound: true },
   });
+
+  const elim = elimBruts.filter((p) => p.eliminatedRound !== m.round);
+  for (const perime of elimBruts.filter((p) => p.eliminatedRound === m.round)) {
+    console.error(
+      `[Tournament] CRITICAL: ${perime.userId} is flagged eliminated in round ${m.round}, the very round of match ${m.id} `
+      + 'which is still open. That flag can only come from a result this match no longer has, so it is ignored: '
+      + 'a player is never forfeited on the strength of an outcome that was voided.',
+    );
+  }
+
   if (elim.length === 0) return false;
 
   if (elim.length === 2) {
@@ -1891,6 +1901,61 @@ async function buildCurrentStandings(tournamentId: string) {
 
 
 
+export async function annulerResultatPerimeDuMatchSuivant(
+  tournamentId: string,
+  nextMatch: {
+    id: string;
+    status: string;
+    round: number;
+    matchIndex: number;
+    bracket?: string | null;
+    player1Id?: string | null;
+    player2Id?: string | null;
+  },
+  updateData: Record<string, unknown>,
+): Promise<boolean> {
+  if (nextMatch.status !== 'completed' && nextMatch.status !== 'forfeit') return false;
+
+  console.error(
+    `[Tournament] CRITICAL: match ${nextMatch.id} was already ${nextMatch.status} when a corrected qualifier arrived. `
+    + 'Its result is voided and both players are put back in play: nobody may lose it on an outcome that no longer exists.',
+  );
+  logMatchEvent({
+    type: 'match.stale-result.voided',
+    tournamentId,
+    matchId: nextMatch.id,
+    bracket: nextMatch.bracket ?? undefined,
+    round: nextMatch.round,
+    matchIndex: nextMatch.matchIndex,
+  });
+
+  updateData.status = 'pending';
+  updateData.winnerId = null;
+  updateData.winnerUsername = null;
+  updateData.completedAt = null;
+  updateData.roomCode = null;
+  updateData.gameId = null;
+  updateData.startedAt = null;
+  updateData.absenceDeadline = null;
+  updateData.absentPlayerId = null;
+
+  const concernes = [nextMatch.player1Id, nextMatch.player2Id].filter((id): id is string => !!id);
+  if (concernes.length > 0) {
+    await prisma.tournamentParticipant.updateMany({
+      where: {
+        tournamentId,
+        userId: { in: concernes },
+        eliminated: true,
+        eliminatedRound: nextMatch.round,
+      },
+      data: { eliminated: false, eliminatedRound: null },
+    });
+  }
+
+  clearTournamentMatchTimers(nextMatch.id);
+  return true;
+}
+
 export async function advanceMatchWinner(
   io: Server | null,
   tournamentId: string,
@@ -2014,6 +2079,8 @@ export async function advanceMatchWinner(
   const updateData: Record<string, unknown> = {};
   if (isTopSlot) { updateData.player1Id = winnerId; updateData.player1Username = winnerUsername; }
   else { updateData.player2Id = winnerId; updateData.player2Username = winnerUsername; }
+
+  await annulerResultatPerimeDuMatchSuivant(tournamentId, nextMatch, updateData);
 
   const updated = await prisma.tournamentMatch.update({ where: { id: nextMatch.id }, data: updateData });
   clearTournamentMatchTimers(nextMatch.id);

@@ -9,6 +9,7 @@ type MatchEventType =
   | 'match.forfeit.overridden'
   | 'match.auto-forfeit.eliminated'
   | 'match.auto-forfeit.eliminated.both'
+  | 'match.stale-result.voided'
   | 'match.completed.played'
   | 'participant.excluded.invalid-deck'
   | 'match.series.game'
