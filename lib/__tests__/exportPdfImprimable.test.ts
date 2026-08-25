@@ -4,6 +4,7 @@ import { join } from 'path';
 import {
   construirePdf,
   dessinerEnRemplissant,
+  boiteOpaque,
   CARTE_L_MM,
   CARTE_H_MM,
   A4_L_MM,
@@ -11,6 +12,8 @@ import {
   COLONNES,
   RANGEES,
 } from '@/lib/utils/exportDeckPdf';
+import { isLandscapeCard } from '@/lib/cards/orientation';
+import { getAllCards } from '@/lib/data/cardIndex';
 
 const RACINE = join(__dirname, '..', '..');
 
@@ -106,6 +109,107 @@ describe('le fichier produit est un vrai PDF', () => {
     const texte = await texteDu(construirePdf([faussePage()]));
     expect(texte).toContain('595.28 0 0 841.89 0 0 cm');
     expect(texte).toContain('/Im0 Do');
+  });
+});
+
+describe('le contour transparent des cartes est retire avant l impression', () => {
+  function image(largeur: number, hauteur: number, opaque: { x0: number; y0: number; x1: number; y1: number }) {
+    const data = new Uint8ClampedArray(largeur * hauteur * 4);
+    for (let y = opaque.y0; y <= opaque.y1; y += 1) {
+      for (let x = opaque.x0; x <= opaque.x1; x += 1) data[(y * largeur + x) * 4 + 3] = 255;
+    }
+    return data;
+  }
+
+  it('une carte bordee de transparence est ramenee a son dessin', () => {
+    const zone = boiteOpaque(image(800, 1100, { x0: 27, y0: 28, x1: 771, y1: 1066 }), 800, 1100)!;
+    expect(zone, 'exactement les marges mesurees sur les cartes du jeu')
+      .toEqual({ sx: 27, sy: 28, sl: 745, sh: 1039 });
+  });
+
+  it('une carte sans transparence garde toute sa surface', () => {
+    const zone = boiteOpaque(image(652, 464, { x0: 0, y0: 0, x1: 651, y1: 463 }), 652, 464)!;
+    expect(zone).toEqual({ sx: 0, sy: 0, sl: 652, sh: 464 });
+  });
+
+  it('une image entierement transparente ne renvoie aucune zone', () => {
+    expect(boiteOpaque(new Uint8ClampedArray(10 * 10 * 4), 10, 10)).toBeNull();
+  });
+
+  it('un pixel presque transparent ne compte pas comme du dessin', () => {
+    const data = new Uint8ClampedArray(4 * 4 * 4);
+    data[3] = 4;
+    data[(2 * 4 + 2) * 4 + 3] = 255;
+    expect(boiteOpaque(data, 4, 4)).toEqual({ sx: 2, sy: 2, sl: 1, sh: 1 });
+  });
+
+  it('deux cartes aux marges differentes remplissent la meme case', () => {
+    const appels: Array<Record<string, number>> = [];
+    const ctx = {
+      drawImage: (_i: unknown, sx: number, sy: number, sl: number, sh: number,
+        x: number, y: number, l: number, h: number) => { appels.push({ sx, sy, sl, sh, x, y, l, h }); },
+    } as unknown as CanvasRenderingContext2D;
+
+    dessinerEnRemplissant(ctx, { width: 800, height: 1100 } as HTMLImageElement, 0, 0, 744, 1039,
+      { sx: 27, sy: 28, sl: 745, sh: 1039 });
+    dessinerEnRemplissant(ctx, { width: 791, height: 1100 } as HTMLImageElement, 0, 0, 744, 1039,
+      { sx: 0, sy: 0, sl: 791, sh: 1100 });
+
+    for (const a of appels) {
+      expect(a.l, 'la case fait toujours la meme largeur').toBe(744);
+      expect(a.h, 'et la meme hauteur').toBe(1039);
+    }
+    expect(appels[0].sx, 'la marge transparente est sautee').toBeGreaterThanOrEqual(27);
+    expect(
+      appels[1].sx,
+      'la carte sans marge part de son bord, au rognage de cadrage pres',
+    ).toBeLessThan(3);
+  });
+
+  it('la zone lue reste dans les bornes de l image', () => {
+    const appels: Array<Record<string, number>> = [];
+    const ctx = {
+      drawImage: (_i: unknown, sx: number, sy: number, sl: number, sh: number) => {
+        appels.push({ sx, sy, sl, sh });
+      },
+    } as unknown as CanvasRenderingContext2D;
+    dessinerEnRemplissant(ctx, { width: 800, height: 1100 } as HTMLImageElement, 0, 0, 744, 1039,
+      { sx: 27, sy: 28, sl: 745, sh: 1039 });
+    const a = appels[0];
+    expect(a.sx).toBeGreaterThanOrEqual(27);
+    expect(a.sx + a.sl).toBeLessThanOrEqual(27 + 745);
+    expect(a.sy).toBeGreaterThanOrEqual(28);
+    expect(a.sy + a.sh).toBeLessThanOrEqual(28 + 1039);
+  });
+});
+
+describe('les cartes couchees sont imprimees couchees', () => {
+  const source = readFileSync(join(RACINE, 'lib/utils/exportDeckPdf.ts'), 'utf8');
+
+  it('les equipements de mission rejoignent les missions, pas la grille des personnages', () => {
+    expect(source, 'une seule regle decide de l orientation dans tout le produit')
+      .toContain("import { isLandscapeCard } from '@/lib/cards/orientation'");
+    expect(source).toContain('const debout = characters.filter((c) => !estCouchee(c));');
+    expect(source).toContain('...characters.filter(estCouchee),');
+  });
+
+  it('la grille couchee inverse bien largeur et hauteur', () => {
+    expect(source).toContain('CARTE_H_MM,\n      CARTE_L_MM,');
+  });
+
+  it('un equipement de mission est bien reconnu comme couche', () => {
+    const equipement = { card_type: 'attachment', attach_to: 'mission' } as const;
+    const objet = { card_type: 'attachment', attach_to: 'character' } as const;
+    expect(isLandscapeCard(equipement), 'EXAM STADIUM et ses semblables').toBe(true);
+    expect(isLandscapeCard(objet), 'un objet porte par un personnage reste debout').toBe(false);
+    expect(isLandscapeCard({ card_type: 'mission' }), 'une mission').toBe(true);
+    expect(isLandscapeCard({ card_type: 'character' }), 'un personnage').toBe(false);
+  });
+
+  it('le catalogue contient bien des equipements de mission a imprimer couches', () => {
+    const couches = (getAllCards() as Array<{ card_type?: string; attach_to?: string | null }>)
+      .filter((c) => c.card_type === 'attachment' && c.attach_to === 'mission');
+    expect(couches.length, 'sinon ce chemin ne serait jamais emprunte').toBeGreaterThan(0);
   });
 });
 

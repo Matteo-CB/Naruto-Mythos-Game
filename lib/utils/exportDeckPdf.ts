@@ -1,4 +1,5 @@
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
+import { isLandscapeCard } from '@/lib/cards/orientation';
 import { normalizeImagePath } from './imagePath';
 
 const MM_PAR_POUCE = 25.4;
@@ -32,6 +33,61 @@ function chargerImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
+export interface ZoneSource { sx: number; sy: number; sl: number; sh: number }
+
+const SEUIL_ALPHA = 8;
+const zonesOpaques = new Map<string, ZoneSource>();
+
+export function boiteOpaque(
+  alpha: Uint8ClampedArray,
+  largeur: number,
+  hauteur: number,
+): ZoneSource | null {
+  let x0 = largeur;
+  let y0 = hauteur;
+  let x1 = -1;
+  let y1 = -1;
+  for (let y = 0; y < hauteur; y += 1) {
+    const ligne = y * largeur;
+    for (let x = 0; x < largeur; x += 1) {
+      if (alpha[(ligne + x) * 4 + 3] <= SEUIL_ALPHA) continue;
+      if (x < x0) x0 = x;
+      if (x > x1) x1 = x;
+      if (y < y0) y0 = y;
+      if (y > y1) y1 = y;
+    }
+  }
+  if (x1 < x0 || y1 < y0) return null;
+  return { sx: x0, sy: y0, sl: x1 - x0 + 1, sh: y1 - y0 + 1 };
+}
+
+export function zoneOpaque(img: HTMLImageElement): ZoneSource {
+  const pleine: ZoneSource = { sx: 0, sy: 0, sl: img.width, sh: img.height };
+  const cle = img.src;
+  if (cle) {
+    const connue = zonesOpaques.get(cle);
+    if (connue) return connue;
+  }
+
+  let zone = pleine;
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (ctx) {
+      ctx.drawImage(img, 0, 0);
+      const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      zone = boiteOpaque(pixels, canvas.width, canvas.height) ?? pleine;
+    }
+  } catch {
+    zone = pleine;
+  }
+
+  if (cle) zonesOpaques.set(cle, zone);
+  return zone;
+}
+
 export function dessinerEnRemplissant(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
@@ -39,19 +95,20 @@ export function dessinerEnRemplissant(
   y: number,
   l: number,
   h: number,
+  zone: ZoneSource = zoneOpaque(img),
 ): void {
-  const ratioSource = img.width / img.height;
+  const ratioSource = zone.sl / zone.sh;
   const ratioCible = l / h;
-  let sx = 0;
-  let sy = 0;
-  let sl = img.width;
-  let sh = img.height;
+  let sx = zone.sx;
+  let sy = zone.sy;
+  let sl = zone.sl;
+  let sh = zone.sh;
   if (ratioSource > ratioCible) {
-    sl = img.height * ratioCible;
-    sx = (img.width - sl) / 2;
+    sl = zone.sh * ratioCible;
+    sx = zone.sx + (zone.sl - sl) / 2;
   } else {
-    sh = img.width / ratioCible;
-    sy = (img.height - sh) / 2;
+    sh = zone.sl / ratioCible;
+    sy = zone.sy + (zone.sh - sh) / 2;
   }
   ctx.drawImage(img, sx, sy, sl, sh, x, y, l, h);
 }
@@ -197,21 +254,30 @@ export async function exportDeckAsPdf(
       }),
     );
 
-  const imagesPersos = await chargerToutes(characters);
-  const imagesMissions = await chargerToutes(missions);
+  const estCouchee = (c: CharacterCard) =>
+    isLandscapeCard(c as Parameters<typeof isLandscapeCard>[0]);
+
+  const debout = characters.filter((c) => !estCouchee(c));
+  const couchees = [
+    ...characters.filter(estCouchee),
+    ...missions,
+  ] as Array<{ image_file?: string }>;
+
+  const imagesDebout = await chargerToutes(debout);
+  const imagesCouchees = await chargerToutes(couchees);
 
   const pages: PageJpeg[] = [];
   const parPage = COLONNES * RANGEES;
 
-  for (let i = 0; i < imagesPersos.length; i += parPage) {
+  for (let i = 0; i < imagesDebout.length; i += parPage) {
     pages.push(await rendrePage(
-      imagesPersos.slice(i, i + parPage), CARTE_L_MM, CARTE_H_MM, COLONNES, RANGEES,
+      imagesDebout.slice(i, i + parPage), CARTE_L_MM, CARTE_H_MM, COLONNES, RANGEES,
     ));
   }
 
-  const missionsParPage = MISSIONS_PAR_RANGEE * RANGEES;
-  for (let i = 0; i < imagesMissions.length; i += missionsParPage) {
-    const lot = imagesMissions.slice(i, i + missionsParPage);
+  const coucheesParPage = MISSIONS_PAR_RANGEE * RANGEES;
+  for (let i = 0; i < imagesCouchees.length; i += coucheesParPage) {
+    const lot = imagesCouchees.slice(i, i + coucheesParPage);
     pages.push(await rendrePage(
       lot,
       CARTE_H_MM,
