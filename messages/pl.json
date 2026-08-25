@@ -1753,7 +1753,7 @@
       "typeAttachments": "Załączniki"
     },
     "search": {
-      "helpButton": "? Wyszukiwanie Zaawansowane",
+      "helpButton": "Wyszukiwanie Zaawansowane",
       "helpTitle": "Wyszukiwanie Zaawansowane",
       "helpIntro": "Użyj paska wyszukiwania, aby znaleźć karty po nazwie, lub połącz filtry, używając poniższej składni. Kliknij dowolny przykład, aby go wypróbować.",
       "nameLabel": "Nazwa / ID",

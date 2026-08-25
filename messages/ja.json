@@ -1881,7 +1881,7 @@
       "typeAttachments": "アタッチメント"
     },
     "search": {
-      "helpButton": "? 詳細検索",
+      "helpButton": "詳細検索",
       "helpTitle": "詳細検索",
       "helpIntro": "検索バーで名前からカードを探すか、下の構文で絞り込みを組み合わせてください。例をクリックすると試せます。",
       "nameLabel": "名前 / ID",

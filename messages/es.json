@@ -1882,7 +1882,7 @@
       "typeAttachments": "Accesorios"
     },
     "search": {
-      "helpButton": "? Búsqueda avanzada",
+      "helpButton": "Búsqueda avanzada",
       "helpTitle": "Búsqueda avanzada",
       "helpIntro": "Usa la barra de búsqueda para encontrar cartas por nombre, o combina filtros con la sintaxis de abajo. Haz clic en cualquier ejemplo para probarlo.",
       "nameLabel": "Nombre / ID",

@@ -1877,7 +1877,7 @@
       "typeAttachments": "Attachments"
     },
     "search": {
-      "helpButton": "? Advanced Search",
+      "helpButton": "Advanced Search",
       "helpTitle": "Advanced Search",
       "helpIntro": "Use the search bar to find cards by name, or combine filters using the syntax below. Click any example to try it.",
       "nameLabel": "Name / ID",

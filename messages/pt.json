@@ -1753,7 +1753,7 @@
       "typeAttachments": "Anexos"
     },
     "search": {
-      "helpButton": "? Busca Avançada",
+      "helpButton": "Busca Avançada",
       "helpTitle": "Busca Avançada",
       "helpIntro": "Use a barra de busca para encontrar cartas por nome, ou combine filtros usando a sintaxe abaixo. Clique em qualquer exemplo para experimentar.",
       "nameLabel": "Nome / ID",

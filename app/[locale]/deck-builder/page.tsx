@@ -41,6 +41,7 @@ import { EvolvingDeckBadge } from "@/components/evolving/EvolvingDeckBadge";
 import { useRevealingStore } from "@/stores/revealingStore";
 import { ChakraIcon, PowerIcon, CHAKRA_COLOR, POWER_COLOR } from "@/components/icons/GameIcons";
 import { RarityIcon } from '@/components/icons/RarityIcon';
+import { FilterIcon } from '@/components/icons/FilterIcon';
 
 const MISSIONS_PER_PAGE = 15;
 
@@ -1650,10 +1651,12 @@ export default function DeckBuilderPage() {
               />
               <button
                 onClick={() => setShowSearchHelp(true)}
-                className="font-body text-[10px] font-bold px-3 py-1.5 cursor-pointer shrink-0 whitespace-nowrap"
+                aria-label={t('deckBuilder.search.helpButton')}
+                title={t('deckBuilder.search.helpButton')}
+                className="font-body px-3 py-1.5 cursor-pointer shrink-0 flex items-center justify-center"
                 style={{ backgroundColor: 'var(--t-accent-tint)', color: 'var(--t-accent)' }}
               >
-                ?
+                <FilterIcon size={14} />
               </button>
               
               <div className="relative">
@@ -1920,9 +1923,11 @@ export default function DeckBuilderPage() {
                   />
                   <button
                     onClick={() => setShowSearchHelp(true)}
-                    className="font-body text-[11px] font-bold cursor-pointer shrink-0"
+                    aria-label={t('deckBuilder.search.helpButton')}
+                    title={t('deckBuilder.search.helpButton')}
+                    className="font-body cursor-pointer shrink-0 flex items-center justify-center"
                     style={{ width: 34, height: 34, backgroundColor: 'var(--t-accent-tint)', color: 'var(--t-accent)' }}
-                  >?</button>
+                  ><FilterIcon size={15} /></button>
                   <div className="relative">
                     <button
                       onClick={() => setShowSortDropdown((v) => !v)}

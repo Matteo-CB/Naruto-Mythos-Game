@@ -1883,7 +1883,7 @@
       "typeAttachments": "Attachements"
     },
     "search": {
-      "helpButton": "? Recherche avancée",
+      "helpButton": "Recherche avancée",
       "helpTitle": "Recherche avancée",
       "helpIntro": "Utilisez la barre de recherche pour trouver des cartes par nom, ou combinez les filtres avec la syntaxe ci-dessous. Cliquez sur un exemple pour l'essayer.",
       "nameLabel": "Nom / ID",

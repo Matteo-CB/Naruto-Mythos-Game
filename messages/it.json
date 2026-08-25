@@ -1753,7 +1753,7 @@
       "typeAttachments": "Allegati"
     },
     "search": {
-      "helpButton": "? Ricerca Avanzata",
+      "helpButton": "Ricerca Avanzata",
       "helpTitle": "Ricerca Avanzata",
       "helpIntro": "Usa la barra di ricerca per trovare carte per nome, o combina i filtri con la sintassi qui sotto. Clicca un esempio per provarlo.",
       "nameLabel": "Nome / ID",
