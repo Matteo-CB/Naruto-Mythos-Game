@@ -1450,7 +1450,7 @@ export default function DeckBuilderPage() {
 
         <div className="flex-1 flex flex-col overflow-hidden" style={{ minWidth: 0 }}>
           
-          <div className="flex items-center gap-3 px-4 py-2 flex-shrink-0" style={{
+          <div className="flex items-center gap-x-3 gap-y-2 px-4 py-2 flex-shrink-0 flex-wrap" style={{
             backgroundColor: 'rgba(10, 10, 10, 0.9)',
             borderBottom: '1px solid var(--t-divider)',
           }}>
@@ -1489,6 +1489,20 @@ export default function DeckBuilderPage() {
                   backgroundColor: 'var(--t-accent-glow)', color: 'var(--t-accent)',
                 }}>{t("deckBuilder.containsUnrevealed")}</span>
               )}
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
+              <AngularButton
+                onClick={() => { exportDeckAsImage(deckName, deckChars, deckMissions); trackUiHook('deck.exported'); }}
+                variant="muted" size="sm" disabled={deckChars.length === 0}
+              >
+                <span className="whitespace-nowrap">{t("deckBuilder.exportAsImage")}</span>
+              </AngularButton>
+              <AngularButton
+                onClick={() => { exportDeckAsPdf(deckName, deckChars, deckMissions); trackUiHook('deck.exported'); }}
+                variant="muted" size="sm" disabled={deckChars.length === 0}
+              >
+                <span className="whitespace-nowrap">{t("deckBuilder.exportAsPdf")}</span>
+              </AngularButton>
             </div>
           </div>
 
@@ -2224,6 +2238,18 @@ export default function DeckBuilderPage() {
                 style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: '#4a7ab5', letterSpacing: '0.08em' }}
               >{t("deckBuilder.importButton")}</button>
               <button
+                onClick={() => { exportDeckAsImage(deckName, deckChars, deckMissions); trackUiHook('deck.exported'); setMobileMenuOpen(false); }}
+                disabled={deckChars.length === 0}
+                className="text-left text-[12px] uppercase font-bold py-3 px-3 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: 'var(--t-accent)', letterSpacing: '0.08em' }}
+              >{t("deckBuilder.exportAsImage")}</button>
+              <button
+                onClick={() => { exportDeckAsPdf(deckName, deckChars, deckMissions); trackUiHook('deck.exported'); setMobileMenuOpen(false); }}
+                disabled={deckChars.length === 0}
+                className="text-left text-[12px] uppercase font-bold py-3 px-3 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+                style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: 'var(--t-accent)', letterSpacing: '0.08em' }}
+              >{t("deckBuilder.exportAsPdf")}</button>
+              <button
                 onClick={() => { setShowExportModal(true); setMobileMenuOpen(false); }}
                 disabled={deckChars.length === 0}
                 className="text-left text-[12px] uppercase font-bold py-3 px-3 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
@@ -2357,17 +2383,6 @@ export default function DeckBuilderPage() {
         <PopupOverlay>
           <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="480px">
             <PopupTitle accentColor="var(--t-accent)" size="lg">{t("deckBuilder.exportTitle")}</PopupTitle>
-            <div className="flex gap-2 mb-4">
-              <PopupActionButton accentColor="var(--t-accent)" onClick={() => { exportDeckAsImage(deckName, deckChars, deckMissions); trackUiHook('deck.exported'); setShowExportModal(false); }}>
-                {t("deckBuilder.exportAsImage")}
-              </PopupActionButton>
-              <PopupActionButton accentColor="var(--t-accent)" onClick={() => { exportDeckAsPdf(deckName, deckChars, deckMissions); trackUiHook('deck.exported'); setShowExportModal(false); }}>
-                {t("deckBuilder.exportAsPdf")}
-              </PopupActionButton>
-            </div>
-            <p className="text-xs mb-3" style={{ color: 'var(--t-muted)', paddingLeft: '8px' }}>
-              {t("deckBuilder.exportPdfDesc")}
-            </p>
             <p className="text-xs mb-2" style={{ color: 'var(--t-muted)', paddingLeft: '8px' }}>
               {t("deckBuilder.exportTextDesc")}
             </p>

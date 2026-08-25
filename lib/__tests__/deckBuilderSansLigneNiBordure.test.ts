@@ -119,3 +119,49 @@ describe('l export en image reste sobre: rien que des cartes centrees', () => {
     expect(source).toContain("'/images/footer-curls-gold.svg'");
   });
 });
+
+describe('les exports sont accessibles en haut a droite', () => {
+  const page = readFileSync(DECK_BUILDER, 'utf8');
+
+  it('les deux boutons sont dans la barre du haut, cales a droite', () => {
+    const at = page.indexOf("placeholder={t(\"deckBuilder.deckName\")}");
+    const barre = page.slice(at, at + 3000);
+    expect(barre, 'un groupe pousse a droite').toContain('flex-shrink-0 ml-auto');
+    expect(barre, 'export en image').toContain('exportDeckAsImage(deckName, deckChars, deckMissions)');
+    expect(barre, 'export en PDF').toContain('exportDeckAsPdf(deckName, deckChars, deckMissions)');
+  });
+
+  it('la barre du haut sait passer a la ligne quand la largeur manque', () => {
+    const at = page.indexOf("backgroundColor: 'rgba(10, 10, 10, 0.9)',\n            borderBottom");
+    expect(at, 'la barre du haut existe').toBeGreaterThan(-1);
+    const debut = page.lastIndexOf('<div className=', at);
+    expect(
+      page.slice(debut, at),
+      'sans retour a la ligne, deux boutons de plus feraient deborder les petits ecrans',
+    ).toContain('flex-wrap');
+  });
+
+  it('les libelles ne se coupent pas au milieu', () => {
+    expect((page.match(/whitespace-nowrap/g) ?? []).length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('les deux exports sont aussi proposes dans le menu mobile', () => {
+    const at = page.indexOf('setMobileMenuOpen(false)');
+    const menu = page.slice(at - 500, at + 4000);
+    expect(menu).toContain('exportDeckAsImage(deckName, deckChars, deckMissions)');
+    expect(menu).toContain('exportDeckAsPdf(deckName, deckChars, deckMissions)');
+  });
+
+  it('les boutons sont eteints tant que le deck est vide', () => {
+    const occurrences = (page.match(/disabled=\{deckChars\.length === 0\}/g) ?? []).length;
+    expect(occurrences, 'bureau et mobile, image et PDF').toBeGreaterThanOrEqual(4);
+  });
+
+  it('la fenetre d export ne garde que le code a partager', () => {
+    const at = page.indexOf('deckBuilder.exportTitle');
+    const modale = page.slice(at, at + 1800);
+    expect(modale, 'les exports ne sont plus dupliques dans la fenetre').not.toContain('exportDeckAsImage(');
+    expect(modale, 'idem pour le PDF').not.toContain('exportDeckAsPdf(');
+    expect(modale, 'le code reste').toContain('deckBuilder.exportCopy');
+  });
+});
