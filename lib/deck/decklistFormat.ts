@@ -122,11 +122,11 @@ export function referenceOfficielle(carte: CarteImprimee, index: IndexDesTirages
   return lettre ? `${base} ${lettre}-${precis}` : `${base} ${precis}`;
 }
 
-export function nomAffiche(carte: CarteImprimee, locale: string): string {
-  const nom = (carte as unknown as Record<string, string>)[`name_${locale}`]
-    || carte.name_en || carte.name_fr || '';
-  const titre = (carte as unknown as Record<string, string>)[`title_${locale}`]
-    || carte.title_en || carte.title_fr || '';
+const SEPARATEUR = '   ';
+
+export function nomAffiche(carte: CarteImprimee): string {
+  const nom = carte.name_en || carte.name_fr || '';
+  const titre = carte.title_en || carte.title_fr || '';
   if (!titre || titre.trim().toUpperCase() === nom.trim().toUpperCase()) return nom;
   return `${nom} ${titre}`;
 }
@@ -136,7 +136,6 @@ export function construireDecklist(
   personnages: CarteImprimee[],
   missions: CarteImprimee[],
   toutesLesCartes: CarteImprimee[],
-  locale = 'en',
 ): string {
   const index = indexerLesTirages(toutesLesCartes);
 
@@ -154,15 +153,16 @@ export function construireDecklist(
   const lignes: string[] = [];
   if (nomDuDeck.trim()) lignes.push(nomDuDeck.trim(), '');
 
-  const persos = compter(personnages);
   lignes.push(`Main Deck: ${personnages.length}`);
-  for (const { carte, quantite } of persos) {
-    lignes.push(`${quantite}x ${nomAffiche(carte, locale)} (${referenceOfficielle(carte, index)})`);
+  for (const { carte, quantite } of compter(personnages)) {
+    lignes.push(
+      `${quantite}${SEPARATEUR}${nomAffiche(carte)}${SEPARATEUR}(${referenceOfficielle(carte, index)})`,
+    );
   }
 
   lignes.push('', `Missions: ${missions.length}`);
   for (const { carte } of compter(missions)) {
-    lignes.push(`${nomAffiche(carte, locale)} (${referenceOfficielle(carte, index)})`);
+    lignes.push(`${nomAffiche(carte)} (${referenceOfficielle(carte, index)})`);
   }
 
   return lignes.join('\n');

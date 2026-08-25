@@ -110,7 +110,6 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, isOwner,
       chars as unknown as CarteImprimee[],
       miss as unknown as CarteImprimee[],
       getAllCards() as unknown as CarteImprimee[],
-      locale,
     );
   };
 

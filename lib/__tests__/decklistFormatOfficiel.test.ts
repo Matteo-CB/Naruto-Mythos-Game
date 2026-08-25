@@ -56,12 +56,42 @@ describe('la reference reproduit les exemples officiels', () => {
   });
 
   it('le nom porte le personnage puis sa version', () => {
-    expect(nomAffiche(carte('KS-027-C'), 'en')).toBe('AKAMARU Ninja Hound');
+    expect(nomAffiche(carte('KS-027-C'))).toBe('AKAMARU Ninja Hound');
   });
 
   it('une mission dont le titre repete le nom ne le dit pas deux fois', () => {
-    const m = nomAffiche(carte('SS-004-MMS'), 'en');
+    const m = nomAffiche(carte('SS-004-MMS'));
     expect(m.toLowerCase().split('high priority mission').length - 1, 'une seule fois').toBe(1);
+  });
+});
+
+describe('la decklist est ecrite en anglais quelle que soit la langue du site', () => {
+  it('le nom et la version sont ceux imprimes en anglais', () => {
+    expect(nomAffiche(carte('KS-007-C')), 'JIRAYA Ermite des Crapauds en francais')
+      .toBe('JIRAIYA Toad Sage');
+    expect(nomAffiche(carte('KS-013-C'))).toBe('SASUKE UCHIHA Last of the Uchiha Clan');
+    expect(nomAffiche(carte('KS-002-MMS')), 'les missions aussi').toBe(
+      carte('KS-002-MMS').title_en || carte('KS-002-MMS').name_en!,
+    );
+  });
+
+  it('une decklist complete ne contient aucun mot francais', () => {
+    const texte = construireDecklist(
+      'Deck', [carte('KS-007-C'), carte('KS-013-C'), carte('KS-017-C')], [carte('KS-002-MMS')], CARTES,
+    );
+    for (const fr of ['Ermite des Crapauds', 'UCHIWA', 'Décuplement', 'CHÔJI']) {
+      expect(texte, `le francais ne doit pas apparaitre: ${fr}`).not.toContain(fr);
+    }
+    expect(texte).toContain('Toad Sage');
+  });
+
+  it('aucun appelant ne peut demander une autre langue', () => {
+    const source = readFileSync(join(__dirname, '..', 'deck', 'decklistFormat.ts'), 'utf8');
+    expect(source, 'le nom se lit uniquement sur les champs anglais')
+      .not.toMatch(/name_\$\{|title_\$\{/);
+    const signature = source.slice(source.indexOf('export function construireDecklist'));
+    expect(signature.slice(0, signature.indexOf('{')), 'construireDecklist ne prend pas de langue')
+      .not.toContain('locale');
   });
 });
 
@@ -115,7 +145,7 @@ describe('chaque carte du jeu se relit telle qu elle a ete ecrite', () => {
     const perdues: string[] = [];
     for (const c of CARTES) {
       const id = c.cardId ?? c.id;
-      const ligne = `2x ${nomAffiche(c, 'en')} (${referenceOfficielle(c, INDEX)})`;
+      const ligne = `2   ${nomAffiche(c)}   (${referenceOfficielle(c, INDEX)})`;
       const analysee = analyserLigne(ligne);
       if (!analysee) { perdues.push(`${id}: ligne illisible`); continue; }
       const relue = resoudreLigne(analysee, INDEX, SET_PAR_NUMERO);
@@ -172,7 +202,7 @@ describe('le lecteur accepte les variations tolerees par le reglement', () => {
 describe('la decklist complete se lit comme le document officiel', () => {
   const persos = [carte('KS-027-C'), carte('KS-027-C'), carte('KS-072-C')];
   const missions = [carte('KS-004-MMS'), carte('SS-004-MMS')];
-  const texte = construireDecklist('Mon deck', persos, missions, CARTES, 'en');
+  const texte = construireDecklist('Mon deck', persos, missions, CARTES);
 
   it('elle annonce le total de cartes principales', () => {
     expect(texte).toContain('Main Deck: 3');
@@ -182,14 +212,21 @@ describe('la decklist complete se lit comme le document officiel', () => {
     expect(texte).toContain('Missions: 2');
   });
 
-  it('les exemplaires identiques sont regroupes avec leur quantite', () => {
-    expect(texte).toContain('2x AKAMARU Ninja Hound (1-27/130)');
+  it('une ligne suit la forme quantite, nom, version, reference', () => {
+    expect(texte).toContain('2   AKAMARU Ninja Hound   (1-27/130)');
     expect(texte.split('AKAMARU Ninja Hound').length - 1, 'une seule ligne pour les deux').toBe(1);
+  });
+
+  it('la quantite est un nombre nu, sans la lettre x', () => {
+    const ligne = texte.split('\n').find((l) => l.includes('1-27/130'))!;
+    expect(ligne.startsWith('2   '), `obtenu: ${ligne}`).toBe(true);
+    expect(ligne, 'le document ecrit la quantite seule').not.toContain('2x ');
   });
 
   it('les missions n ont pas de quantite, comme dans le document', () => {
     const ligneMission = texte.split('\n').find((l) => l.includes('MSS04'))!;
-    expect(ligneMission.startsWith('1x'), 'pas de quantite devant une mission').toBe(false);
+    expect(/^\d/.test(ligneMission), 'pas de quantite devant une mission').toBe(false);
+    expect(ligneMission, 'un seul espace avant la reference').toContain('Assassination (1-MSS04)');
   });
 
   it('elle se relit entierement', () => {

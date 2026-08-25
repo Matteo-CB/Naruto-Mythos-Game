@@ -972,9 +972,8 @@ export default function DeckBuilderPage() {
       deckChars as unknown as CarteImprimee[],
       deckMissions as unknown as CarteImprimee[],
       [...allChars, ...allMissions] as unknown as CarteImprimee[],
-      locale,
     ),
-    [deckName, deckChars, deckMissions, allChars, allMissions, locale],
+    [deckName, deckChars, deckMissions, allChars, allMissions],
   );
 
   const handleCopyExportCode = useCallback(() => {
