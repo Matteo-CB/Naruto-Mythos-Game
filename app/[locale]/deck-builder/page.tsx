@@ -32,6 +32,10 @@ import { isAlternateArtwork } from "@/lib/cards/versionKey";
 import { exportDeckAsImage } from "@/lib/utils/exportDeckImage";
 import { exportDeckAsPdf } from "@/lib/utils/exportDeckPdf";
 import {
+  construireDecklist, analyserDecklist, indexerLesTirages, resoudreLigne,
+  ressemblELaUneDecklist, type CarteImprimee,
+} from "@/lib/deck/decklistFormat";
+import {
   PopupOverlay, PopupCornerFrame, PopupTitle, PopupActionButton,
   PopupDismissLink, AngularButton,
 } from "@/components/game/PopupPrimitives";
@@ -811,6 +815,52 @@ export default function DeckBuilderPage() {
   const handleImport = useCallback((codeArg?: string) => {
     const code = (codeArg ?? importCode).trim();
     if (!code) return;
+
+    if (ressemblELaUneDecklist(code)) {
+      const toutes = [...allChars, ...allMissions] as unknown as CarteImprimee[];
+      const index = indexerLesTirages(toutes);
+      const setParNumero = new Map<number, string>();
+      for (const [id, spec] of Object.entries(SET_REGISTRY)) setParNumero.set(spec.number, id);
+
+      const persosLus: CharacterCard[] = [];
+      const missionsLues: MissionCard[] = [];
+      const introuvables: string[] = [];
+      const premiereLigne = (code.split('\n')[0] ?? '').trim();
+      const nomLu = /\(/.test(premiereLigne) || /^(main deck|missions)/i.test(premiereLigne)
+        ? '' : premiereLigne;
+
+      for (const ligne of analyserDecklist(code)) {
+        const carte = resoudreLigne(ligne, index, setParNumero);
+        if (!carte) { introuvables.push(ligne.brut); continue; }
+        const estMission = (carte.card_type ?? '') === 'mission' || carte.rarity === 'MMS';
+        for (let i = 0; i < ligne.quantite; i += 1) {
+          if (estMission) missionsLues.push(carte as unknown as MissionCard);
+          else persosLus.push(carte as unknown as CharacterCard);
+        }
+      }
+
+      clearDeck();
+      if (nomLu) setDeckName(nomLu);
+      const charParId = new Map(allChars.map((c) => [c.cardId, c]));
+      const remplacerParLaBase = (carte: CharacterCard): CharacterCard => {
+        if (isLockedVariantCard(carte) && !unlockedVariantIds.has(carte.id)) {
+          const base = charParId.get(baseCardIdFor(carte.cardId || carte.id));
+          if (base) return base;
+        }
+        return carte;
+      };
+      for (const c of persosLus) addChar(remplacerParLaBase(c));
+      for (const m of missionsLues) addMission(m);
+
+      if (introuvables.length > 0) {
+        setImportMessage({ type: "error", text: t("deckBuilder.importNotFound", { count: introuvables.length, ids: introuvables.join(", ") }) });
+      } else {
+        setImportMessage({ type: "success", text: t("deckBuilder.importSuccess", { name: nomLu || "Deck", chars: persosLus.length, missions: missionsLues.length }) });
+      }
+      setImportCode("");
+      return;
+    }
+
     const parts = code.split("|");
     if (parts.length < 2) { setImportMessage({ type: "error", text: t("deckBuilder.importError") }); return; }
     const lastPart = parts[parts.length - 1];
@@ -916,15 +966,16 @@ export default function DeckBuilderPage() {
     } catch { /* SSR / privacy */ }
   }, [allChars, allMissions, handleImport]);
 
-  const exportCode = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const c of deckChars) { const id = (c.isHolo ? holoIdFor(c.cardId || c.id) : (c.cardId || c.id)); counts.set(id, (counts.get(id) || 0) + 1); }
-    for (const m of deckMissions) { const id = m.cardId || m.id; counts.set(id, (counts.get(id) || 0) + 1); }
-    const p: string[] = [];
-    for (const [id, qty] of counts) p.push(`${id}--${qty}`);
-    p.push((deckName || 'Deck').replace(/\s+/g, '_'));
-    return p.join('|');
-  }, [deckChars, deckMissions, deckName]);
+  const exportCode = useMemo(
+    () => construireDecklist(
+      deckName,
+      deckChars as unknown as CarteImprimee[],
+      deckMissions as unknown as CarteImprimee[],
+      [...allChars, ...allMissions] as unknown as CarteImprimee[],
+      locale,
+    ),
+    [deckName, deckChars, deckMissions, allChars, allMissions, locale],
+  );
 
   const handleCopyExportCode = useCallback(() => {
     navigator.clipboard.writeText(exportCode).then(() => {
@@ -2345,7 +2396,7 @@ export default function DeckBuilderPage() {
 
       {showImportModal && (
         <PopupOverlay>
-          <PopupCornerFrame accentColor="rgba(74, 122, 181, 0.35)" maxWidth="480px">
+          <PopupCornerFrame accentColor="rgba(74, 122, 181, 0.35)" maxWidth="560px">
             <PopupTitle accentColor="#4a7ab5" size="lg">{t("deckBuilder.importTitle")}</PopupTitle>
             <p className="text-xs mb-3" style={{ color: 'var(--t-muted)', paddingLeft: '8px' }}>
               {t("deckBuilder.importDesc")}
@@ -2357,16 +2408,19 @@ export default function DeckBuilderPage() {
                 {t("deckBuilder.importVisit")}
               </a>
             </div>
-            <div className="flex items-center gap-2 mb-3">
-              <input type="text" placeholder={t("deckBuilder.importPlaceholder")} value={importCode}
+            <div className="mb-3">
+              <textarea placeholder={t("deckBuilder.importPlaceholder")} value={importCode}
                 onChange={(e) => setImportCode(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") handleImport(); }}
-                className="flex-1 px-3 py-1.5 text-xs font-mono focus:outline-none"
+                onKeyDown={(e) => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) handleImport(); }}
+                rows={10}
+                className="w-full px-3 py-2 text-xs font-mono focus:outline-none resize-y"
                 style={{ backgroundColor: 'var(--t-bg-elevated)', border: '1px solid var(--t-divider)', color: 'var(--t-text)' }}
               />
-              <PopupActionButton accentColor="var(--t-success)" onClick={() => handleImport()} disabled={!importCode.trim()}>
-                {t("deckBuilder.importButton")}
-              </PopupActionButton>
+              <div className="flex justify-end mt-2">
+                <PopupActionButton accentColor="var(--t-success)" onClick={() => handleImport()} disabled={!importCode.trim()}>
+                  {t("deckBuilder.importButton")}
+                </PopupActionButton>
+              </div>
             </div>
             {importMessage && (
               <div className="text-xs mb-3 py-1 px-2" style={{
@@ -2381,20 +2435,23 @@ export default function DeckBuilderPage() {
 
       {showExportModal && (
         <PopupOverlay>
-          <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="480px">
+          <PopupCornerFrame accentColor="rgba(196, 163, 90, 0.35)" maxWidth="560px">
             <PopupTitle accentColor="var(--t-accent)" size="lg">{t("deckBuilder.exportTitle")}</PopupTitle>
             <p className="text-xs mb-2" style={{ color: 'var(--t-muted)', paddingLeft: '8px' }}>
               {t("deckBuilder.exportTextDesc")}
             </p>
-            <div className="flex items-center gap-2 mb-3">
-              <input type="text" readOnly value={exportCode}
-                onClick={(e) => (e.target as HTMLInputElement).select()}
-                className="flex-1 px-3 py-1.5 text-xs font-mono focus:outline-none"
+            <div className="mb-3">
+              <textarea readOnly value={exportCode}
+                onClick={(e) => (e.target as HTMLTextAreaElement).select()}
+                rows={14}
+                className="w-full px-3 py-2 text-xs font-mono focus:outline-none resize-y"
                 style={{ backgroundColor: 'var(--t-bg-elevated)', border: '1px solid var(--t-divider)', color: 'var(--t-text)' }}
               />
-              <PopupActionButton accentColor={exportCopied ? 'var(--t-success)' : 'var(--t-accent)'} onClick={handleCopyExportCode}>
-                {exportCopied ? t("deckBuilder.exportCopied") : t("deckBuilder.exportCopy")}
-              </PopupActionButton>
+              <div className="flex justify-end mt-2">
+                <PopupActionButton accentColor={exportCopied ? 'var(--t-success)' : 'var(--t-accent)'} onClick={handleCopyExportCode}>
+                  {exportCopied ? t("deckBuilder.exportCopied") : t("deckBuilder.exportCopy")}
+                </PopupActionButton>
+              </div>
             </div>
             <PopupDismissLink onClick={() => { setShowExportModal(false); setExportCopied(false); }}>{t("common.close")}</PopupDismissLink>
           </PopupCornerFrame>

@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations, useLocale } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
+import { getAllCards, getCharacterById, getMissionById } from '@/lib/data/cardIndex';
+import { construireDecklist, type CarteImprimee } from '@/lib/deck/decklistFormat';
 import { normalizeImagePath , portraitImagePath } from '@/lib/utils/imagePath';
 import { getCardName } from '@/lib/utils/cardLocale';
 import { exportDeckAsImage } from '@/lib/utils/exportDeckImage';
@@ -97,8 +98,24 @@ export default function DeckViewerModal({ deck, ownerName, isAdminView, isOwner,
     return parts.join('|');
   };
 
+  const buildDecklist = () => {
+    const chars = deck.cardIds
+      .map((id) => getCharacterById(id))
+      .filter((c): c is NonNullable<typeof c> => c != null);
+    const miss = deck.missionIds
+      .map((id) => getMissionById(id))
+      .filter((m): m is NonNullable<typeof m> => m != null);
+    return construireDecklist(
+      deck.name,
+      chars as unknown as CarteImprimee[],
+      miss as unknown as CarteImprimee[],
+      getAllCards() as unknown as CarteImprimee[],
+      locale,
+    );
+  };
+
   const handleCopy = () => {
-    navigator.clipboard.writeText(buildDeckCode()).then(() => {
+    navigator.clipboard.writeText(buildDecklist()).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       trackUiHook('deck.exported');
