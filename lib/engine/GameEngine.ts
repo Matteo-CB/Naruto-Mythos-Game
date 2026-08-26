@@ -22,6 +22,7 @@ import {
 } from './types';
 import { deepClone } from './utils/deepClone';
 import { archiverTourPrecedent } from './rules/discountedPlay';
+import { envoyerLesCartesRegardeesAuFond } from '../effects/deckBottom';
 import { normalizeHoloCardForGame } from '../holo/holoId';
 import { shuffle } from './utils/shuffle';
 import { generateGameId, generateInstanceId, resetIdCounter, seedIdCounterFromState, getIdCounter } from './utils/id';
@@ -773,6 +774,22 @@ export class GameEngine {
           }
           return newState;
         }
+      }
+
+      if (effect.targetSelectionType === 'SS_DECK_SEARCH_SHOW'
+        || effect.targetSelectionType === 'SS_DECK_SEARCH_TAKE') {
+        let metaFouille: { depth?: number; sourceName?: string; sourceId?: string } = {};
+        try { metaFouille = JSON.parse(effect.effectDescription); } catch { /* pas de charge utile */ }
+        newState.pendingEffects.splice(effectIdx, 1);
+        newState.pendingActions = newState.pendingActions.filter((a) => a.sourceEffectId !== effect.id);
+        newState = envoyerLesCartesRegardeesAuFond(
+          newState, effect.sourcePlayer, metaFouille.depth ?? 3,
+          metaFouille.sourceName ?? '', metaFouille.sourceId ?? '',
+        );
+        if (effect.remainingEffectTypes && effect.remainingEffectTypes.length > 0) {
+          return EffectEngine.processRemainingEffects(newState, effect);
+        }
+        return newState;
       }
 
       if (effect.targetSelectionType === 'SS113_CONFIRM_DUEL_MODIFIER') {

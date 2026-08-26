@@ -19,6 +19,7 @@ import { buildPlayLessTargets, playLessRevealBlockedName, type PlayLessCategory 
 import { compterMissionsAvecSonQuatre, missionADuSonQuatre, estSonQuatreReel } from './soundFourCount';
 import { ss000DeckHounds, ss000FinalizeSearch, ss000HoundChoicePayload, SS000_NINJA_HOUND } from './handlers/SS/ss000Search';
 import { topmostHinataIndexInDiscard } from './handlers/SS/shinobi';
+import { envoyerLesCartesRegardeesAuFond } from './deckBottom';
 import { missionCarries, SS_MISSION_LOW_PROFILE } from './missions/ssMissions';
 import { discardableSoundFour, soundFourNameOf, friendlyCharactersToMove, KIMIMARO_031_ID, KIMIMARO_031_NAME, type SoundFourName } from './handlers/SS/kimimaro031';
 import { hiddenCharactersInPlay, attachmentsInPlay } from './handlers/SS/missions/ssMissionHandlers';
@@ -13286,23 +13287,10 @@ export class EffectEngine {
             'EFFECT_NO_TARGET', `${metaVue.sourceName ?? ''} (${metaVue.sourceId ?? ''}): ${metaVue.refus}`,
             'game.log.effect.noTarget', { card: metaVue.sourceName ?? '', id: metaVue.sourceId ?? '' });
         }
-        const profondeurVue = metaVue.depth ?? 3;
-        const joueurVue = pendingEffect.sourcePlayer;
-        const deckVue = [...newState[joueurVue].deck];
-        const sommetVue = deckVue.slice(0, profondeurVue);
-        if (sommetVue.length === 0) break;
-        for (let i = sommetVue.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [sommetVue[i], sommetVue[j]] = [sommetVue[j], sommetVue[i]];
-        }
-        newState[joueurVue] = {
-          ...newState[joueurVue],
-          deck: [...deckVue.slice(profondeurVue), ...sommetVue],
-        };
-        newState.log = logAction(newState.log, newState.turn, newState.phase, joueurVue,
-          'EFFECT', `${metaVue.sourceName ?? ''} (${metaVue.sourceId ?? ''}): the ${sommetVue.length} cards looked at go randomly to the bottom of the deck.`,
-          'game.log.effect.ssDeckSearchBottom',
-          { card: metaVue.sourceName ?? '', id: metaVue.sourceId ?? '', amount: String(sommetVue.length) });
+        newState = envoyerLesCartesRegardeesAuFond(
+          newState, pendingEffect.sourcePlayer, metaVue.depth ?? 3,
+          metaVue.sourceName ?? '', metaVue.sourceId ?? '',
+        );
         break;
       }
 

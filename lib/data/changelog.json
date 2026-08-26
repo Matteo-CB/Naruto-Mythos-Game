@@ -1,6 +1,40 @@
 {
   "entries": [
     {
+      "date": "2026-08-26",
+      "title_fr": "La fouille de deck ne laisse plus rien sur le dessus",
+      "title_en": "Deck searches no longer leave cards on top",
+      "title_es": "Las búsquedas en el mazo ya no dejan cartas arriba",
+      "title_pt": "As buscas no deck não deixam mais cartas no topo",
+      "title_it": "Le ricerche nel mazzo non lasciano più carte in cima",
+      "title_pl": "Przeszukiwanie talii nie zostawia już kart na wierzchu",
+      "title_ja": "デッキ検索が山札の上にカードを残さなくなりました",
+      "categories": [
+        "fix"
+      ],
+      "changes_fr": [
+        "JIRAIYA 004, FUGAKU 058 et SUIKO 074 : fermer la fenêtre après avoir regardé envoie quand même les cartes vues sous le deck."
+      ],
+      "changes_en": [
+        "JIRAIYA 004, FUGAKU 058 and SUIKO 074: closing the window after looking still sends the cards you saw to the bottom."
+      ],
+      "changes_es": [
+        "JIRAIYA 004, FUGAKU 058 y SUIKO 074: cerrar la ventana tras mirar envía igualmente las cartas vistas al fondo."
+      ],
+      "changes_pt": [
+        "JIRAIYA 004, FUGAKU 058 e SUIKO 074: fechar a janela depois de olhar envia mesmo assim as cartas vistas para o fundo."
+      ],
+      "changes_it": [
+        "JIRAIYA 004, FUGAKU 058 e SUIKO 074: chiudere la finestra dopo aver guardato manda comunque in fondo le carte viste."
+      ],
+      "changes_pl": [
+        "JIRAIYA 004, FUGAKU 058 i SUIKO 074: zamknięcie okna po podejrzeniu i tak odkłada zobaczone karty na spód talii."
+      ],
+      "changes_ja": [
+        "JIRAIYA 004、FUGAKU 058、SUIKO 074：見たあとに画面を閉じても、見たカードは山札の下に送られます。"
+      ]
+    },
+    {
       "date": "2026-08-25",
       "title_fr": "La Bombe Aveuglante efface vraiment tout",
       "title_en": "Flash Bomb truly blanks everything",

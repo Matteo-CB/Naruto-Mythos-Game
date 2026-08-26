@@ -62,7 +62,7 @@ describe('un match deja resolu ne peut pas etre repeuple en gardant son resultat
   it('les eliminations produites par ce match sont effacees, pas les autres', async () => {
     await annulerResultatPerimeDuMatchSuivant('t1', { ...FINALE, status: 'forfeit' }, {});
     expect(participantUpdateMany).toHaveBeenCalledTimes(1);
-    const arg = participantUpdateMany.mock.calls[0][0] as {
+    const arg = (participantUpdateMany.mock.calls[0] as unknown as unknown[])[0] as {
       where: { userId: { in: string[] }; eliminatedRound: number; eliminated: boolean };
       data: { eliminated: boolean; eliminatedRound: null };
     };
