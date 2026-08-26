@@ -10,27 +10,35 @@
       "title_pl": "Przeszukiwanie talii nie zostawia już kart na wierzchu",
       "title_ja": "デッキ検索が山札の上にカードを残さなくなりました",
       "categories": [
+        "fix",
         "fix"
       ],
       "changes_fr": [
+        "SAKON 062 posé en amélioration copie bien un effet UPGRADE : l'effet choisi n'est plus refusé au moment de l'appliquer.",
         "JIRAIYA 004, FUGAKU 058 et SUIKO 074 : fermer la fenêtre après avoir regardé envoie quand même les cartes vues sous le deck."
       ],
       "changes_en": [
+        "SAKON 062 played as an upgrade can copy an UPGRADE effect: the chosen effect is no longer refused when it resolves.",
         "JIRAIYA 004, FUGAKU 058 and SUIKO 074: closing the window after looking still sends the cards you saw to the bottom."
       ],
       "changes_es": [
+        "SAKON 062 jugado como mejora copia un efecto UPGRADE: el efecto elegido ya no se rechaza al aplicarlo.",
         "JIRAIYA 004, FUGAKU 058 y SUIKO 074: cerrar la ventana tras mirar envía igualmente las cartas vistas al fondo."
       ],
       "changes_pt": [
+        "SAKON 062 jogado como melhoria copia um efeito UPGRADE: o efeito escolhido não é mais recusado na hora de aplicar.",
         "JIRAIYA 004, FUGAKU 058 e SUIKO 074: fechar a janela depois de olhar envia mesmo assim as cartas vistas para o fundo."
       ],
       "changes_it": [
+        "SAKON 062 giocato come miglioramento copia un effetto UPGRADE: l'effetto scelto non viene più rifiutato al momento di applicarlo.",
         "JIRAIYA 004, FUGAKU 058 e SUIKO 074: chiudere la finestra dopo aver guardato manda comunque in fondo le carte viste."
       ],
       "changes_pl": [
+        "SAKON 062 zagrany jako ulepszenie kopiuje efekt UPGRADE: wybrany efekt nie jest już odrzucany przy rozpatrywaniu.",
         "JIRAIYA 004, FUGAKU 058 i SUIKO 074: zamknięcie okna po podejrzeniu i tak odkłada zobaczone karty na spód talii."
       ],
       "changes_ja": [
+        "アップグレードとして出したSAKON 062がUPGRADE効果をコピーできます。選んだ効果が解決時に弾かれなくなりました。",
         "JIRAIYA 004、FUGAKU 058、SUIKO 074：見たあとに画面を閉じても、見たカードは山札の下に送られます。"
       ]
     },

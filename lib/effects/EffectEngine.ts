@@ -6221,11 +6221,8 @@ export class EffectEngine {
               targetSelectionType: 'COPY_EFFECT_CHOSEN',
               sourcePlayer: s062Player, requiresTargetSelection: true,
               validTargets: s062Opts, isOptional: false, isMandatory: true,
-              resolved: false, isUpgrade: false,
-              
-              
-              
-              
+              resolved: false, isUpgrade: pendingEffect.isUpgrade,
+              wasFirstCard: pendingEffect.wasFirstCard,
               wasRevealed: true,
             }];
             newState.pendingActions = [...newState.pendingActions, {
@@ -6252,9 +6249,8 @@ export class EffectEngine {
           effectDescription: '', targetSelectionType: 'SAKON062_COPY_EFFECT',
           sourcePlayer: s062Player, requiresTargetSelection: true,
           validTargets: s062Targets, isOptional: false, isMandatory: true,
-          resolved: false, isUpgrade: false,
-          
-          
+          resolved: false, isUpgrade: pendingEffect.isUpgrade,
+          wasFirstCard: pendingEffect.wasFirstCard,
           wasRevealed: true,
         }];
         newState.pendingActions = [...newState.pendingActions, {
@@ -16647,6 +16643,8 @@ export class EffectEngine {
             sourcePlayer: k148aPlayer, requiresTargetSelection: true,
             validTargets: k148aValidTargets, isOptional: false, isMandatory: true,
             resolved: false, isUpgrade: pendingEffect.isUpgrade,
+            wasRevealed: pendingEffect.wasRevealed,
+            wasFirstCard: pendingEffect.wasFirstCard,
             remainingEffectTypes: pendingEffect.remainingEffectTypes,
           });
           newState.pendingActions.push({
@@ -17081,6 +17079,8 @@ export class EffectEngine {
             isMandatory: true,
             resolved: false,
             isUpgrade: pendingEffect.isUpgrade,
+            wasRevealed: pendingEffect.wasRevealed,
+            wasFirstCard: pendingEffect.wasFirstCard,
           });
           newState.pendingActions.push({
             id: choiceActionId,
@@ -18985,8 +18985,7 @@ export class EffectEngine {
             isMandatory: true,
             resolved: false,
             isUpgrade: pendingEffect.isUpgrade,
-            
-            
+            wasFirstCard: pendingEffect.wasFirstCard,
             wasRevealed: pendingEffect.wasRevealed ?? false,
           });
           newState.pendingActions.push({
@@ -20320,6 +20319,8 @@ export class EffectEngine {
           isMandatory: true,
           resolved: false,
           isUpgrade: pending.isUpgrade,
+          wasRevealed: pending.wasRevealed,
+          wasFirstCard: pending.wasFirstCard,
         });
         newState.pendingActions.push({
           id: choiceActionId,

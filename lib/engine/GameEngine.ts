@@ -1672,7 +1672,7 @@ export class GameEngine {
             const topCard = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
             if (topCard.chakra > 4) continue;
             const hasInstant = topCard.effects?.some((eff: { type: string; description: string }) => {
-              return isCopyableEffect(eff, { wasRevealed: effect.wasRevealed, wasFirstCard: effect.wasFirstCard });
+              return isCopyableEffect(eff, { wasRevealed: effect.wasRevealed, wasFirstCard: effect.wasFirstCard, wasUpgrade: effect.isUpgrade, copieur: effect.sourceCardId });
             });
             if (hasInstant) k016dTargets.push(char.instanceId);
           }
@@ -1690,7 +1690,9 @@ export class GameEngine {
             effectDescription: '', targetSelectionType: 'KAKASHI_COPY_EFFECT',
             sourcePlayer: effect.sourcePlayer, requiresTargetSelection: true,
             validTargets: k016dTargets, isOptional: false, isMandatory: true,
-            resolved: false, isUpgrade: false,
+            resolved: false, isUpgrade: effect.isUpgrade,
+            wasRevealed: effect.wasRevealed,
+            wasFirstCard: effect.wasFirstCard,
           }];
           newState.pendingActions = [...newState.pendingActions, {
             id: k016dActId, type: 'SELECT_TARGET' as const,
