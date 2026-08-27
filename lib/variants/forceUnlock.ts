@@ -8,7 +8,7 @@ function isPreReleaseSet(setId: string): boolean {
   return status === 'coming_soon' || status === 'revealing';
 }
 
-const SETS_TEMPORAIREMENT_DEBLOQUES = new Set(['SS']);
+const SETS_TEMPORAIREMENT_DEBLOQUES = new Set<string>();
 
 function estTemporairementDebloque(setId: string): boolean {
   return SETS_TEMPORAIREMENT_DEBLOQUES.has(setId);

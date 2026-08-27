@@ -6,7 +6,9 @@ export function isVariantCard(card: Pick<CardData, 'rarity'> | null | undefined)
   return isSpecialVariant(card.rarity);
 }
 
-export const SETS_TEMPORAIREMENT_DEBLOQUES = new Set(['SS']);
+// Plus aucun set n est offert en bloc: chaque variante se gagne, seuls les administrateurs
+// les voient toutes par le contournement d autorisation.
+export const SETS_TEMPORAIREMENT_DEBLOQUES = new Set<string>();
 
 export function isLockedVariantCard(
   card: Pick<CardData, 'rarity'> & { set?: string; id?: string } | null | undefined,

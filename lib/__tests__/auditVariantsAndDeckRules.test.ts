@@ -203,13 +203,13 @@ describe('variant rarity classification', () => {
     }
   });
 
-  it('un set temporairement ouvert ne verrouille aucune de ses variantes', () => {
-    const ouvertes = getAllCards()
-      .filter((c) => DOCUMENTED_LOCKED_RARITIES.includes(c.rarity))
-      .filter((c) => SETS_TEMPORAIREMENT_DEBLOQUES.has(String(c.set)));
-    expect(ouvertes.length, 'le set 2 a bien des variantes').toBeGreaterThan(0);
-    for (const card of ouvertes) {
-      expect(isLockedVariantCard(card), `${card.id} est ouverte`).toBe(false);
+  it('plus aucun set n est ouvert en bloc, donc chaque variante reste verrouillee', () => {
+    expect([...SETS_TEMPORAIREMENT_DEBLOQUES], 'aucun set offert en entier').toEqual([]);
+    const variantes = getAllCards()
+      .filter((c) => DOCUMENTED_LOCKED_RARITIES.includes(c.rarity));
+    expect(variantes.length, 'le jeu a bien des variantes').toBeGreaterThan(0);
+    for (const card of variantes) {
+      expect(isLockedVariantCard(card), `${card.id} doit se gagner`).toBe(true);
       expect(isVariantCard(card), `${card.id} reste une variante`).toBe(true);
     }
   });
@@ -278,15 +278,14 @@ describe('card id parsing and base card resolution', () => {
 });
 
 describe('force unlocked cards', () => {
-  it('force unlocks every card of a not yet released set', () => {
-    expect(isForceUnlockedCard('SS-149-L')).toBe(true);
-    expect(isForceUnlockedCard('SS-147-POPV')).toBe(true);
+  it('ouvre les cartes d un set pas encore sorti, qu on ne peut de toute facon pas obtenir', () => {
     expect(isForceUnlockedCard('AK-001-RA')).toBe(true);
   });
 
-  it('does not force unlock a released set', () => {
-    expect(isForceUnlockedCard('KS-108-RA')).toBe(false);
-    expect(isForceUnlockedCard('KS-133-L')).toBe(false);
+  it('n ouvre rien sur un set sorti, quel que soit le set', () => {
+    for (const id of ['KS-108-RA', 'KS-133-L', 'SS-149-L', 'SS-147-POPV']) {
+      expect(isForceUnlockedCard(id), `${id} se gagne`).toBe(false);
+    }
   });
 
   it('rejects empty and malformed ids', () => {
@@ -295,13 +294,13 @@ describe('force unlocked cards', () => {
     expect(isForceUnlockedCard('KS-108')).toBe(false);
   });
 
-  it('lists the not yet released card ids and never a released one', () => {
+  it('n enumere aucune carte des sets sortis', () => {
     const ids = getForceUnlockedCardIds();
-    expect(ids.has('SS-149-L')).toBe(true);
-    expect(ids.has('KS-108-RA')).toBe(false);
-    for (const id of ids) {
-      expect(id.startsWith('KS-')).toBe(false);
-    }
+    const sortis = [...ids].filter((id) => id.startsWith('KS-') || id.startsWith('SS-'));
+    expect(
+      sortis.slice(0, 10),
+      'une carte d un set sorti se gagne, elle n est jamais offerte d office',
+    ).toEqual([]);
   });
 });
 
@@ -370,11 +369,10 @@ describe('server side deck variant validation', () => {
     expect(fakeUserFindUnique).not.toHaveBeenCalled();
   });
 
-  it('accepts a locked rarity from a not yet released set without any ownership', async () => {
-    expect(isLockedVariantCard(getCardById('SS-147-POPV')), 'ouverte pendant le deblocage temporaire').toBe(false);
+  it('refuse une variante d un set sorti que le joueur ne possede pas', async () => {
+    expect(isLockedVariantCard(getCardById('SS-147-POPV')), 'elle se gagne').toBe(true);
     const res = await validateDeckVariantUnlocks('u1', ['SS-147-POPV', 'SS-149-L']);
-    expect(res.ok).toBe(true);
-    expect(fakeUserFindUnique).not.toHaveBeenCalled();
+    expect(res.ok, 'sans possession, le deck est refuse').toBe(false);
   });
 });
 

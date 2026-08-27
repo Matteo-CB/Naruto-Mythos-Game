@@ -127,7 +127,7 @@ describe('the four Secret variants are complete cards', () => {
     expect(getEffectHandler(ZABUZA, 'DUEL')).toBeTruthy();
     expect(getEffectHandler(ZABUZA, 'UPGRADE')).toBeTruthy();
     for (const id of SECRETS) {
-      expect(isForceUnlockedCard(id), `${id} unlocked`).toBe(true);
+      expect(isForceUnlockedCard(id), `${id} se gagne, il n est offert a personne`).toBe(false);
       expect(isStaticRankedBanned(id), `${id} banned from ranked`).toBe(true);
     }
   });

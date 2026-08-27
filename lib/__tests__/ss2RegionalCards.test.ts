@@ -285,9 +285,9 @@ describe('the regional variants are wired like the cards they copy', () => {
     }
   });
 
-  it('the promo variants are unlocked for everyone and out of ranked', () => {
+  it('les promos se gagnent, et restent hors classe', () => {
     for (const id of [SAKURA, ITACHI, GAARA, SASUKE]) {
-      expect(isForceUnlockedCard(id), `${id} unlocked`).toBe(true);
+      expect(isForceUnlockedCard(id), `${id} se gagne, il n est offert a personne`).toBe(false);
       expect(isStaticRankedBanned(id), `${id} banned from ranked`).toBe(true);
     }
     expect(isStaticRankedBanned(NARUTO)).toBe(true);

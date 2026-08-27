@@ -3,13 +3,10 @@ import { isForceUnlockedCard, getForceUnlockedCardIds } from '@/lib/variants/for
 import { applySetStatusOverrides } from '@/lib/data/sets/registry';
 
 describe('force-unlock for not-yet-released (coming_soon / revealing) sets', () => {
-  it('keeps the Set 2 promo variants unlocked now that the set is released', () => {
-    expect(isForceUnlockedCard('SS-112-SPV')).toBe(true);
-    expect(isForceUnlockedCard('SS-122-SPV')).toBe(true);
-    expect(isForceUnlockedCard('SS-126-SPV')).toBe(true);
-    expect(isForceUnlockedCard('SS-120-CHIBIV')).toBe(true);
-    expect(isForceUnlockedCard('SS-147-POPV')).toBe(true);
-    expect(isForceUnlockedCard('SS-149-L')).toBe(true);
+  it('les promos du set 2 se gagnent maintenant que le set est sorti', () => {
+    for (const id of ['SS-112-SPV', 'SS-122-SPV', 'SS-126-SPV', 'SS-120-CHIBIV', 'SS-147-POPV', 'SS-149-L']) {
+      expect(isForceUnlockedCard(id), `${id} n est offert a personne`).toBe(false);
+    }
   });
 
   it('unlocks every card of a set that is still being revealed', () => {
@@ -25,11 +22,10 @@ describe('force-unlock for not-yet-released (coming_soon / revealing) sets', () 
     expect(isForceUnlockedCard('KS-108-RA')).toBe(false);
   });
 
-  it('getForceUnlockedCardIds enumerates all SS cards but no KS variant', () => {
+  it('l enumeration ne contient aucune carte d un set sorti', () => {
     const ids = getForceUnlockedCardIds();
-    expect(ids.has('SS-112-SPV')).toBe(true);
-    expect(ids.has('SS-126-SPV')).toBe(true);
-    expect(ids.has('SS-149-L')).toBe(true);
-    expect(ids.has('KS-108-MV')).toBe(false);
+    for (const id of ['SS-112-SPV', 'SS-126-SPV', 'SS-149-L', 'KS-108-MV']) {
+      expect(ids.has(id), `${id} se gagne`).toBe(false);
+    }
   });
 });

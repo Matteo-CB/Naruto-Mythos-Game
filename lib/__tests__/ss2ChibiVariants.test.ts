@@ -89,9 +89,9 @@ describe('a Chibi variant is the same card as the one it copies', () => {
     }
   });
 
-  it('they are unlocked for everyone and kept out of ranked', () => {
+  it('elles se gagnent, et restent hors classe', () => {
     for (const id of CHIBI) {
-      expect(isForceUnlockedCard(id), `${id} unlocked`).toBe(true);
+      expect(isForceUnlockedCard(id), `${id} se gagne, il n est offert a personne`).toBe(false);
       expect(isStaticRankedBanned(id), `${id} banned from ranked`).toBe(true);
     }
   });
