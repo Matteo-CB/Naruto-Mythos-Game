@@ -1,3 +1,4 @@
+import { BATTLEPASS_TIER_COUNT } from '@/lib/battlepass/constants';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const fakeAuth = vi.fn();
@@ -55,65 +56,72 @@ describe('POST /api/battlepass/claim-card', () => {
 
   it('400 if tier not in card-tier whitelist', async () => {
     fakeAuth.mockResolvedValue({ user: { id: 'u1' } });
-    const res = await POST(makeReq({ tier: 24 }) as never);
-    expect(res.status).toBe(400);
+    const res = await POST(makeReq({ tier: 7 }) as never);
+    expect(res.status, 'le palier 7 ne porte aucune carte').toBe(400);
   });
 
   it('400 if user has not reached the tier', async () => {
     fakeAuth.mockResolvedValue({ user: { id: 'u1' } });
-    findUniqueUser.mockResolvedValue({ battlepassTier: 24 });
-    const res = await POST(makeReq({ tier: 25 }) as never);
+    findUniqueUser.mockResolvedValue({ battlepassTier: 23 });
+    const res = await POST(makeReq({ tier: 24 }) as never);
     expect(res.status).toBe(400);
   });
 
   it('409 if card already unlocked', async () => {
     fakeAuth.mockResolvedValue({ user: { id: 'u1' } });
-    findUniqueUser.mockResolvedValue({ battlepassTier: 25 });
+    findUniqueUser.mockResolvedValue({ battlepassTier: 24 });
     variantInvFindUnique.mockResolvedValue({ count: 1 });
-    const res = await POST(makeReq({ tier: 25 }) as never);
+    const res = await POST(makeReq({ tier: 24 }) as never);
     expect(res.status).toBe(409);
     expect(variantInvUpsert).not.toHaveBeenCalled();
   });
 
-  it('200 grants the card for tier 25 (KS-137-MV)', async () => {
+  it('accorde le chibi du palier 24', async () => {
     fakeAuth.mockResolvedValue({ user: { id: 'u1' } });
-    findUniqueUser.mockResolvedValue({ battlepassTier: 25 });
+    findUniqueUser.mockResolvedValue({ battlepassTier: 24 });
     variantInvFindUnique.mockResolvedValue(null);
-    const res = await POST(makeReq({ tier: 25 }) as never);
+    const res = await POST(makeReq({ tier: 24 }) as never);
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body.tier).toBe(25);
-    expect(body.cardId).toBe('KS-137-MV');
+    expect(body.tier).toBe(24);
+    expect(body.cardId).toBe('SS-115-CHIBIV');
     expect(variantInvUpsert).toHaveBeenCalledTimes(1);
     const args = variantInvUpsert.mock.calls[0][0];
-    expect(args.where).toMatchObject({ userId_cardId: { userId: 'u1', cardId: 'KS-137-MV' } });
+    expect(args.where).toMatchObject({ userId_cardId: { userId: 'u1', cardId: 'SS-115-CHIBIV' } });
   });
 
-  it('200 grants the card for tier 5 (KS-133_2-MV)', async () => {
+  it('accorde le premier chibi, au palier 4', async () => {
     fakeAuth.mockResolvedValue({ user: { id: 'u1' } });
-    findUniqueUser.mockResolvedValue({ battlepassTier: 5 });
+    findUniqueUser.mockResolvedValue({ battlepassTier: 4 });
     variantInvFindUnique.mockResolvedValue(null);
-    const res = await POST(makeReq({ tier: 5 }) as never);
+    const res = await POST(makeReq({ tier: 4 }) as never);
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body.tier).toBe(5);
-    expect(body.cardId).toBe('KS-133_2-MV');
+    expect(body.tier).toBe(4);
+    expect(body.cardId).toBe('SS-031-CHIBIV');
   });
 
-  it('200 grants the card for tier 50 (KS-133-MV)', async () => {
+  it('accorde le chibi de SASUKE au tout dernier palier', async () => {
     fakeAuth.mockResolvedValue({ user: { id: 'u1' } });
-    findUniqueUser.mockResolvedValue({ battlepassTier: 50 });
+    findUniqueUser.mockResolvedValue({ battlepassTier: BATTLEPASS_TIER_COUNT });
     variantInvFindUnique.mockResolvedValue(null);
-    const res = await POST(makeReq({ tier: 50 }) as never);
+    const res = await POST(makeReq({ tier: BATTLEPASS_TIER_COUNT }) as never);
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body.cardId).toBe('KS-133-MV');
+    expect(body.cardId, 'la recompense finale de la saison').toBe('SS-126-CHIBIV');
+  });
+
+  it('un palier sans carte est refuse', async () => {
+    fakeAuth.mockResolvedValue({ user: { id: 'u1' } });
+    findUniqueUser.mockResolvedValue({ battlepassTier: 30 });
+    const res = await POST(makeReq({ tier: 30 }) as never);
+    expect(res.status, 'le palier 30 ne donne que des boosters').toBe(400);
   });
 
   it('404 if user not found', async () => {
     fakeAuth.mockResolvedValue({ user: { id: 'u-missing' } });
     findUniqueUser.mockResolvedValue(null);
-    const res = await POST(makeReq({ tier: 25 }) as never);
+    const res = await POST(makeReq({ tier: 24 }) as never);
     expect(res.status).toBe(404);
   });
 });

@@ -9920,6 +9920,48 @@
       "title_pl": "„Daj spokój, wiesz, jaką jestem kobietą.”",
       "image_file": "images/cards/SS/sp_v/SS-141-SPV.webp",
       "image_url": "/images/cards/SS/sp_v/SS-141-SPV.webp"
+    },
+    "SS-112_2-SPV": {
+      "id": "SS-112_2-SPV",
+      "cardId": "SS-112_2-SPV",
+      "rarity": "SPV",
+      "number": "112",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NEJI HYUGA",
+      "name_ja": "日向ネジ",
+      "name_fr": "NEJI HYÛGA",
+      "name_es": "NEJI HYUGA",
+      "title_en": "You never meant to be a ninja.",
+      "title_ja": "「お前は忍びになるべきではなかった。」",
+      "title_fr": "Tu n'étais pas fait pour devenir un ninja.",
+      "title_es": "Nunca estuviste destinado a ser un ninja.",
+      "title_pt": "Você nunca foi feito para ser ninja.",
+      "title_it": "Non sei mai stato tagliato per fare il ninja.",
+      "title_pl": "Nigdy nie miałeś być ninją.",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team Guy",
+        "Taijutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Remove all Power tokens from an enemy character in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Hinata Hyuga: Hide an enemy character without Power tokens in this mission."
+        }
+      ],
+      "rarity_display": "Special V",
+      "data_complete": true,
+      "old_id": "112/140 V",
+      "image_file": "images/cards/SS/sp_v/SS-112_2-SPV.webp",
+      "image_url": "/images/cards/SS/sp_v/SS-112_2-SPV.webp"
     }
   }
 }

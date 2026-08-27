@@ -65,8 +65,8 @@ export async function awardXp(userId: string, xp: number): Promise<AwardXpResult
 
   for (const tier of crossed) {
     const reward = getTierReward(tier);
-    if (reward.type === 'booster') {
-      await grantBoosters(userId, reward.setId, 1);
+    for (const setId of reward.boosterSetIds) {
+      await grantBoosters(userId, setId, 1);
       boostersGranted += 1;
     }
   }

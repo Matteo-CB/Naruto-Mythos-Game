@@ -39,7 +39,7 @@ describe('battlepass tier math', () => {
   it('xpRequiredForTier(tier) is linear', () => {
     expect(xpRequiredForTier(1)).toBe(BATTLEPASS_XP_PER_TIER);
     expect(xpRequiredForTier(25)).toBe(25 * BATTLEPASS_XP_PER_TIER);
-    expect(xpRequiredForTier(50)).toBe(BATTLEPASS_MAX_NAMED_XP);
+    expect(xpRequiredForTier(BATTLEPASS_TIER_COUNT)).toBe(BATTLEPASS_MAX_NAMED_XP);
   });
 });
 
@@ -115,18 +115,34 @@ describe('infiniteBoostersDelta', () => {
 });
 
 describe('getTierReward', () => {
-  it('tier 25 is a card reward', () => {
-    expect(getTierReward(25).type).toBe('card');
-    expect(getTierReward(25).cardId).toBeTruthy();
+  it('un palier multiple de quatre offre un chibi', () => {
+    for (const t of [4, 8, 12, 56]) {
+      expect(getTierReward(t).type, `palier ${t}`).toBe('card');
+      expect(getTierReward(t).cardId, `palier ${t}`).toMatch(/CHIBIV$/);
+    }
   });
 
-  it('tier 50 is a card reward', () => {
-    expect(getTierReward(50).type).toBe('card');
+  it('le tout dernier palier offre le chibi de SASUKE', () => {
+    const dernier = getTierReward(BATTLEPASS_TIER_COUNT);
+    expect(dernier.cardId, 'la recompense finale de la saison').toBe('SS-126-CHIBIV');
   });
 
-  it('every other tier is a booster', () => {
-    for (const t of [1, 2, 10, 24, 26, 49]) {
-      expect(getTierReward(t).type).toBe('booster');
+  it('un palier multiple de cinq ajoute le booster de Konoha Shido', () => {
+    for (const t of [5, 10, 25, 50]) {
+      expect(getTierReward(t).boosterSetIds, `palier ${t}`).toEqual(['SS', 'KS']);
+    }
+  });
+
+  it('tous les autres paliers donnent un seul booster Shinobi Shiren', () => {
+    for (const t of [1, 2, 6, 9, 23, 49]) {
+      expect(getTierReward(t).type, `palier ${t}`).toBe('booster');
+      expect(getTierReward(t).boosterSetIds, `palier ${t}`).toEqual(['SS']);
+    }
+  });
+
+  it('chaque palier de la saison donne au moins un booster', () => {
+    for (let t = 1; t <= BATTLEPASS_TIER_COUNT; t += 1) {
+      expect(getTierReward(t).boosterSetIds.length, `palier ${t}`).toBeGreaterThanOrEqual(1);
     }
   });
 });
@@ -143,8 +159,8 @@ describe('computeClaimable', () => {
   it('returns all unclaimed tiers up to current', () => {
     const r = computeClaimable(800, []);
     expect(r.unclaimedTiers).toEqual([1, 2, 3, 4]);
-    expect(r.totalBoosters).toBe(4);
-    expect(r.totalCards).toEqual([]);
+    expect(r.totalBoosters, 'un booster par palier, aucun multiple de cinq ici').toBe(4);
+    expect(r.totalCards, 'le palier 4 porte le premier chibi').toEqual(['SS-031-CHIBIV']);
   });
 
   it('skips already-claimed tiers', () => {
@@ -153,9 +169,10 @@ describe('computeClaimable', () => {
     expect(r.totalBoosters).toBe(2);
   });
 
-  it('separates card rewards (tier 25 and 50)', () => {
+  it('les chibis reclamables sont listes a part des boosters', () => {
     const r = computeClaimable(5200, []);
-    expect(r.totalCards).toContain('KS-133_2-MV');
+    expect(r.totalCards, 'le premier chibi de la saison').toContain('SS-031-CHIBIV');
     expect(r.unclaimedTiers).toContain(25);
+    expect(r.totalBoosters, 'les doubles boosters comptent pour deux').toBeGreaterThan(r.unclaimedTiers.length);
   });
 });

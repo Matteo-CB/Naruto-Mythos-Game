@@ -1,8 +1,11 @@
+import { SEASON_CHIBIS, CHIBIS_HORS_SAISON } from '@/lib/variants/seasonChibis';
 import { describe, it, expect } from 'vitest';
 import {
   VARIANT_RARITIES,
   VARIANT_PACK_PROBABILITIES,
   BOOSTER_EXCLUDED_VARIANTS,
+  SEASON_EXCLUSIVE_CARD_IDS,
+  FORCE_UNLOCKED_CARD_IDS,
   TOURNAMENT_PRIZE_CARD_IDS,
   BATTLEPASS_TIER_5_CARD,
   BATTLEPASS_TIER_25_CARD,
@@ -35,14 +38,37 @@ describe('variants constants', () => {
     expect(VARIANT_PACK_PROBABILITIES.HOLO_UC).toBeLessThan(VARIANT_PACK_PROBABILITIES.HOLO_C);
   });
 
-  it('excludes every tournament prize MV and the 3 battlepass MVs', () => {
-    expect(BOOSTER_EXCLUDED_VARIANTS.size).toBe(TOURNAMENT_PRIZE_CARD_IDS.length + 3);
+  it('les lots de tournoi et les cartes de battlepass du set 1 restent hors booster', () => {
     for (const id of TOURNAMENT_PRIZE_CARD_IDS) {
-      expect(BOOSTER_EXCLUDED_VARIANTS.has(id)).toBe(true);
+      expect(BOOSTER_EXCLUDED_VARIANTS.has(id), id).toBe(true);
     }
     expect(BOOSTER_EXCLUDED_VARIANTS.has(BATTLEPASS_TIER_5_CARD)).toBe(true);
     expect(BOOSTER_EXCLUDED_VARIANTS.has(BATTLEPASS_TIER_25_CARD)).toBe(true);
     expect(BOOSTER_EXCLUDED_VARIANTS.has(BATTLEPASS_TIER_50_CARD)).toBe(true);
+  });
+
+  it('aucun chibi ne sort d un booster, ils viennent des paliers de saison', () => {
+    for (const id of [...SEASON_CHIBIS, ...CHIBIS_HORS_SAISON]) {
+      expect(BOOSTER_EXCLUDED_VARIANTS.has(id), id).toBe(true);
+    }
+    expect(SEASON_CHIBIS.length, 'quinze chibis dans la saison').toBe(15);
+    expect(CHIBIS_HORS_SAISON, 'MINATO et IRUKA sont attribues autrement')
+      .toEqual(['SS-122-CHIBIV', 'SS-140-CHIBIV']);
+  });
+
+  it('les cartes evenementielles du set 2 ne sortent pas non plus d un booster', () => {
+    for (const id of SEASON_EXCLUSIVE_CARD_IDS) {
+      expect(BOOSTER_EXCLUDED_VARIANTS.has(id), id).toBe(true);
+    }
+    expect(SEASON_EXCLUSIVE_CARD_IDS, 'KAKASHI legendaire, NARUTO et OROCHIMARU tamponnes')
+      .toEqual(['SS-149-L', 'SS-121-MV', 'SS-127_2-MV']);
+  });
+
+  it('plus aucune variante n est offerte d office: elles se gagnent toutes', () => {
+    expect(
+      FORCE_UNLOCKED_CARD_IDS.size,
+      'seuls les administrateurs les possedent toutes, par contournement',
+    ).toBe(0);
   });
 
   it('duplicate XP scales with rarity', () => {

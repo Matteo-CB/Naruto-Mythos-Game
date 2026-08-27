@@ -5,7 +5,7 @@ import { getTierReward, BATTLEPASS_SEASON_SET_ID } from '@/lib/battlepass/consta
 import { withUserLock } from '@/lib/quests/userLock';
 import { incrementVariant, isVariantOwned } from '@/lib/variants/inventory';
 
-const CARD_TIERS: ReadonlySet<number> = new Set([5, 25, 50]);
+import { isChibiTier } from '@/lib/battlepass/season';
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid body', errorKey: 'battlepass.error.invalidBody' }, { status: 400 });
   }
   const tier = typeof body.tier === 'number' ? Math.floor(body.tier) : NaN;
-  if (!CARD_TIERS.has(tier)) {
+  if (!Number.isFinite(tier) || !isChibiTier(tier)) {
     return NextResponse.json({ error: 'Tier is not a card tier', errorKey: 'battlepass.error.notCardTier' }, { status: 400 });
   }
 

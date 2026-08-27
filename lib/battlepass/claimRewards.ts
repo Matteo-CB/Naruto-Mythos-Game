@@ -24,8 +24,8 @@ export function computeClaimable(
     unclaimedTiers.push(tier);
     const reward = getTierReward(tier);
     rewards.push({ ...reward, tier });
-    if (reward.type === 'booster') totalBoosters += 1;
-    else if (reward.type === 'card' && reward.cardId) totalCards.push(reward.cardId);
+    totalBoosters += reward.boosterSetIds.length;
+    if (reward.cardId) totalCards.push(reward.cardId);
   }
 
   return { unclaimedTiers, rewards, totalBoosters, totalCards };

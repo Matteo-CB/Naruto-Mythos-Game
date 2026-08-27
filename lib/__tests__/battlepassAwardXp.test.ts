@@ -1,3 +1,4 @@
+import { BATTLEPASS_MAX_NAMED_XP, BATTLEPASS_TIER_COUNT } from '@/lib/battlepass/constants';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const findUniqueUser = vi.fn();
@@ -104,9 +105,9 @@ describe('awardXp', () => {
     expect(r.cardsUnlocked).toEqual([]);
   });
 
-  it('grants infinite boosters past tier 50', async () => {
+  it('accorde les boosters de la queue infinie une fois la saison terminee', async () => {
     findUniqueUser.mockResolvedValue({
-      battlepassXp: 10000, battlepassTier: 50, infiniteBoostersGranted: 0,
+      battlepassXp: BATTLEPASS_MAX_NAMED_XP, battlepassTier: BATTLEPASS_TIER_COUNT, infiniteBoostersGranted: 0,
     });
     updateUser.mockResolvedValue({});
     upsertInventory.mockResolvedValue({ count: 5 });

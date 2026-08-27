@@ -104,11 +104,11 @@ function scriptedRng(values: number[]): Rng {
   };
 }
 
-describe('battlepass tier maths: 200 XP per tier, 50 named tiers, infinite 500 XP tail', () => {
+describe('battlepass tier maths: 200 XP par palier, la saison entiere, queue infinie de 500 XP', () => {
   it('pins the documented constants', () => {
     expect(BATTLEPASS_XP_PER_TIER).toBe(200);
-    expect(BATTLEPASS_TIER_COUNT).toBe(50);
-    expect(BATTLEPASS_MAX_NAMED_XP).toBe(10000);
+    expect(BATTLEPASS_TIER_COUNT, 'la saison Shinobi Shiren compte soixante paliers').toBe(60);
+    expect(BATTLEPASS_MAX_NAMED_XP).toBe(BATTLEPASS_TIER_COUNT * BATTLEPASS_XP_PER_TIER);
     expect(BATTLEPASS_INFINITE_STEP_XP).toBe(500);
   });
 
@@ -121,14 +121,14 @@ describe('battlepass tier maths: 200 XP per tier, 50 named tiers, infinite 500 X
     }
   });
 
-  it('clamps the named track at tier 50 and never returns tier 51', () => {
-    expect(xpRequiredForTier(51)).toBe(BATTLEPASS_MAX_NAMED_XP);
+  it('borne la piste nommee au dernier palier et ne renvoie jamais au dela', () => {
+    expect(xpRequiredForTier(BATTLEPASS_TIER_COUNT + 1)).toBe(BATTLEPASS_MAX_NAMED_XP);
     expect(tierForXp(BATTLEPASS_MAX_NAMED_XP + 999999)).toBe(BATTLEPASS_TIER_COUNT);
     const crossed = tiersCrossed(0, BATTLEPASS_MAX_NAMED_XP + 12345);
     expect(crossed).toHaveLength(BATTLEPASS_TIER_COUNT);
     expect(crossed[0]).toBe(1);
     expect(crossed[crossed.length - 1]).toBe(BATTLEPASS_TIER_COUNT);
-    expect(crossed).not.toContain(51);
+    expect(crossed).not.toContain(BATTLEPASS_TIER_COUNT + 1);
   });
 
   it('treats negative and fractional XP as a floored non-negative amount', () => {
@@ -177,28 +177,46 @@ describe('battlepass tier maths: 200 XP per tier, 50 named tiers, infinite 500 X
     expect(mid.xpToNextInfiniteBooster).toBe(200);
   });
 
-  it('maps tier rewards to the three reserved cards and a booster everywhere else', () => {
-    expect(getTierReward(5)).toEqual({ type: 'card', setId: 'KS', cardId: BATTLEPASS_TIER_5_CARD });
-    expect(getTierReward(25)).toEqual({ type: 'card', setId: 'KS', cardId: BATTLEPASS_TIER_25_CARD });
-    expect(getTierReward(50)).toEqual({ type: 'card', setId: 'KS', cardId: BATTLEPASS_TIER_50_CARD });
-    let boosters = 0;
+  it('chaque palier donne un booster Shinobi Shiren, double tous les cinq paliers', () => {
+    let simples = 0;
+    let doubles = 0;
     for (let t = 1; t <= BATTLEPASS_TIER_COUNT; t++) {
-      if (t === 5 || t === 25 || t === 50) continue;
-      expect(getTierReward(t)).toEqual({ type: 'booster', setId: 'KS' });
-      boosters++;
+      const r = getTierReward(t);
+      expect(r.boosterSetIds[0], `palier ${t}`).toBe('SS');
+      if (t % 5 === 0) {
+        expect(r.boosterSetIds, `palier ${t}`).toEqual(['SS', 'KS']);
+        doubles++;
+      } else {
+        expect(r.boosterSetIds, `palier ${t}`).toEqual(['SS']);
+        simples++;
+      }
     }
-    expect(boosters).toBe(47);
+    expect(doubles, 'un double booster tous les cinq paliers').toBe(BATTLEPASS_TIER_COUNT / 5);
+    expect(simples + doubles).toBe(BATTLEPASS_TIER_COUNT);
   });
 
-  it('a fully completed named track claims 47 boosters and the 3 reserved cards', () => {
+  it('les quinze chibis de la saison sont repartis, SASUKE au dernier palier', () => {
+    const chibis: string[] = [];
+    for (let t = 1; t <= BATTLEPASS_TIER_COUNT; t++) {
+      const id = getTierReward(t).cardId;
+      if (id) chibis.push(id);
+    }
+    expect(chibis, 'quinze chibis').toHaveLength(15);
+    expect(new Set(chibis).size, 'aucun doublon').toBe(15);
+    expect(chibis.every((id) => id.endsWith('-CHIBIV'))).toBe(true);
+    expect(chibis[chibis.length - 1]).toBe('SS-126-CHIBIV');
+    expect(chibis, 'MINATO et IRUKA sont attribues autrement').not.toContain('SS-122-CHIBIV');
+    expect(chibis).not.toContain('SS-140-CHIBIV');
+  });
+
+  it('une saison entierement reclamee donne tous les boosters et tous les chibis', () => {
     const summary = computeClaimable(BATTLEPASS_MAX_NAMED_XP, []);
     expect(summary.unclaimedTiers).toHaveLength(BATTLEPASS_TIER_COUNT);
-    expect(summary.totalBoosters).toBe(47);
-    expect(summary.totalCards).toEqual([
-      BATTLEPASS_TIER_5_CARD,
-      BATTLEPASS_TIER_25_CARD,
-      BATTLEPASS_TIER_50_CARD,
-    ]);
+    expect(
+      summary.totalBoosters,
+      'un par palier, plus un second tous les cinq paliers',
+    ).toBe(BATTLEPASS_TIER_COUNT + BATTLEPASS_TIER_COUNT / 5);
+    expect(summary.totalCards).toHaveLength(15);
     const beyond = computeClaimable(BATTLEPASS_MAX_NAMED_XP + 9999, []);
     expect(beyond.unclaimedTiers[beyond.unclaimedTiers.length - 1]).toBe(BATTLEPASS_TIER_COUNT);
   });
@@ -228,8 +246,8 @@ describe('quest XP by difficulty', () => {
     expect(byLevelTotal).toBe(QUESTS.length);
   });
 
-  it('a level 4 quest is worth exactly one fiftieth of the named battlepass track', () => {
-    expect(BATTLEPASS_MAX_NAMED_XP / QUEST_XP_BY_LEVEL[4]).toBe(50);
+  it('une quete de niveau 4 vaut exactement un palier de la piste nommee', () => {
+    expect(BATTLEPASS_MAX_NAMED_XP / QUEST_XP_BY_LEVEL[4]).toBe(BATTLEPASS_TIER_COUNT);
     expect(QUEST_XP_BY_LEVEL[4]).toBe(BATTLEPASS_XP_PER_TIER);
   });
 });
@@ -386,11 +404,17 @@ describe('variant booster composition and reserved-card exclusion', () => {
     const pool = eligibleVariantsForSet('KS').map((c) => c.cardId);
     const byRarity = eligibleVariantsForSetByRarity('KS');
     for (const id of BOOSTER_EXCLUDED_VARIANTS) {
-      expect(getCardById(id)).toBeTruthy();
       expect(pool).not.toContain(id);
-      expect(isBoosterObtainableVariant(id)).toBe(false);
-      expect(getVariantObtentionMode(id)).toBe('reserved');
+      expect(isBoosterObtainableVariant(id), id).toBe(false);
+      if (!getCardById(id)) continue;
+      expect(getVariantObtentionMode(id), id).toBe('reserved');
     }
+
+    const pasEncoreSortie = [...BOOSTER_EXCLUDED_VARIANTS].filter((id) => !getCardById(id));
+    expect(
+      pasEncoreSortie,
+      'une carte peut etre reservee avant d exister: les chibis de MINATO et IRUKA attendent leur sortie',
+    ).toEqual(['SS-122-CHIBIV', 'SS-140-CHIBIV']);
     for (const rarity of ['RA', 'MV', 'SV', 'L'] as const) {
       for (const card of byRarity[rarity]) {
         expect(card.rarity).toBe(rarity);

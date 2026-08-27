@@ -1,4 +1,5 @@
 import type { Rarity } from '@/lib/engine/types';
+import { SEASON_CHIBIS, CHIBIS_HORS_SAISON } from './seasonChibis';
 
 export const VARIANT_RARITIES = ['RA', 'MV', 'SV', 'L'] as const;
 export type VariantRarity = (typeof VARIANT_RARITIES)[number];
@@ -7,71 +8,7 @@ export const SPECIAL_VARIANT_RARITIES = ['RA', 'MV', 'SV', 'L', 'SP', 'SPV', 'PO
 
 export const LOCKED_VARIANT_RARITIES = ['RA', 'MV', 'SV', 'L', 'SPV', 'POPV', 'CHIBIV', 'SHINOBIV'] as const;
 
-export const FORCE_UNLOCKED_CARD_IDS: ReadonlySet<string> = new Set([
-  'SS-112-SPV',
-  'SS-122-SPV',
-  'SS-121-SPV',
-  'SS-123-SPV',
-  'SS-149-SPV',
-  'SS-126-SPV',
-  'SS-118-SHINOBIV',
-  'SS-119-SHINOBIV',
-  'SS-120-SHINOBIV',
-  'SS-121-SHINOBIV',
-  'SS-114-RA',
-  'SS-114-SPV',
-  'SS-115-RA',
-  'SS-115-SPV',
-  'SS-121-RA',
-  'SS-121_2-SPV',
-  'SS-123-POPV',
-  'SS-126-POPV',
-  'SS-126-RA',
-  'SS-137-SPV',
-  'SS-120-CHIBIV',
-  'SS-147-POPV',
-  'SS-147-MV',
-  'SS-148-MV',
-  'SS-149-L',
-  'SS-111-SHINOBIV',
-  'SS-123-SHINOBIV',
-  'SS-124-SHINOBIV',
-  'SS-112-SHINOBIV',
-  'SS-114-SHINOBIV',
-  'SS-115-SHINOBIV',
-  'SS-121-MV',
-  'SS-126-R',
-  'SS-031-CHIBIV',
-  'SS-999-L',
-  'SS-998-L',
-  'SS-078-L',
-  'SS-114-MV',
-  'SS-005-MV',
-  'SS-123-MV',
-  'SS-126-MV',
-  'SS-137-MV',
-  'SS-127-MV',
-  'SS-127_2-MV',
-  'SS-126_2-MV',
-  'SS-061-CHIBIV',
-  'SS-137-CHIBIV',
-  'SS-141-CHIBIV',
-  'SS-144-CHIBIV',
-  'SS-149-CHIBIV',
-  'SS-149-POPV',
-  'SS-078-CHIBIV',
-  'SS-111-CHIBIV',
-  'SS-112-CHIBIV',
-  'SS-115-CHIBIV',
-  'SS-118-CHIBIV',
-  'SS-121-CHIBIV',
-  'SS-123-CHIBIV',
-  'SS-126-CHIBIV',
-  'SS-147-SV',
-  'SS-148-SV',
-  'SS-149-SV',
-  'SS-150-SV',
-]);
+export const FORCE_UNLOCKED_CARD_IDS: ReadonlySet<string> = new Set([]);
 
 export const VARIANT_PACK_SIZE = 8;
 
@@ -90,6 +27,12 @@ export const VARIANT_PACK_PROBABILITIES: VariantPackProbabilities = {
 
 export const VARIANT_RARITY_ROLL_ORDER: PackSlotKind[] = ['SV', 'L', 'MV', 'RA', 'HOLO_UC', 'HOLO_C'];
 
+export const SEASON_EXCLUSIVE_CARD_IDS: readonly string[] = [
+  'SS-149-L',
+  'SS-121-MV',
+  'SS-127_2-MV',
+];
+
 export const BOOSTER_EXCLUDED_VARIANTS: ReadonlySet<string> = new Set([
   'KS-107-MV',
   'KS-108-MV',
@@ -98,6 +41,9 @@ export const BOOSTER_EXCLUDED_VARIANTS: ReadonlySet<string> = new Set([
   'KS-137-MV',
   'KS-133-MV',
   'KS-133_2-MV',
+  ...SEASON_CHIBIS,
+  ...CHIBIS_HORS_SAISON,
+  ...SEASON_EXCLUSIVE_CARD_IDS,
 ]);
 
 export const TOURNAMENT_PRIZE_CARD_IDS = [

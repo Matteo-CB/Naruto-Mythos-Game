@@ -1,11 +1,12 @@
+import { DUPLICATE_XP_BY_RARITY } from '@/lib/variants/constants';
 import {
-  BATTLEPASS_TIER_5_CARD,
-  BATTLEPASS_TIER_25_CARD,
-  BATTLEPASS_TIER_50_CARD,
-  DUPLICATE_XP_BY_RARITY,
-} from '@/lib/variants/constants';
+  SEASON_SET_ID,
+  SEASON_COMPANION_SET_ID,
+  SEASON_TIER_COUNT,
+  planTier,
+} from './season';
 
-export const BATTLEPASS_TIER_COUNT = 50;
+export const BATTLEPASS_TIER_COUNT = SEASON_TIER_COUNT;
 export const BATTLEPASS_XP_PER_TIER = 200;
 export const BATTLEPASS_MAX_NAMED_XP = BATTLEPASS_TIER_COUNT * BATTLEPASS_XP_PER_TIER;
 export const BATTLEPASS_INFINITE_STEP_XP = 500;
@@ -25,21 +26,20 @@ export interface TierReward {
   type: TierRewardType;
   setId: string;
   cardId?: string;
+  boosterSetIds: string[];
 }
 
-export const BATTLEPASS_SEASON_SET_ID = 'KS';
+export const BATTLEPASS_SEASON_SET_ID = SEASON_SET_ID;
+export const BATTLEPASS_COMPANION_SET_ID = SEASON_COMPANION_SET_ID;
 
 export function getTierReward(tier: number): TierReward {
-  if (tier === 5) {
-    return { type: 'card', setId: BATTLEPASS_SEASON_SET_ID, cardId: BATTLEPASS_TIER_5_CARD };
-  }
-  if (tier === 25) {
-    return { type: 'card', setId: BATTLEPASS_SEASON_SET_ID, cardId: BATTLEPASS_TIER_25_CARD };
-  }
-  if (tier === 50) {
-    return { type: 'card', setId: BATTLEPASS_SEASON_SET_ID, cardId: BATTLEPASS_TIER_50_CARD };
-  }
-  return { type: 'booster', setId: BATTLEPASS_SEASON_SET_ID };
+  const plan = planTier(tier);
+  return {
+    type: plan.cardId ? 'card' : 'booster',
+    setId: SEASON_SET_ID,
+    cardId: plan.cardId,
+    boosterSetIds: plan.boosterSetIds,
+  };
 }
 
 export { DUPLICATE_XP_BY_RARITY };

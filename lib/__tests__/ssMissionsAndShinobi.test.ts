@@ -86,14 +86,17 @@ describe('the Shinobi variants are a real rarity with real cards', () => {
     expect(LOCKED_VARIANT_RARITIES).not.toContain('SHINOBI');
   });
 
-  it('the four Shinobi cards exist, are playable by everyone and stay out of ranked', () => {
+  it('les quatre cartes Shinobi existent, se gagnent et restent hors classe', () => {
     for (const id of SHINOBI_IDS) {
       const card = getCharacterById(id);
       expect(card, `${id} exists`).toBeTruthy();
       expect(card!.rarity).toBe('SHINOBIV');
       expect(card!.set).toBe('SS');
       expect((card!.effects ?? []).length, `${id} has effects`).toBeGreaterThan(0);
-      expect(FORCE_UNLOCKED_CARD_IDS.has(id), `${id} unlocked for everyone`).toBe(true);
+      expect(
+        FORCE_UNLOCKED_CARD_IDS.has(id),
+        `${id}: plus aucune variante n est offerte, elles se gagnent toutes`,
+      ).toBe(false);
       expect(isStaticRankedBanned(id), `${id} banned in ranked`).toBe(true);
     }
   });
