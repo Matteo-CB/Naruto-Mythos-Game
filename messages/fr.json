@@ -3508,7 +3508,13 @@
       "noProgress": "Aucune progression sur cette quête.",
       "notFound": "Quête introuvable.",
       "serverError": "Erreur serveur, réessaie dans un instant."
-    }
+    },
+    "seasonHeader": "Quêtes de la saison Shinobi Shiren",
+    "seasonSoon": "Bientôt",
+    "seasonIntro": "Voici les quêtes de la saison. Elles ne comptent pas encore de progression.",
+    "archiveHeader": "Saison précédente",
+    "archiveShow": "Consulter",
+    "archiveHide": "Masquer"
   },
   "battlepass": {
     "title": "Récompenses",

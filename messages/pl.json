@@ -1213,7 +1213,13 @@
       "noProgress": "Brak postępu w tym zadaniu.",
       "notFound": "Nie znaleziono zadania.",
       "serverError": "Błąd serwera, spróbuj ponownie za chwilę."
-    }
+    },
+    "seasonHeader": "Zadania sezonu Shinobi Shiren",
+    "seasonSoon": "Wkrótce",
+    "seasonIntro": "Oto zadania sezonu. Nie zliczają jeszcze postępu.",
+    "archiveHeader": "Poprzedni sezon",
+    "archiveShow": "Zobacz",
+    "archiveHide": "Ukryj"
   },
   "trade": {
     "title": "Wymiana",

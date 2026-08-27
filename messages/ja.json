@@ -3506,7 +3506,13 @@
       "noProgress": "このクエストの進捗がありません。",
       "notFound": "クエストが見つかりません。",
       "serverError": "サーバーエラーです。少ししてからもう一度お試しください。"
-    }
+    },
+    "seasonHeader": "忍びの試練シーズンのクエスト",
+    "seasonSoon": "近日公開",
+    "seasonIntro": "シーズンのクエスト一覧です。進捗はまだ記録されません。",
+    "archiveHeader": "前シーズン",
+    "archiveShow": "見る",
+    "archiveHide": "隠す"
   },
   "battlepass": {
     "title": "報酬",

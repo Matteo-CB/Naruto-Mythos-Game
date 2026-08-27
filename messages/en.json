@@ -3502,7 +3502,13 @@
       "noProgress": "No progress on this quest.",
       "notFound": "Quest not found.",
       "serverError": "Server error, try again in a moment."
-    }
+    },
+    "seasonHeader": "Shinobi Shiren season quests",
+    "seasonSoon": "Coming soon",
+    "seasonIntro": "Here are the season quests. They do not track progress yet.",
+    "archiveHeader": "Previous season",
+    "archiveShow": "View",
+    "archiveHide": "Hide"
   },
   "battlepass": {
     "title": "Rewards",

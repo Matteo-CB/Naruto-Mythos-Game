@@ -76,6 +76,18 @@ interface QuestRow {
   claimedVia?: 'main' | 'daily' | null;
 }
 
+interface SeasonQuestRow {
+  id: string;
+  level: 1 | 2 | 3 | 4;
+  target: number;
+  text_fr: string;
+  text_en: string;
+  text_es?: string;
+  text_ja?: string;
+  xpReward: number;
+  tracked: boolean;
+}
+
 function questText(q: { text_fr: string; text_en: string; text_es?: string; text_ja?: string }, locale: string): string {
   const v = (q as Record<string, unknown>)[`text_${locale}`];
   if (typeof v === 'string' && v) return v;
@@ -135,6 +147,8 @@ export default function RewardsHubPage() {
 
   const [bpState, setBpState] = useState<BattlepassState | null>(null);
   const [quests, setQuests] = useState<QuestRow[]>([]);
+  const [seasonQuests, setSeasonQuests] = useState<SeasonQuestRow[]>([]);
+  const [voirArchive, setVoirArchive] = useState(false);
   const [daily, setDaily] = useState<DailyRow | null>(null);
   const { inventory, totalUnopened, loading: invLoading, refresh: refreshInventory } = useBoosterInventory();
 
@@ -170,6 +184,7 @@ export default function RewardsHubPage() {
     const qData = await qRes.json();
     const dData = dRes.ok ? await dRes.json() : null;
     setQuests(Array.isArray(qData.quests) ? qData.quests : []);
+    setSeasonQuests(Array.isArray(qData.seasonQuests) ? qData.seasonQuests : []);
     setDaily(dData);
   }, []);
 
@@ -835,6 +850,50 @@ export default function RewardsHubPage() {
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.2 }}
                 >
+                  {seasonQuests.length > 0 && (
+                    <section
+                      className="mb-5 px-5 py-4"
+                      style={{ backgroundColor: PANEL_BG, clipPath: PANEL_CLIP, boxShadow: '0 12px 32px var(--t-shadow)' }}
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-3 mb-1">
+                        <h3 className="text-xs uppercase tracking-[0.24em] font-display" style={{ color: ACCENT }}>
+                          {tQuests('seasonHeader')}
+                        </h3>
+                        <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>
+                          {tQuests('seasonSoon')}
+                        </span>
+                      </div>
+                      <p className="text-[11px] mb-4" style={{ color: 'var(--t-dim)' }}>
+                        {tQuests('seasonIntro')}
+                      </p>
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        {[...seasonQuests].sort((a, b) => a.level - b.level).map((q) => (
+                          <div
+                            key={q.id}
+                            className="flex items-center justify-between gap-3 px-3 py-2"
+                            style={{ backgroundColor: 'var(--t-surface-2)', opacity: 0.85 }}
+                          >
+                            <span
+                              className="text-[10px] font-display tracking-widest uppercase shrink-0"
+                              style={{ color: LEVEL_COLOR[q.level], width: 48 }}
+                            >
+                              {tQuests('levelLabel', { level: q.level })}
+                            </span>
+                            <span className="text-[12px] flex-1" style={{ color: 'var(--t-text)' }}>
+                              {questText(q, locale)}
+                            </span>
+                            <span
+                              className="text-[10px] shrink-0"
+                              style={{ color: ACCENT, fontVariantNumeric: 'tabular-nums' }}
+                            >
+                              +{q.xpReward} XP
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+
                   {daily && (
                     <section
                       className="mb-5 px-5 py-4"
@@ -893,6 +952,24 @@ export default function RewardsHubPage() {
                     </section>
                   )}
 
+                  <div className="flex items-center justify-between gap-3 mb-4">
+                    <h3 className="text-xs uppercase tracking-[0.24em] font-display" style={{ color: 'var(--t-dim)' }}>
+                      {tQuests('archiveHeader')}
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setVoirArchive((v) => !v)}
+                      className="text-[10px] uppercase tracking-widest font-display px-3 py-1.5"
+                      style={{ backgroundColor: 'var(--t-surface-2)', color: ACCENT }}
+                    >
+                      {voirArchive ? tQuests('archiveHide') : tQuests('archiveShow')}
+                    </button>
+                  </div>
+
+                  
+
+                  {voirArchive && (
+                    <>
                   <div className="flex flex-wrap gap-2 mb-4">
                     {levelCounts.map(({ level, total, completed, claimable }) => (
                       <button
@@ -977,6 +1054,8 @@ export default function RewardsHubPage() {
                       </div>
                     ))}
                   </div>
+                    </>
+                  )}
                 </motion.section>
               )}
             </AnimatePresence>

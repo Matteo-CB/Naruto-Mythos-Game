@@ -3507,7 +3507,13 @@
       "noProgress": "No hay progreso en esta misión.",
       "notFound": "Misión no encontrada.",
       "serverError": "Error del servidor, inténtalo de nuevo en un momento."
-    }
+    },
+    "seasonHeader": "Misiones de la temporada Shinobi Shiren",
+    "seasonSoon": "Próximamente",
+    "seasonIntro": "Estas son las misiones de la temporada. Todavía no registran progreso.",
+    "archiveHeader": "Temporada anterior",
+    "archiveShow": "Consultar",
+    "archiveHide": "Ocultar"
   },
   "battlepass": {
     "title": "Recompensas",
