@@ -2,6 +2,7 @@ import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
 import type { CardData, GameState, PlayerID } from '@/lib/engine/types';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
+import { porteLeNom } from '@/lib/effects/nameMatch';
 
 export const KIMIMARO_031_ID = 'SS-031-CHIBIV';
 export const KIMIMARO_031_BASE_ID = 'SS-031-UC';
@@ -13,9 +14,8 @@ export const SOUND_FOUR_ORDER: SoundFourName[] = ['JIROBO', 'TAYUYA', 'KIDOMARU'
 
 export function soundFourNameOf(card: CardData | undefined): SoundFourName | null {
   if (!card) return null;
-  const label = `${card.name_fr ?? ''} ${card.name_en ?? ''}`.toUpperCase();
   for (const name of SOUND_FOUR_ORDER) {
-    if (label.includes(name)) return name;
+    if (porteLeNom(card, name)) return name;
   }
   return null;
 }
@@ -31,13 +31,11 @@ export function discardableSoundFour(
   alreadyUsed: ReadonlyArray<SoundFourName>,
 ): DiscardChoice[] {
   const used = new Set(alreadyUsed);
-  const seen = new Set<SoundFourName>();
   const choices: DiscardChoice[] = [];
 
   state[player].hand.forEach((card, handIndex) => {
     const name = soundFourNameOf(card);
-    if (!name || used.has(name) || seen.has(name)) return;
-    seen.add(name);
+    if (!name || used.has(name)) return;
     choices.push({ handIndex, name });
   });
 

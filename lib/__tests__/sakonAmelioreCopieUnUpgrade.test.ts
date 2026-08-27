@@ -53,6 +53,29 @@ describe('la condition depend de ce que le copieur a fait, pas du maillon de la 
   });
 });
 
+describe('le SAKON du set 2 est lui aussi copiable en amelioration', () => {
+  const SAKON_SECOND_ETAT = 'SS-037-UC';
+
+  it('son UPGRADE est un instantane que SAKON 062 peut reprendre', () => {
+    const carte = getCardById(SAKON_SECOND_ETAT) as unknown as CardData;
+    const up = (carte.effects ?? []).find((e) => e.type === 'UPGRADE');
+    expect(up, 'la carte porte bien un UPGRADE').toBeTruthy();
+    expect(
+      isCopyableEffect(up!, { wasRevealed: true, wasFirstCard: false, wasUpgrade: true, copieur: SAKON_GRAND }),
+      'revele en amelioration, SAKON 062 remplit la condition de l effet',
+    ).toBe(true);
+    expect(
+      isCopyableEffect(up!, { wasRevealed: true, wasFirstCard: false, wasUpgrade: false, copieur: SAKON_GRAND }),
+      'pose a plat, il ne la remplit pas',
+    ).toBe(false);
+  });
+
+  it('il porte bien le mot cle qui le rend visible par SAKON 062', () => {
+    const carte = getCardById(SAKON_SECOND_ETAT) as unknown as CardData;
+    expect(carte.keywords ?? [], 'SAKON 062 ne copie que les Quatre du Son allies').toContain('Sound Four');
+  });
+});
+
 describe('reveler SAKON 062 en amelioration mene jusqu au choix de l effet', () => {
   function plateau(): GameState {
     const s = buildSimState({

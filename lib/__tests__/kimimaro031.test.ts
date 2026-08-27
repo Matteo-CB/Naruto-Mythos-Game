@@ -67,10 +67,14 @@ describe('Kimimaro 031 reads the Sound Four in hand', () => {
     expect(soundFourNameOf(getCharacterById(ALLY)), 'an outsider is not an option').toBeNull();
   });
 
-  it('offers at most one copy of each name', () => {
+  it('offers every copy in hand, because the player picks which one to discard', () => {
     const state = buildSimState({ hand1: [JIROBO, JIROBO, TAYUYA] });
     const choices = discardableSoundFour(state, 'player1', []);
-    expect(choices.map((c) => c.name).sort()).toEqual(['JIROBO', 'TAYUYA']);
+    expect(
+      choices.map((c) => c.name).sort(),
+      'the card limits how many you discard per name, not which copy you may choose',
+    ).toEqual(['JIROBO', 'JIROBO', 'TAYUYA']);
+    expect(choices.map((c) => c.handIndex), 'each copy has its own hand slot').toEqual([0, 1, 2]);
   });
 
   it('never offers a name already spent this turn', () => {

@@ -126,7 +126,10 @@ describe('KIMIMARO 031 defausse au plus un exemplaire de chaque nom', () => {
       getCardById('SS-032-C') as CharacterCard,
       getCardById('SS-039-C') as CharacterCard,
     ];
-    expect(discardableSoundFour(s, 'player1', []).length, 'un choix par nom distinct').toBe(2);
+    expect(
+      discardableSoundFour(s, 'player1', []).length,
+      'les deux JIROBO de la main sont proposes, le joueur choisit lequel part',
+    ).toBe(3);
     expect(discardableSoundFour(s, 'player1', ['JIROBO']).map((c) => c.name)).toEqual(['TAYUYA']);
     expect(discardableSoundFour(s, 'player1', ['JIROBO', 'TAYUYA'])).toEqual([]);
   });
