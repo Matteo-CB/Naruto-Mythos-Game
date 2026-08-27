@@ -46,6 +46,7 @@ export async function GET() {
         type: reward.type,
         setId: reward.setId,
         cardId: reward.cardId,
+        boosterSetIds: reward.boosterSetIds,
         cardOwned,
         cardClaimable,
       },

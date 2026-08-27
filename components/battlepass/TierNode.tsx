@@ -1,12 +1,14 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { withImageVersion } from '@/lib/utils/imagePath';
+import { withImageVersion, portraitImagePath } from '@/lib/utils/imagePath';
+import { getCardById } from '@/lib/data/cardIndex';
 
 interface TierReward {
   type: 'booster' | 'card';
   setId: string;
   cardId?: string;
+  boosterSetIds?: string[];
   cardOwned?: boolean;
   cardClaimable?: boolean;
 }
@@ -27,27 +29,37 @@ const ACCENT = 'var(--t-accent)';
 const ACCENT_DIM = 'var(--t-accent-dim)';
 const accentAlpha = (percent: number) => `color-mix(in srgb, var(--t-accent) ${percent}%, transparent)`;
 
+function boosterImage(setId: string): string {
+  return withImageVersion(`/images/booster-${setId}.webp`);
+}
+
+// L illustration d une carte vient de ses propres donnees: chaque rarete vit dans son
+// dossier, donc un chemin devine a partir du set affiche une image manquante. La case du
+// palier est debout, donc une carte couchee est servie dans sa version pivotee.
 function rewardImage(reward: TierReward): { src: string; isCard: boolean } {
   if (reward.type === 'card' && reward.cardId) {
-    return {
-      src: withImageVersion(`/images/cards/${reward.setId}/mythos_v/${reward.cardId}.webp`),
-      isCard: true,
-    };
+    const carte = getCardById(reward.cardId);
+    const chemin = portraitImagePath(carte);
+    if (chemin) return { src: chemin, isCard: true };
   }
-  return {
-    src: withImageVersion(`/images/booster-${reward.setId}.webp`),
-    isCard: false,
-  };
+  return { src: boosterImage(reward.setId), isCard: false };
+}
+
+function boostersDuPalier(reward: TierReward): string[] {
+  if (reward.boosterSetIds && reward.boosterSetIds.length > 0) return reward.boosterSetIds;
+  return reward.type === 'booster' ? [reward.setId] : [];
 }
 
 export function TierNode({ tier, xpRequired, reward, reached, isCurrent, fillRatio, onClaim, claimLabel, claiming }: TierNodeProps) {
   const img = rewardImage(reward);
   const isSpecial = reward.type === 'card';
+  const boosters = boostersDuPalier(reward);
+  const estDouble = !isSpecial && boosters.length > 1;
 
   return (
     <motion.div
       className="flex flex-col items-center"
-      style={{ width: isSpecial ? 96 : 72 }}
+      style={{ width: isSpecial ? 96 : estDouble ? 92 : 72 }}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
@@ -62,7 +74,7 @@ export function TierNode({ tier, xpRequired, reward, reached, isCurrent, fillRat
       <div
         className="relative"
         style={{
-          width: isSpecial ? 96 : 72,
+          width: isSpecial ? 96 : estDouble ? 92 : 72,
           height: isSpecial ? 132 : 100,
           overflow: isSpecial ? 'hidden' : 'visible',
           backgroundColor: isSpecial ? (reached ? 'var(--t-accent-tint)' : 'var(--t-surface)') : 'transparent',
@@ -89,19 +101,46 @@ export function TierNode({ tier, xpRequired, reward, reached, isCurrent, fillRat
                   : 'none',
           }}
         >
-          <img
-            src={img.src}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            draggable={false}
-            className="absolute inset-0 w-full h-full"
-            style={{
-              objectFit: img.isCard ? 'cover' : 'contain',
-              opacity: reached ? 1 : 0.35,
-              filter: reached ? 'none' : 'grayscale(0.6) brightness(0.8)',
-            }}
-          />
+          {estDouble ? (
+            boosters.map((setId, rang) => {
+              const devant = rang === boosters.length - 1;
+              return (
+                <img
+                  key={setId}
+                  src={boosterImage(setId)}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  draggable={false}
+                  className="absolute inset-0 w-full h-full"
+                  style={{
+                    objectFit: 'contain',
+                    opacity: reached ? 1 : 0.35,
+                    filter: reached ? 'none' : 'grayscale(0.6) brightness(0.8)',
+                    transform: devant
+                      ? 'translate(-11%, 6%) scale(0.9)'
+                      : 'translate(13%, -8%) rotate(14deg) scale(0.86)',
+                    transformOrigin: 'center',
+                    zIndex: devant ? 2 : 1,
+                  }}
+                />
+              );
+            })
+          ) : (
+            <img
+              src={img.src}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              draggable={false}
+              className="absolute inset-0 w-full h-full"
+              style={{
+                objectFit: img.isCard ? 'cover' : 'contain',
+                opacity: reached ? 1 : 0.35,
+                filter: reached ? 'none' : 'grayscale(0.6) brightness(0.8)',
+              }}
+            />
+          )}
         </motion.div>
 
         {isSpecial && isCurrent && (
