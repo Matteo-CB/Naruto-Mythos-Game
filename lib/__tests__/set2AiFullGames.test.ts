@@ -21,11 +21,19 @@ function cartesDuSet2(): { personnages: CharacterCard[]; missions: MissionCard[]
   };
 }
 
-function melange<T>(liste: T[]): T[] {
-  return [...liste].sort(() => Math.random() - 0.5);
+function alea(graine: number): () => number {
+  let a = graine >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
-function config(personnages: CharacterCard[], missions: MissionCard[]): GameConfig {
+function config(personnages: CharacterCard[], missions: MissionCard[], graine: number): GameConfig {
+  const tirage = alea(graine);
+  const melange = <T,>(liste: T[]): T[] => [...liste].sort(() => tirage() - 0.5);
   const joueur = (userId: string, difficulte: 'easy' | 'medium') => ({
     userId,
     isAI: true,
@@ -43,8 +51,8 @@ interface Issue {
   erreur?: string;
 }
 
-function jouerUnePartie(personnages: CharacterCard[], missions: MissionCard[]): Issue {
-  let s: GameState = GameEngine.createGame(config(personnages, missions));
+function jouerUnePartie(personnages: CharacterCard[], missions: MissionCard[], graine: number): Issue {
+  let s: GameState = GameEngine.createGame(config(personnages, missions, graine));
   const ia = { player1: new AIPlayer('easy', 'player1'), player2: new AIPlayer('medium', 'player2') };
   let ticks = TICKS_MAX;
 
@@ -83,10 +91,11 @@ describe('l_IA joue des parties entieres avec des decks entierement du set 2', (
 
     const echecs: string[] = [];
     for (let i = 0; i < PARTIES; i++) {
-      const issue = jouerUnePartie(personnages, missions);
-      if (issue.erreur) echecs.push(`partie ${i + 1}: exception ${issue.erreur}`);
+      const graine = Math.floor(Math.random() * 0xffffffff);
+      const issue = jouerUnePartie(personnages, missions, graine);
+      if (issue.erreur) echecs.push(`graine ${graine}: exception ${issue.erreur}`);
       else if (issue.phase !== 'gameOver') {
-        echecs.push(`partie ${i + 1}: bloquee en ${issue.phase} apres ${issue.ticks} tours, ${issue.attente} question(s) en attente`);
+        echecs.push(`graine ${graine}: bloquee en ${issue.phase} apres ${issue.ticks} tours, ${issue.attente} question(s) en attente`);
       }
     }
     expect(echecs, 'aucune partie ne plante ni ne se bloque').toEqual([]);

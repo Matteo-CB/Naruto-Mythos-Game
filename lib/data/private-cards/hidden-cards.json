@@ -33,6 +33,42 @@
       "title_pl": "„Ten shinobi znany był jako Czwarty Hokage.”",
       "image_file": "images/cards/SS/chibi_v/SS-122-CHIBIV.webp",
       "image_url": "/images/cards/SS/chibi_v/SS-122-CHIBIV.webp"
+    },
+    "SS-140-CHIBIV": {
+      "id": "SS-140-CHIBIV",
+      "cardId": "SS-140-CHIBIV",
+      "rarity": "CHIBIV",
+      "number": "140",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "IRUKA UMINO",
+      "name_fr": "IRUKA UMINO",
+      "name_ja": "うみのイルカ",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Hide a Naruto Uzumaki in play."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Play a Naruto Uzumaki while hidden anywhere, paying 2 less."
+        }
+      ],
+      "data_complete": true,
+      "title_en": "\"The road gets tougher now that you're a ninja.\"",
+      "title_fr": "« Le chemin sera plus dur maintenant que tu es un ninja. »",
+      "title_es": "«El camino se vuelve más duro ahora que eres un ninja.»",
+      "title_ja": "「忍になった今、道はもっと険しくなる。」",
+      "title_pt": "«O caminho fica mais duro agora que és um ninja.»",
+      "title_it": "«La strada si fa più dura ora che sei un ninja.»",
+      "title_pl": "„Droga staje się trudniejsza, gdy jesteś ninja.”",
+      "image_file": "images/cards/SS/chibi_v/SS-140-CHIBIV.webp",
+      "image_url": "/images/cards/SS/chibi_v/SS-140-CHIBIV.webp"
     }
   }
 }
