@@ -348,8 +348,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'equipa a un aliado con KUNAI 080',
     text_pt: 'equipe um aliado com KUNAI 080',
     text_it: 'equipaggia un alleato con KUNAI 080',
-    text_pl: 'wyposaż sojusznika w KUNAI 080',
-    text_ja: '味方に クナイ 080 を装備させる',
+    text_pl: 'wyposaż sojusznika w przedmiot: KUNAI 080',
+    text_ja: '味方にクナイ 080 を装備させる',
   },
   {
     id: 'ss-equip-085', level: 1, target: 1, scope: 'cumulative',
@@ -358,8 +358,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'equipa a un aliado con ABANICO GIGANTE 085',
     text_pt: 'equipe um aliado com LEQUE GIGANTE 085',
     text_it: 'equipaggia un alleato con VENTAGLIO GIGANTE 085',
-    text_pl: 'wyposaż sojusznika w GIGANTYCZNY WACHLARZ 085',
-    text_ja: '味方に 大鉄扇 085 を装備させる',
+    text_pl: 'wyposaż sojusznika w przedmiot: GIGANTYCZNY WACHLARZ 085',
+    text_ja: '味方に大鉄扇 085 を装備させる',
   },
   {
     id: 'ss-equip-090', level: 1, target: 1, scope: 'cumulative',
@@ -368,8 +368,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'equipa a un aliado con SAMEHADA 090',
     text_pt: 'equipe um aliado com SAMEHADA 090',
     text_it: 'equipaggia un alleato con SAMEHADA 090',
-    text_pl: 'wyposaż sojusznika w SAMEHADA 090',
-    text_ja: '味方に 鮫肌 090 を装備させる',
+    text_pl: 'wyposaż sojusznika w przedmiot: SAMEHADA 090',
+    text_ja: '味方に鮫肌 090 を装備させる',
   },
   {
     id: 'ss-equip-099', level: 1, target: 1, scope: 'cumulative',
@@ -378,8 +378,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'equipa a un aliado con ESPADA DEL DIOS DEL TRUENO 099',
     text_pt: 'equipe um aliado com ESPADA DO DEUS DO TROVÃO 099',
     text_it: 'equipaggia un alleato con SPADA DEL DIO DEL TUONO 099',
-    text_pl: 'wyposaż sojusznika w MIECZ BOGA PIORUNÓW 099',
-    text_ja: '味方に 雷神の剣 099 を装備させる',
+    text_pl: 'wyposaż sojusznika w przedmiot: MIECZ BOGA PIORUNÓW 099',
+    text_ja: '味方に雷神の剣 099 を装備させる',
   },
   {
     id: 'ss-equip-101', level: 1, target: 1, scope: 'cumulative',
@@ -388,8 +388,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'equipa a un aliado con ESPADA SERPIENTE 101',
     text_pt: 'equipe um aliado com ESPADA SERPENTE 101',
     text_it: 'equipaggia un alleato con SPADA SERPENTE 101',
-    text_pl: 'wyposaż sojusznika w WĘŻOWY MIECZ 101',
-    text_ja: '味方に 蛇の剣 101 を装備させる',
+    text_pl: 'wyposaż sojusznika w przedmiot: WĘŻOWY MIECZ 101',
+    text_ja: '味方に蛇の剣 101 を装備させる',
   },
   {
     id: 'ss-equipe-team-guy-3', level: 1, target: 3, scope: 'cumulative',
@@ -398,7 +398,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'despliega 3 personajes Equipo Guy',
     text_pt: 'coloque em jogo 3 personagens Time Guy',
     text_it: 'schiera 3 personaggi Squadra Guy',
-    text_pl: 'wystaw 3 postacie Drużyna Guya',
+    text_pl: 'wystaw 3 postacie o cesze Drużyna Guya',
     text_ja: 'ガイ班のキャラクターを3体並べる',
   },
   {
@@ -408,7 +408,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'despliega 3 personajes Equipo 8',
     text_pt: 'coloque em jogo 3 personagens Time 8',
     text_it: 'schiera 3 personaggi Squadra 8',
-    text_pl: 'wystaw 3 postacie Drużyna 8',
+    text_pl: 'wystaw 3 postacie o cesze Drużyna 8',
     text_ja: '第八班のキャラクターを3体並べる',
   },
   {
@@ -418,7 +418,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'despliega 3 personajes Equipo 10',
     text_pt: 'coloque em jogo 3 personagens Time 10',
     text_it: 'schiera 3 personaggi Squadra 10',
-    text_pl: 'wystaw 3 postacie Drużyna 10',
+    text_pl: 'wystaw 3 postacie o cesze Drużyna 10',
     text_ja: '第十班のキャラクターを3体並べる',
   },
   {
@@ -428,7 +428,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'despliega 3 personajes Equipo Baki',
     text_pt: 'coloque em jogo 3 personagens Time Baki',
     text_it: 'schiera 3 personaggi Squadra Baki',
-    text_pl: 'wystaw 3 postacie Drużyna Baki',
+    text_pl: 'wystaw 3 postacie o cesze Drużyna Baki',
     text_ja: 'バキ班のキャラクターを3体並べる',
   },
   {
@@ -438,7 +438,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'despliega 3 personajes Equipo Dosu',
     text_pt: 'coloque em jogo 3 personagens Time Dosu',
     text_it: 'schiera 3 personaggi Squadra Dosu',
-    text_pl: 'wystaw 3 postacie Drużyna Dosu',
+    text_pl: 'wystaw 3 postacie o cesze Drużyna Dosu',
     text_ja: 'ドス班のキャラクターを3体並べる',
   },
   {
@@ -488,8 +488,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'coloca BANDA DE LA ALDEA DE LA HOJA 091 sobre un personaje',
     text_pt: 'coloque BANDANA DA VILA DA FOLHA 091 sobre um personagem',
     text_it: 'metti FASCIA DEL VILLAGGIO DELLA FOGLIA 091 su un personaggio',
-    text_pl: 'nałóż OPASKA WIOSKI LIŚCIA 091 na postać',
-    text_ja: 'キャラクターに 木ノ葉隠れの額当て 091 を着ける',
+    text_pl: 'nałóż postaci przedmiot: OPASKA WIOSKI LIŚCIA 091',
+    text_ja: 'キャラクターに木ノ葉隠れの額当て 091 を着ける',
   },
   {
     id: 'ss-bandeau-092', level: 2, target: 1, scope: 'cumulative',
@@ -498,8 +498,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'coloca BANDA DE LA ALDEA DE LA ARENA 092 sobre un personaje',
     text_pt: 'coloque BANDANA DA VILA DA AREIA 092 sobre um personagem',
     text_it: 'metti FASCIA DEL VILLAGGIO DELLA SABBIA 092 su un personaggio',
-    text_pl: 'nałóż OPASKA WIOSKI PIASKU 092 na postać',
-    text_ja: 'キャラクターに 砂隠れの額当て 092 を着ける',
+    text_pl: 'nałóż postaci przedmiot: OPASKA WIOSKI PIASKU 092',
+    text_ja: 'キャラクターに砂隠れの額当て 092 を着ける',
   },
   {
     id: 'ss-bandeau-093', level: 2, target: 1, scope: 'cumulative',
@@ -508,8 +508,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'coloca BANDA DE LA ALDEA DEL SONIDO 093 sobre un personaje',
     text_pt: 'coloque BANDANA DA VILA DO SOM 093 sobre um personagem',
     text_it: 'metti FASCIA DEL VILLAGGIO DEL SUONO 093 su un personaggio',
-    text_pl: 'nałóż OPASKA WIOSKI DŹWIĘKU 093 na postać',
-    text_ja: 'キャラクターに 音隠れの額当て 093 を着ける',
+    text_pl: 'nałóż postaci przedmiot: OPASKA WIOSKI DŹWIĘKU 093',
+    text_ja: 'キャラクターに音隠れの額当て 093 を着ける',
   },
   {
     id: 'ss-bandeau-094', level: 2, target: 1, scope: 'cumulative',
@@ -518,8 +518,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'coloca BANDA DE NINJA RENEGADO 094 sobre un personaje',
     text_pt: 'coloque BANDANA DE NINJA RENEGADO 094 sobre um personagem',
     text_it: 'metti FASCIA DEL NINJA RINNEGATO 094 su un personaggio',
-    text_pl: 'nałóż OPASKA ZBIEGŁEGO NINJA 094 na postać',
-    text_ja: 'キャラクターに 抜け忍の額当て 094 を着ける',
+    text_pl: 'nałóż postaci przedmiot: OPASKA ZBIEGŁEGO NINJA 094',
+    text_ja: 'キャラクターに抜け忍の額当て 094 を着ける',
   },
   {
     id: 'ss-soin-081', level: 2, target: 1, scope: 'cumulative',
@@ -528,8 +528,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'usa RAMEN 081 en uno de tus ninja',
     text_pt: 'use RAMEN 081 num dos teus ninja',
     text_it: 'usa RAMEN 081 su uno dei tuoi ninja',
-    text_pl: 'użyj RAMEN 081 na jednym ze swoich ninja',
-    text_ja: '自分の忍に ラーメン 081 を使う',
+    text_pl: 'użyj na swoim ninja przedmiotu: RAMEN 081',
+    text_ja: '自分の忍にラーメン 081 を使う',
   },
   {
     id: 'ss-soin-087', level: 2, target: 1, scope: 'cumulative',
@@ -538,8 +538,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'usa PESAS 087 en uno de tus ninja',
     text_pt: 'use PESOS 087 num dos teus ninja',
     text_it: 'usa PESI 087 su uno dei tuoi ninja',
-    text_pl: 'użyj OBCIĄŻNIKI 087 na jednym ze swoich ninja',
-    text_ja: '自分の忍に 重り 087 を使う',
+    text_pl: 'użyj na swoim ninja przedmiotu: OBCIĄŻNIKI 087',
+    text_ja: '自分の忍に重り 087 を使う',
   },
   {
     id: 'ss-parchemins-paire', level: 2, target: 1, scope: 'cumulative',
@@ -738,7 +738,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'juega 15 personajes Jutsu del set 2',
     text_pt: 'jogue 15 personagens Jutsu do set 2',
     text_it: 'gioca 15 personaggi Jutsu del set 2',
-    text_pl: 'zagraj 15 postaci Jutsu z zestawu 2',
+    text_pl: 'zagraj 15 postaci o cesze Jutsu z zestawu 2',
     text_ja: 'セット2の術キャラクターを15体プレイする',
   },
   {
@@ -748,7 +748,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'juega 10 personajes Ninja Renegado del set 2',
     text_pt: 'jogue 10 personagens Ninja Renegado do set 2',
     text_it: 'gioca 10 personaggi Ninja Rinnegato del set 2',
-    text_pl: 'zagraj 10 postaci Zbiegły Ninja z zestawu 2',
+    text_pl: 'zagraj 10 postaci o cesze Zbiegły Ninja z zestawu 2',
     text_ja: 'セット2の抜け忍キャラクターを10体プレイする',
   },
   {
@@ -758,7 +758,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'juega 8 personajes Sannin del set 2',
     text_pt: 'jogue 8 personagens Sannin do set 2',
     text_it: 'gioca 8 personaggi Sannin del set 2',
-    text_pl: 'zagraj 8 postaci Sannin z zestawu 2',
+    text_pl: 'zagraj 8 postaci o cesze Sannin z zestawu 2',
     text_ja: 'セット2の三忍キャラクターを8体プレイする',
   },
   {
@@ -768,7 +768,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'juega 8 personajes Jonin Especial del set 2',
     text_pt: 'jogue 8 personagens Jonin Especial do set 2',
     text_it: 'gioca 8 personaggi Jonin Speciale del set 2',
-    text_pl: 'zagraj 8 postaci Specjalny Jonin z zestawu 2',
+    text_pl: 'zagraj 8 postaci o cesze Specjalny Jonin z zestawu 2',
     text_ja: 'セット2の特別上忍キャラクターを8体プレイする',
   },
   {
@@ -1298,7 +1298,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'juega 40 personajes Jutsu del set 2',
     text_pt: 'jogue 40 personagens Jutsu do set 2',
     text_it: 'gioca 40 personaggi Jutsu del set 2',
-    text_pl: 'zagraj 40 postaci Jutsu z zestawu 2',
+    text_pl: 'zagraj 40 postaci o cesze Jutsu z zestawu 2',
     text_ja: 'セット2の術キャラクターを40体プレイする',
   },
   {
@@ -1308,7 +1308,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'juega 25 personajes Ninja Renegado del set 2',
     text_pt: 'jogue 25 personagens Ninja Renegado do set 2',
     text_it: 'gioca 25 personaggi Ninja Rinnegato del set 2',
-    text_pl: 'zagraj 25 postaci Zbiegły Ninja z zestawu 2',
+    text_pl: 'zagraj 25 postaci o cesze Zbiegły Ninja z zestawu 2',
     text_ja: 'セット2の抜け忍キャラクターを25体プレイする',
   },
   {
@@ -1318,7 +1318,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'juega 20 personajes Cuatro del Sonido del set 2',
     text_pt: 'jogue 20 personagens Quarteto do Som do set 2',
     text_it: 'gioca 20 personaggi Quartetto del Suono del set 2',
-    text_pl: 'zagraj 20 postaci Czwórka Dźwięku z zestawu 2',
+    text_pl: 'zagraj 20 postaci o cesze Czwórka Dźwięku z zestawu 2',
     text_ja: 'セット2の音の四人衆キャラクターを20体プレイする',
   },
   {
@@ -1328,7 +1328,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'juega 20 personajes Sannin del set 2',
     text_pt: 'jogue 20 personagens Sannin do set 2',
     text_it: 'gioca 20 personaggi Sannin del set 2',
-    text_pl: 'zagraj 20 postaci Sannin z zestawu 2',
+    text_pl: 'zagraj 20 postaci o cesze Sannin z zestawu 2',
     text_ja: 'セット2の三忍キャラクターを20体プレイする',
   },
   {
@@ -1738,7 +1738,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'juega 120 personajes Jutsu',
     text_pt: 'jogue 120 personagens Jutsu',
     text_it: 'gioca 120 personaggi Jutsu',
-    text_pl: 'zagraj 120 postaci Jutsu',
+    text_pl: 'zagraj 120 postaci o cesze Jutsu',
     text_ja: '術キャラクターを120体プレイする',
   },
   {
@@ -1748,7 +1748,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'juega 60 personajes Cuatro del Sonido',
     text_pt: 'jogue 60 personagens Quarteto do Som',
     text_it: 'gioca 60 personaggi Quartetto del Suono',
-    text_pl: 'zagraj 60 postaci Czwórka Dźwięku',
+    text_pl: 'zagraj 60 postaci o cesze Czwórka Dźwięku',
     text_ja: '音の四人衆キャラクターを60体プレイする',
   },
   {
@@ -1758,7 +1758,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'juega 60 personajes Ninja Renegado',
     text_pt: 'jogue 60 personagens Ninja Renegado',
     text_it: 'gioca 60 personaggi Ninja Rinnegato',
-    text_pl: 'zagraj 60 postaci Zbiegły Ninja',
+    text_pl: 'zagraj 60 postaci o cesze Zbiegły Ninja',
     text_ja: '抜け忍キャラクターを60体プレイする',
   },
   {
@@ -1768,7 +1768,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_es: 'juega 60 personajes Equipo Guy',
     text_pt: 'jogue 60 personagens Time Guy',
     text_it: 'gioca 60 personaggi Squadra Guy',
-    text_pl: 'zagraj 60 postaci Drużyna Guya',
+    text_pl: 'zagraj 60 postaci o cesze Drużyna Guya',
     text_ja: 'ガイ班キャラクターを60体プレイする',
   },
   {
