@@ -155,12 +155,12 @@ describe('rollVariantBooster', () => {
     const huc = counts.HOLO_UC / totalSlots;
 
     expect(totalSlots).toBeGreaterThan(N * 2);
-    expect(Math.abs(ra - VARIANT_PACK_PROBABILITIES.RA)).toBeLessThan(0.005);
-    expect(Math.abs(mv - VARIANT_PACK_PROBABILITIES.MV)).toBeLessThan(0.003);
-    expect(Math.abs(l - VARIANT_PACK_PROBABILITIES.L)).toBeLessThan(0.002);
-    expect(Math.abs(sv - VARIANT_PACK_PROBABILITIES.SV)).toBeLessThan(0.001);
-    expect(Math.abs(hc - VARIANT_PACK_PROBABILITIES.HOLO_C)).toBeLessThan(0.005);
-    expect(Math.abs(huc - VARIANT_PACK_PROBABILITIES.HOLO_UC)).toBeLessThan(0.005);
+    expect(Math.abs(ra - (VARIANT_PACK_PROBABILITIES.RA ?? 0))).toBeLessThan(0.005);
+    expect(Math.abs(mv - (VARIANT_PACK_PROBABILITIES.MV ?? 0))).toBeLessThan(0.003);
+    expect(Math.abs(l - (VARIANT_PACK_PROBABILITIES.L ?? 0))).toBeLessThan(0.002);
+    expect(Math.abs(sv - (VARIANT_PACK_PROBABILITIES.SV ?? 0))).toBeLessThan(0.001);
+    expect(Math.abs(hc - (VARIANT_PACK_PROBABILITIES.HOLO_C ?? 0))).toBeLessThan(0.005);
+    expect(Math.abs(huc - (VARIANT_PACK_PROBABILITIES.HOLO_UC ?? 0))).toBeLessThan(0.005);
   }, 60_000);
 
   it('over many rolls, every slot kind appears at least once', () => {

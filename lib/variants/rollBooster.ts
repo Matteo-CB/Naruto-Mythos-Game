@@ -1,11 +1,11 @@
 import type { CardData } from '@/lib/engine/types';
 import {
-  VARIANT_PACK_PROBABILITIES,
   VARIANT_PACK_SIZE,
-  VARIANT_RARITY_ROLL_ORDER,
+  BOOSTER_SLOT_RARITIES,
   type PackSlotKind,
-  type VariantRarity,
+  type BoosterSlotRarity,
 } from './constants';
+import { tauxDuBoosterVariante, ordreDeTirage, poidsDeLaCarte } from './rates';
 import { eligibleVariantsForSetByRarity, holoEligibleForSet } from './variantPool';
 import { decorateHoloCard } from '@/lib/holo/holoId';
 import { pickUniform, systemRng, type Rng } from './rng';
@@ -17,31 +17,44 @@ export interface RollOptions {
   mode?: RollMode;
 }
 
-function rollSlotKind(rng: Rng): PackSlotKind {
+function rollSlotKind(setId: string, rng: Rng): PackSlotKind {
+  const taux = tauxDuBoosterVariante(setId);
   const r = rng.next();
   let cumulative = 0;
-  for (const kind of VARIANT_RARITY_ROLL_ORDER) {
-    cumulative += VARIANT_PACK_PROBABILITIES[kind];
+  for (const kind of ordreDeTirage(setId)) {
+    cumulative += taux[kind] ?? 0;
     if (r < cumulative) return kind;
   }
   return 'HOLO_C';
 }
 
+// Deux impressions d une meme rarete peuvent ne pas sortir aussi souvent l une que l autre.
+function tirageAvecPoids(cartes: readonly CardData[], rng: Rng): CardData {
+  const total = cartes.reduce((t, c) => t + poidsDeLaCarte(c.cardId), 0);
+  let seuil = rng.next() * total;
+  for (const carte of cartes) {
+    seuil -= poidsDeLaCarte(carte.cardId);
+    if (seuil <= 0) return carte;
+  }
+  return cartes[cartes.length - 1];
+}
+
 function rollSlot(
-  pools: Record<VariantRarity, CardData[]>,
+  setId: string,
+  pools: Record<BoosterSlotRarity, CardData[]>,
   holoPools: Record<'HOLO_C' | 'HOLO_UC', CardData[]>,
   rng: Rng,
   forcedKind: PackSlotKind | null,
 ): CardData | null {
-  const kind = forcedKind ?? rollSlotKind(rng);
-  const order: PackSlotKind[] = [kind, 'HOLO_C', 'HOLO_UC', 'RA', 'MV', 'L', 'SV'];
+  const kind = forcedKind ?? rollSlotKind(setId, rng);
+  const order: PackSlotKind[] = [kind, 'HOLO_C', 'HOLO_UC', ...BOOSTER_SLOT_RARITIES];
   for (const k of order) {
     if (k === 'HOLO_C' || k === 'HOLO_UC') {
       if (holoPools[k].length > 0) {
         return decorateHoloCard(pickUniform(holoPools[k], rng));
       }
     } else if (pools[k].length > 0) {
-      return pickUniform(pools[k], rng);
+      return tirageAvecPoids(pools[k], rng);
     }
   }
   return null;
@@ -60,7 +73,7 @@ export function rollVariantBooster(setId: string, opts: RollOptions = {}): CardD
       if (mode === 'forceL') forced = 'L';
       else if (mode === 'forceSV') forced = 'SV';
     }
-    const card = rollSlot(pools, holoPools, rng, forced);
+    const card = rollSlot(setId, pools, holoPools, rng, forced);
     if (card) slots.push(card);
   }
   return slots;

@@ -6,9 +6,10 @@ import { rollVariantBooster, type RollMode } from '@/lib/variants/rollBooster';
 import {
   VARIANT_PACK_PROBABILITIES,
   VARIANT_PACK_SIZE,
-  VARIANT_RARITY_ROLL_ORDER,
+  BOOSTER_SLOT_RARITIES,
   type PackSlotKind,
 } from '@/lib/variants/constants';
+import { tauxDuBoosterVariante, ordreDeTirage } from '@/lib/variants/rates';
 import type { CardData } from '@/lib/engine/types';
 import { isSetAvailable } from '@/lib/data/sets/registry';
 
@@ -34,7 +35,9 @@ function slotKindOf(card: CardData): PackSlotKind {
 }
 
 function emptyKindRecord(): Record<PackSlotKind, number> {
-  return { RA: 0, MV: 0, SV: 0, L: 0, HOLO_C: 0, HOLO_UC: 0 };
+  const vide = { HOLO_C: 0, HOLO_UC: 0 } as Record<PackSlotKind, number>;
+  for (const r of BOOSTER_SLOT_RARITIES) vide[r] = 0;
+  return vide;
 }
 
 export async function POST(req: NextRequest) {
@@ -84,21 +87,22 @@ export async function POST(req: NextRequest) {
 
   const totalSlots = count * VARIANT_PACK_SIZE;
 
+  const taux = tauxDuBoosterVariante(setId);
   const perRarityExpected = emptyKindRecord();
   if (mode === 'normal') {
-    for (const k of VARIANT_RARITY_ROLL_ORDER) {
-      perRarityExpected[k] = totalSlots * VARIANT_PACK_PROBABILITIES[k];
+    for (const k of ordreDeTirage(setId)) {
+      perRarityExpected[k] = totalSlots * (taux[k] ?? 0);
     }
   } else {
     const forcedRarity: PackSlotKind = mode === 'forceL' ? 'L' : 'SV';
     const remainingSlots = totalSlots - count;
-    for (const k of VARIANT_RARITY_ROLL_ORDER) {
-      perRarityExpected[k] = (k === forcedRarity ? count : 0) + remainingSlots * VARIANT_PACK_PROBABILITIES[k];
+    for (const k of ordreDeTirage(setId)) {
+      perRarityExpected[k] = (k === forcedRarity ? count : 0) + remainingSlots * (taux[k] ?? 0);
     }
   }
 
   const perRarityDeviationPct = emptyKindRecord();
-  for (const k of VARIANT_RARITY_ROLL_ORDER) {
+  for (const k of ordreDeTirage(setId)) {
     const exp = perRarityExpected[k];
     if (exp > 0) {
       perRarityDeviationPct[k] = ((perRarityCounts[k] - exp) / exp) * 100;

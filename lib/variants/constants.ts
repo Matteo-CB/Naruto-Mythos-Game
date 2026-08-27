@@ -12,9 +12,12 @@ export const FORCE_UNLOCKED_CARD_IDS: ReadonlySet<string> = new Set([]);
 
 export const VARIANT_PACK_SIZE = 8;
 
-export type PackSlotKind = VariantRarity | 'HOLO_C' | 'HOLO_UC';
+export const BOOSTER_SLOT_RARITIES = ['RA', 'MV', 'SV', 'L', 'SPV', 'POPV', 'SHINOBIV'] as const;
+export type BoosterSlotRarity = (typeof BOOSTER_SLOT_RARITIES)[number];
 
-export type VariantPackProbabilities = Record<PackSlotKind, number>;
+export type PackSlotKind = BoosterSlotRarity | 'HOLO_C' | 'HOLO_UC';
+
+export type VariantPackProbabilities = Partial<Record<PackSlotKind, number>>;
 
 export const VARIANT_PACK_PROBABILITIES: VariantPackProbabilities = {
   L: 1 / 200,

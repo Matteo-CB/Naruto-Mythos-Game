@@ -2,11 +2,11 @@ import type { CardData } from '@/lib/engine/types';
 import { getAllCards } from '@/lib/data/cardLoader';
 import { isHoloEligibleCard } from '@/lib/holo/holoId';
 import { isVariantCard, parseCardId, stripVariantSuffix } from './isVariant';
-import { VARIANT_RARITIES, type VariantRarity } from './constants';
+import { BOOSTER_SLOT_RARITIES, type BoosterSlotRarity } from './constants';
 import { isBoosterObtainableVariant } from './obtention';
 
 const eligibleSetCache = new Map<string, CardData[]>();
-const eligibleByRarityCache = new Map<string, Record<VariantRarity, CardData[]>>();
+const eligibleByRarityCache = new Map<string, Record<BoosterSlotRarity, CardData[]>>();
 const holoPoolCache = new Map<string, Record<'HOLO_C' | 'HOLO_UC', CardData[]>>();
 
 export function clearVariantPoolCache(): void {
@@ -43,13 +43,15 @@ export function eligibleVariantsForSet(setId: string): CardData[] {
   return list;
 }
 
-export function eligibleVariantsForSetByRarity(setId: string): Record<VariantRarity, CardData[]> {
+export function eligibleVariantsForSetByRarity(setId: string): Record<BoosterSlotRarity, CardData[]> {
   const cached = eligibleByRarityCache.get(setId);
   if (cached) return cached;
-  const out: Record<VariantRarity, CardData[]> = { RA: [], MV: [], SV: [], L: [] };
+  const out = Object.fromEntries(
+    BOOSTER_SLOT_RARITIES.map((r) => [r, [] as CardData[]]),
+  ) as Record<BoosterSlotRarity, CardData[]>;
   for (const card of eligibleVariantsForSet(setId)) {
-    const r = card.rarity as VariantRarity;
-    if ((VARIANT_RARITIES as readonly string[]).includes(r)) {
+    const r = card.rarity as BoosterSlotRarity;
+    if ((BOOSTER_SLOT_RARITIES as readonly string[]).includes(r)) {
       out[r].push(card);
     }
   }
