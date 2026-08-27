@@ -9027,6 +9027,899 @@
         }
       ],
       "data_complete": true
+    },
+    "SS-111-RA": {
+      "id": "SS-111-RA",
+      "cardId": "SS-111-RA",
+      "rarity": "RA",
+      "number": "111",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "HINATA HYUGA",
+      "name_fr": "HINATA HYÛGA",
+      "name_ja": "日向ヒナタ",
+      "title_en": "\"I can do this.\"",
+      "title_fr": "« Je peux y arriver. »",
+      "title_es": "«Puedo hacerlo.»",
+      "title_ja": "「私にもできる。」",
+      "title_pt": "«Eu consigo.»",
+      "title_it": "«Ce la posso fare.»",
+      "title_pl": "„Dam radę.”",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 8",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Neji Hyuga: Return the topmost Hinata Hyuga from your discard pile to your hand."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] Play a Hyuga-named character anywhere, paying 3 less."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-111-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-111-RA.webp"
+    },
+    "SS-112-RA": {
+      "id": "SS-112-RA",
+      "cardId": "SS-112-RA",
+      "rarity": "RA",
+      "number": "112",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "NEJI HYUGA",
+      "name_fr": "NEJI HYÛGA",
+      "name_ja": "日向ネジ",
+      "title_en": "\"My eyes cannot be deceived.\"",
+      "title_fr": "« Mes yeux ne peuvent être trompés. »",
+      "title_es": "«Mis ojos no pueden ser engañados.»",
+      "title_ja": "「私の眼は欺けない。」",
+      "title_pt": "«Os meus olhos não podem ser enganados.»",
+      "title_it": "«I miei occhi non possono essere ingannati.»",
+      "title_pl": "„Moich oczu nie da się oszukać.”",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team Guy",
+        "Taijutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Remove all Power tokens from an enemy character in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Hinata Hyuga: Hide an enemy character without Power tokens in this mission."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-112-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-112-RA.webp"
+    },
+    "SS-113-RA": {
+      "id": "SS-113-RA",
+      "cardId": "SS-113-RA",
+      "rarity": "RA",
+      "number": "113",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SHINO ABURAME",
+      "name_fr": "SHINO ABURAME",
+      "name_ja": "油女シノ",
+      "title_en": "\"I hate having to explain the same thing twice.\"",
+      "title_fr": "« Je déteste devoir répéter deux fois la même chose. »",
+      "title_es": "«Odio tener que explicar lo mismo dos veces.»",
+      "title_ja": "「同じことを二度説明するのは嫌いだ。」",
+      "title_pt": "«Odeio ter de explicar a mesma coisa duas vezes.»",
+      "title_it": "«Odio dover spiegare due volte la stessa cosa.»",
+      "title_pl": "„Nienawidzę tłumaczyć dwa razy tego samego.”",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 8",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] The opponent discards a card from hand."
+        },
+        {
+          "type": "DUEL",
+          "description": "DUEL Kankuro MAIN effect: Instead, the opponent discards a card at random."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-113-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-113-RA.webp"
+    },
+    "SS-116-RA": {
+      "id": "SS-116-RA",
+      "cardId": "SS-116-RA",
+      "rarity": "RA",
+      "number": "116",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "MIGHT GUY",
+      "name_fr": "GAÏ MAITO",
+      "name_ja": "マイト・ガイ",
+      "title_en": "\"Forge ahead to the end.\"",
+      "title_fr": "« Aller de l'avant jusqu'au bout. »",
+      "title_es": "«Avanzar hasta el final.»",
+      "title_ja": "「最後まで突き進む。」",
+      "title_pt": "«Avançar até ao fim.»",
+      "title_it": "«Andare avanti fino alla fine.»",
+      "title_pl": "„Naprzód aż do końca.”",
+      "has_visual": true,
+      "chakra": 3,
+      "power": 4,
+      "keywords": [
+        "Team Guy",
+        "Taijutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] At the start of the round, POWERUP 2 every Team Guy character of yours with an attachment in play."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-116-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-116-RA.webp"
+    },
+    "SS-117-RA": {
+      "id": "SS-117-RA",
+      "cardId": "SS-117-RA",
+      "rarity": "RA",
+      "number": "117",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KANKURO",
+      "name_fr": "KANKURÔ",
+      "name_es": "KANKURO",
+      "name_ja": "カンクロウ",
+      "title_en": "\"You’re in for a real treat.\"",
+      "title_fr": "Tu vas être servi.",
+      "title_es": "Te espera un buen espectáculo.",
+      "title_ja": "「いいものを見せてやる」",
+      "title_pt": "Você vai ter uma bela surpresa.",
+      "title_it": "Ti aspetta una bella sorpresa.",
+      "title_pl": "Czeka cię niezła uczta.",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Whenever you move one or more enemy characters, gain 1 Chakra."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Shino Aburame: Move an enemy character to this mission."
+        }
+      ],
+      "image_file": "images/cards/SS/rare_art/SS-117-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-117-RA.webp"
+    },
+    "SS-118-RA": {
+      "id": "SS-118-RA",
+      "cardId": "SS-118-RA",
+      "rarity": "RA",
+      "number": "118",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "SHIKAMARU NARA",
+      "name_fr": "SHIKAMARU NARA",
+      "name_ja": "奈良シカマル",
+      "title_en": "\"But who ever said I was classy?\"",
+      "title_fr": "« Mais qui a dit que j'avais de la classe ? »",
+      "title_es": "«¿Pero quién ha dicho que yo tenga clase?»",
+      "title_ja": "「誰が俺を上品だと言った？」",
+      "title_pt": "«Mas quem disse que eu tenho classe?»",
+      "title_it": "«Ma chi ha mai detto che ho classe?»",
+      "title_pl": "„A kto powiedział, że mam klasę?”",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 10",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "AMBUSH",
+          "description": "[↯] Reveal and defeat an enemy hidden character in play."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Temari: Hide an enemy character in play with the same name as the revealed character."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-118-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-118-RA.webp"
+    },
+    "SS-119-RA": {
+      "id": "SS-119-RA",
+      "cardId": "SS-119-RA",
+      "rarity": "RA",
+      "number": "119",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "TEMARI",
+      "name_fr": "TEMARI",
+      "name_es": "TEMARI",
+      "name_ja": "テマリ",
+      "title_en": "\"You can’t hide forever.\"",
+      "title_fr": "Tu ne peux pas te cacher éternellement.",
+      "title_es": "No puedes esconderte para siempre.",
+      "title_ja": "「いつまでも隠れてはいられない」",
+      "title_pt": "Você não pode se esconder para sempre.",
+      "title_it": "Non puoi nasconderti per sempre.",
+      "title_pl": "Nie możesz ukrywać się wiecznie.",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team Baki",
+        "Jutsu"
+      ],
+      "group": "Sand Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Move an enemy character from this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Shikamaru Nara: Draw a card and gain the Edge."
+        }
+      ],
+      "image_file": "images/cards/SS/rare_art/SS-119-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-119-RA.webp"
+    },
+    "SS-120-RA": {
+      "id": "SS-120-RA",
+      "cardId": "SS-120-RA",
+      "rarity": "RA",
+      "number": "120",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KIBA INUZUKA",
+      "name_fr": "KIBA INUZUKA",
+      "name_ja": "犬塚キバ",
+      "title_en": "\"I got you now!!\"",
+      "title_fr": "« Je te tiens ! »",
+      "title_es": "«¡Ahora te tengo!»",
+      "title_ja": "「捕まえたぞ！！」",
+      "title_pt": "«Agora apanhei-te!»",
+      "title_it": "«Adesso ti ho preso!»",
+      "title_pl": "„Mam cię!”",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team 8"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] The opponent must pay 1 more Chakra when revealing characters from hidden in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Naruto Uzumaki: Hide an enemy character with Power 4 or less in play."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-120-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-120-RA.webp"
+    },
+    "SS-122-RA": {
+      "id": "SS-122-RA",
+      "cardId": "SS-122-RA",
+      "rarity": "RA",
+      "number": "122",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "MINATO NAMIKAZE",
+      "name_fr": "MINATO NAMIKAZE",
+      "name_ja": "波風ミナト",
+      "title_en": "\"This ninja was known as the Fourth Hokage.\"",
+      "title_fr": "« Ce ninja était connu comme le Quatrième Hokage. »",
+      "title_es": "«Este ninja era conocido como el Cuarto Hokage.»",
+      "title_ja": "「この忍は四代目火影と呼ばれていた。」",
+      "title_pt": "«Este ninja era conhecido como o Quarto Hokage.»",
+      "title_it": "«Questo ninja era noto come il Quarto Hokage.»",
+      "title_pl": "„Ten shinobi znany był jako Czwarty Hokage.”",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Hokage"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Discard all Tailed Beast characters from an enemy stack in this mission or move a friendly Tailed Beast character in play."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-122-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-122-RA.webp"
+    },
+    "SS-123-RA": {
+      "id": "SS-123-RA",
+      "cardId": "SS-123-RA",
+      "rarity": "RA",
+      "rarity_display": "Rare",
+      "number": "123",
+      "set": "SS",
+      "card_type": "character",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Team 7"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] POWERUPs on friendly characters in this mission are increased by 1."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Ino Yamanaka: Take back control of a character you own in play."
+        }
+      ],
+      "data_complete": true,
+      "name_en": "SAKURA HARUNO",
+      "title_en": "Let's see your best Ino.",
+      "name_fr": "SAKURA HARUNO",
+      "title_fr": "Montre-moi ce que tu sais faire, Ino.",
+      "name_es": "SAKURA HARUNO",
+      "title_es": "Veamos lo mejor que tienes, Ino.",
+      "name_ja": "春野サクラ",
+      "title_ja": "「いの、本気を見せて。」",
+      "name_pt": "SAKURA HARUNO",
+      "title_pt": "Vamos ver o teu melhor, Ino.",
+      "name_it": "SAKURA HARUNO",
+      "title_it": "Vediamo il tuo meglio, Ino.",
+      "name_pl": "SAKURA HARUNO",
+      "title_pl": "Pokaż, co potrafisz, Ino.",
+      "image_file": "images/cards/SS/rare_art/SS-123-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-123-RA.webp"
+    },
+    "SS-124-RA": {
+      "id": "SS-124-RA",
+      "cardId": "SS-124-RA",
+      "rarity": "RA",
+      "number": "124",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "INO YAMANAKA",
+      "name_fr": "INO YAMANAKA",
+      "name_ja": "山中いの",
+      "title_en": "\"Get ready to tell everyone that you lost!\"",
+      "title_fr": "« Prépare-toi à annoncer à tout le monde que tu as perdu ! »",
+      "title_es": "«¡Prepárate para contarle a todos que perdiste!»",
+      "title_ja": "「負けたと皆に言う準備をしなさい！」",
+      "title_pt": "«Prepara-te para dizer a todos que perdeste!»",
+      "title_it": "«Preparati a dire a tutti che hai perso!»",
+      "title_pl": "„Szykuj się, by powiedzieć wszystkim, że przegrałaś!”",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 2,
+      "keywords": [
+        "Team 10",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Sakura Haruno: Take control of an enemy character of Power lower than the Sakura Haruno's Power."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Move a controlled character from this mission."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-124-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-124-RA.webp"
+    },
+    "SS-125-RA": {
+      "id": "SS-125-RA",
+      "cardId": "SS-125-RA",
+      "rarity": "RA",
+      "number": "125",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "DOSU KINUTA",
+      "name_fr": "DOSU KINUTA",
+      "name_es": "DOSU KINUTA",
+      "name_ja": "ドス・キヌタ",
+      "name_pt": "DOSU KINUTA",
+      "name_it": "DOSU KINUTA",
+      "name_pl": "DOSU KINUTA",
+      "title_en": "\"I'll just win it quickly.\"",
+      "title_fr": "« Je vais gagner vite, c’est tout. »",
+      "title_es": "«Simplemente ganaré rápido.»",
+      "title_ja": "「さっさと勝つだけだ。」",
+      "title_pt": "«Vou apenas ganhar depressa.»",
+      "title_it": "«Vincerò e in fretta.»",
+      "title_pl": "„Po prostu wygram szybko.”",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [
+        "Team Dosu",
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Choji Akimichi: Defeat an enemy character that moved in the opponent's previous turn."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Move a friendly hidden character in play."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-125-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-125-RA.webp"
+    },
+    "SS-128-RA": {
+      "id": "SS-128-RA",
+      "cardId": "SS-128-RA",
+      "rarity": "RA",
+      "number": "128",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "CHOJI AKIMICHI",
+      "name_fr": "CHÔJI AKIMICHI",
+      "name_es": "CHOJI AKIMICHI",
+      "name_ja": "秋道チョウジ",
+      "title_en": "\"You're going to go down hard.\"",
+      "title_fr": "Tu vas tomber de haut.",
+      "title_es": "Vas a caer con fuerza.",
+      "title_pt": "Você vai cair feio.",
+      "title_it": "Cadrai rovinosamente.",
+      "title_pl": "Padniesz boleśnie.",
+      "title_ja": "「お前は派手に倒れることになるぞ。」",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Team 10"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] Double the Power of Food attachments on this character."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Jirobo: Defeat an enemy character in this mission with Power 8 or more."
+        }
+      ],
+      "image_file": "images/cards/SS/rare_art/SS-128-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-128-RA.webp"
+    },
+    "SS-129-RA": {
+      "id": "SS-129-RA",
+      "cardId": "SS-129-RA",
+      "rarity": "RA",
+      "number": "129",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "HASHIRAMA SENJU",
+      "name_fr": "HASHIRAMA SENJU",
+      "name_ja": "千手柱間",
+      "title_en": "\"Forgive us, Sarutobi.\"",
+      "title_fr": "« Pardonne-nous, Sarutobi. »",
+      "title_es": "«Perdónanos, Sarutobi.»",
+      "title_ja": "「許せ、猿飛。」",
+      "title_pt": "«Perdoa-nos, Sarutobi.»",
+      "title_it": "«Perdonaci, Sarutobi.»",
+      "title_pl": "„Wybacz nam, Sarutobi.”",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 8,
+      "keywords": [
+        "Hokage",
+        "Reanimation"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "DUEL Orochimaru [⧗] You can upgrade over friendly characters with a different name than this character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] POWERUP 2 a Hokage character in play."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-129-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-129-RA.webp"
+    },
+    "SS-130-RA": {
+      "id": "SS-130-RA",
+      "cardId": "SS-130-RA",
+      "rarity": "RA",
+      "number": "130",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "OROCHIMARU",
+      "name_fr": "OROCHIMARU",
+      "name_es": "OROCHIMARU",
+      "name_ja": "大蛇丸",
+      "name_pt": "OROCHIMARU",
+      "name_it": "OROCHIMARU",
+      "name_pl": "OROCHIMARU",
+      "title_en": "\"The Leaf Village will fall.\"",
+      "title_fr": "« Le Village de Konoha tombera. »",
+      "title_es": "«La Aldea de la Hoja caerá.»",
+      "title_ja": "「木ノ葉隠れの里は滅びる。」",
+      "title_pt": "«A Vila da Folha vai cair.»",
+      "title_it": "«Il Villaggio della Foglia cadrà.»",
+      "title_pl": "„Wioska Liścia upadnie.”",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Sannin",
+        "Jutsu"
+      ],
+      "group": "Sound Village",
+      "effects": [
+        {
+          "type": "FIRST_STRIKE",
+          "description": "[↯] Hide an enemy Leaf Village character in this mission."
+        },
+        {
+          "type": "DUEL",
+          "description": "DUEL Hiruzen Sarutobi FIRST STRIKE effect: Instead, defeat them."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-130-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-130-RA.webp"
+    },
+    "SS-131-RA": {
+      "id": "SS-131-RA",
+      "cardId": "SS-131-RA",
+      "rarity": "RA",
+      "number": "131",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "TOBIRAMA SENJU",
+      "name_fr": "TOBIRAMA SENJU",
+      "name_ja": "千手扉間",
+      "title_en": "\"We made your life difficult.\"",
+      "title_fr": "« Nous t'avons compliqué la vie. »",
+      "title_es": "«Te hemos complicado la vida.»",
+      "title_ja": "「お前の人生を難しくしてしまった。」",
+      "title_pt": "«Complicámos-te a vida.»",
+      "title_it": "«Ti abbiamo complicato la vita.»",
+      "title_pl": "„Utrudniliśmy ci życie.”",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 8,
+      "keywords": [
+        "Hokage",
+        "Reanimation"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "DUEL Orochimaru [⧗] You can upgrade over friendly characters with a different name than this character."
+        },
+        {
+          "type": "MAIN",
+          "description": "[↯] Move a Hokage character in play."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-131-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-131-RA.webp"
+    },
+    "SS-133-RA": {
+      "id": "SS-133-RA",
+      "cardId": "SS-133-RA",
+      "rarity": "RA",
+      "number": "133",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "HIRUZEN SARUTOBI",
+      "name_fr": "HIRUZEN SARUTOBI",
+      "name_ja": "猿飛ヒルゼン",
+      "title_en": "\"You were meant to guide them, not toy with them!\"",
+      "title_fr": "« Tu devais les guider, pas jouer avec eux ! »",
+      "title_es": "«¡Debías guiarlos, no jugar con ellos!»",
+      "title_ja": "「導くべきだった、弄ぶのではなく！」",
+      "title_pt": "«Devias guiá-los, não brincar com eles!»",
+      "title_it": "«Dovevi guidarli, non giocare con loro!»",
+      "title_pl": "„Miałeś ich prowadzić, a nie się nimi bawić!”",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 7,
+      "keywords": [
+        "Hokage"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[⧗] When a friendly Leaf Village character is played in this mission, POWERUP 2 that character."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Orochimaru: Play a Summon character in this mission, paying 2 less."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-133-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-133-RA.webp"
+    },
+    "SS-134-RA": {
+      "id": "SS-134-RA",
+      "cardId": "SS-134-RA",
+      "rarity": "RA",
+      "number": "134",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "KURENAI YUHI",
+      "name_ja": "夕日紅",
+      "name_fr": "KURENAI YUHI",
+      "name_es": "KURENAI YUHI",
+      "title_en": "\"Alright... Let's end this!\"",
+      "title_ja": "「よし…終わらせよう！」",
+      "title_fr": "Bien... Finissons-en !",
+      "title_es": "Muy bien... ¡Acabemos con esto!",
+      "title_pt": "Certo... Vamos acabar com isso!",
+      "title_it": "Bene... Finiamola!",
+      "title_pl": "Dobra... Skończmy z tym!",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Team 8",
+        "Jutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Itachi Uchiha: Defeat the strongest enemy character in this mission if they have at least 6 Power."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "DUEL effect: Instead, defeat them if they have at least 5 Power."
+        }
+      ],
+      "rarity_display": "Rare",
+      "data_complete": true,
+      "old_id": "134/140",
+      "image_file": "images/cards/SS/rare_art/SS-134-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-134-RA.webp"
+    },
+    "SS-135-RA": {
+      "id": "SS-135-RA",
+      "cardId": "SS-135-RA",
+      "rarity": "RA",
+      "number": "135",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "HAKU",
+      "name_fr": "HAKU",
+      "name_ja": "白",
+      "title_en": "\"I face death for him.\"",
+      "title_fr": "« J'affronte la mort pour lui. »",
+      "title_es": "«Afronto la muerte por él.»",
+      "title_ja": "「あの人のためなら死をも厭わない。」",
+      "title_pt": "«Enfrento a morte por ele.»",
+      "title_it": "«Affronto la morte per lui.»",
+      "title_pl": "„Zmierzę się ze śmiercią dla niego.”",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 5,
+      "keywords": [
+        "Rogue Ninja",
+        "Jutsu"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Discard the top card of your deck. Hide an enemy character in this mission with cost less than the cost of the discarded card."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-135-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-135-RA.webp"
+    },
+    "SS-136-RA": {
+      "id": "SS-136-RA",
+      "cardId": "SS-136-RA",
+      "rarity": "RA",
+      "number": "136",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "ZABUZA MOMOCHI",
+      "name_fr": "ZABUZA MOMOCHI",
+      "name_ja": "桃地再不斬",
+      "title_en": "\"A very simple plan can defeat you.\"",
+      "title_fr": "« Un plan très simple peut te vaincre. »",
+      "title_es": "«Un plan muy simple puede vencerte.»",
+      "title_ja": "「単純な策でもお前を倒せる。」",
+      "title_pt": "«Um plano muito simples pode derrotar-te.»",
+      "title_it": "«Un piano molto semplice può sconfiggerti.»",
+      "title_pl": "„Bardzo prosty plan może cię pokonać.”",
+      "has_visual": true,
+      "chakra": 4,
+      "power": 4,
+      "keywords": [
+        "Rogue Ninja",
+        "Jutsu"
+      ],
+      "group": "Independent",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Defeat an enemy character in this mission that was played last turn for less than its printed cost due to a card effect."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-136-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-136-RA.webp"
+    },
+    "SS-137-RA": {
+      "id": "SS-137-RA",
+      "cardId": "SS-137-RA",
+      "rarity": "RA",
+      "number": "137",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "ITACHI UCHIHA",
+      "title_en": "\"It isn't my desire to kill you.\"",
+      "name_fr": "ITACHI UCHIWA",
+      "title_fr": "« Je n'ai pas le désir de te tuer. »",
+      "name_es": "ITACHI UCHIHA",
+      "title_es": "«No es mi deseo matarte.»",
+      "name_ja": "うちはイタチ",
+      "title_ja": "「お前を殺したいわけではない。」",
+      "name_pt": "ITACHI UCHIHA",
+      "title_pt": "«Não é meu desejo matar-te.»",
+      "name_it": "ITACHI UCHIHA",
+      "title_it": "«Non è mio desiderio ucciderti.»",
+      "name_pl": "ITACHI UCHIHA",
+      "title_pl": "„Nie pragnę cię zabić.”",
+      "has_visual": true,
+      "chakra": 6,
+      "power": 6,
+      "keywords": [
+        "Rogue Ninja",
+        "Jutsu"
+      ],
+      "group": "Akatsuki",
+      "effects": [
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Return a friendly hidden character from this mission to your hand."
+        },
+        {
+          "type": "DUEL",
+          "description": "[↯] DUEL Kurenai Yuhi: The opponent chooses and defeats their characters in this mission until they have the same number as your characters."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-137-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-137-RA.webp"
+    },
+    "SS-140-RA": {
+      "id": "SS-140-RA",
+      "cardId": "SS-140-RA",
+      "rarity": "RA",
+      "number": "140",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "IRUKA UMINO",
+      "name_fr": "IRUKA UMINO",
+      "name_ja": "うみのイルカ",
+      "title_en": "\"I can't help it... I still want Naruto to win!\"",
+      "title_fr": "« Je n'y peux rien... je veux quand même que Naruto gagne ! »",
+      "title_es": "«No puedo evitarlo... ¡sigo queriendo que Naruto gane!»",
+      "title_ja": "「仕方ない…それでもナルトに勝ってほしい！」",
+      "title_pt": "«Não consigo evitar... ainda quero que o Naruto ganhe!»",
+      "title_it": "«Non ci posso fare nulla... voglio ancora che Naruto vinca!»",
+      "title_pl": "„Nic na to nie poradzę... wciąż chcę, żeby Naruto wygrał!”",
+      "has_visual": true,
+      "chakra": 5,
+      "power": 6,
+      "keywords": [],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Hide a Naruto Uzumaki in play."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "[↯] Play a Naruto Uzumaki while hidden anywhere, paying 2 less."
+        }
+      ],
+      "data_complete": true,
+      "image_file": "images/cards/SS/rare_art/SS-140-RA.webp",
+      "image_url": "/images/cards/SS/rare_art/SS-140-RA.webp"
+    },
+    "SS-141-SPV": {
+      "id": "SS-141-SPV",
+      "cardId": "SS-141-SPV",
+      "rarity": "SPV",
+      "number": "141",
+      "set": "SS",
+      "card_type": "character",
+      "name_en": "TSUNADE",
+      "name_fr": "TSUNADE",
+      "name_ja": "綱手",
+      "has_visual": true,
+      "chakra": 7,
+      "power": 7,
+      "keywords": [
+        "Sannin",
+        "Taijutsu"
+      ],
+      "group": "Leaf Village",
+      "effects": [
+        {
+          "type": "MAIN",
+          "description": "[↯] Shuffle up to 5 cards from the top of your discard pile into your deck. For each card shuffled, POWERUP 1."
+        },
+        {
+          "type": "UPGRADE",
+          "description": "MAIN effect: In addition, for each card, also POWERUP 1 a friendly character in play."
+        }
+      ],
+      "data_complete": true,
+      "title_en": "\"Come on, you know the type of gal I am.\"",
+      "title_fr": "« Allons, tu sais quel genre de femme je suis. »",
+      "title_es": "«Vamos, ya sabes qué clase de mujer soy.»",
+      "title_ja": "「私がどういう女か知っているだろう。」",
+      "title_pt": "«Vá lá, sabes que tipo de mulher eu sou.»",
+      "title_it": "«Andiamo, sai che tipo di donna sono.»",
+      "title_pl": "„Daj spokój, wiesz, jaką jestem kobietą.”",
+      "image_file": "images/cards/SS/sp_v/SS-141-SPV.webp",
+      "image_url": "/images/cards/SS/sp_v/SS-141-SPV.webp"
     }
   }
 }

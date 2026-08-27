@@ -5,8 +5,17 @@ import { getAllCards } from '@/lib/data/cardLoader';
 import { HIDDEN_PRINTING_IDS, isHiddenPrinting } from '@/lib/data/sets/hiddenPrintings';
 
 describe('les impressions masquees n_existent nulle part', () => {
-  it('la liste couvre les impressions retirees', () => {
-    expect(HIDDEN_PRINTING_IDS.length, 'vingt-cinq impressions').toBe(25);
+  it('seuls les deux chibis encore sous embargo restent masques', () => {
+    expect(
+      [...HIDDEN_PRINTING_IDS].sort(),
+      'les vingt-trois autres impressions ont ete revelees',
+    ).toEqual(['SS-122-CHIBIV', 'SS-140-CHIBIV']);
+  });
+
+  it('les impressions revelees sont bien arrivees dans le jeu', () => {
+    const manquantes = ['SS-111-RA', 'SS-122-RA', 'SS-137-RA', 'SS-140-RA', 'SS-141-SPV']
+      .filter((id) => !getCardById(id));
+    expect(manquantes, 'elles doivent etre jouables et visibles').toEqual([]);
   });
 
   it('aucune n_apparait dans les donnees de carte', () => {
