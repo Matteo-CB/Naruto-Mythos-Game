@@ -12,7 +12,7 @@ function itachi140MainHandler(ctx: EffectContext): EffectResult {
 
   const handSize = opponentState.hand.length;
 
-  if (handSize === 0) {
+  if (handSize === 0 && !ctx.isUpgrade) {
     const log = logAction(
       state.log,
       state.turn,

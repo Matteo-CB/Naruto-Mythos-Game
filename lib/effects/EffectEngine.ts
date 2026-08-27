@@ -16165,9 +16165,8 @@ export class EffectEngine {
         const i140HandSize = i140OpponentState.hand.length;
         if (i140HandSize === 0) {
           newState.log = logAction(newState.log, newState.turn, newState.phase, i140Player,
-            'EFFECT_NO_TARGET', 'Itachi Uchiwa (140): Opponent hand is empty (state changed).',
+            'EFFECT_NO_TARGET', 'Itachi Uchiwa (140): Opponent hand is empty, nothing to discard.',
             'game.log.effect.noTarget', { card: 'ITACHI UCHIWA', id: 'KS-140-S' });
-          break;
         }
 
         
@@ -16177,7 +16176,9 @@ export class EffectEngine {
           instanceId: c.instanceId || generateInstanceId(),
         }));
 
-        if (i140HandSize >= 2) {
+        if (i140HandSize === 0) {
+          
+        } else if (i140HandSize >= 2) {
           newState = {
             ...newState,
             [i140Opponent]: {
@@ -16219,7 +16220,7 @@ export class EffectEngine {
         
         
         
-        if (i140IsUpgrade && i140HandSize > 0) {
+        if (i140IsUpgrade) {
           const i140DefeatTargets: string[] = [];
           for (let mi = 0; mi < newState.activeMissions.length; mi++) {
             const m = newState.activeMissions[mi];
@@ -16259,6 +16260,11 @@ export class EffectEngine {
               sourceEffectId: i140ConfEffId,
             });
             pendingEffect.remainingEffectTypes = undefined;
+          } else {
+            newState.log = logAction(newState.log, newState.turn, newState.phase, i140Player,
+              'EFFECT_NO_TARGET',
+              `Itachi Uchiwa (140) UPGRADE: no character in play with cost ${i140HandSize} or less.`,
+              'game.log.effect.noTarget', { card: 'ITACHI UCHIWA', id: 'KS-140-S' });
           }
         }
         break;

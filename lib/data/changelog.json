@@ -1,6 +1,40 @@
 {
   "entries": [
     {
+      "date": "2026-08-27",
+      "title_fr": "ITACHI UCHIHA 140 frappe meme quand la main adverse est vide",
+      "title_en": "ITACHI UCHIHA 140 strikes even with an empty opponent hand",
+      "title_es": "ITACHI UCHIHA 140 golpea incluso con la mano rival vacía",
+      "title_pt": "ITACHI UCHIHA 140 golpeia mesmo com a mão adversária vazia",
+      "title_it": "ITACHI UCHIHA 140 colpisce anche a mano avversaria vuota",
+      "title_pl": "ITACHI UCHIHA 140 uderza nawet przy pustej ręce przeciwnika",
+      "title_ja": "ITACHI UCHIHA 140は相手の手札が空でも撃てます",
+      "categories": [
+        "fix"
+      ],
+      "changes_fr": [
+        "ITACHI UCHIHA 140 : avec une main adverse vide, il peut toujours vaincre une carte face cachée, qui compte pour un coût de 0."
+      ],
+      "changes_en": [
+        "ITACHI UCHIHA 140: with an empty opponent hand it can still defeat a face-down card, which counts as cost 0."
+      ],
+      "changes_es": [
+        "ITACHI UCHIHA 140: con la mano rival vacía aún puede derrotar una carta bocabajo, que cuenta como coste 0."
+      ],
+      "changes_pt": [
+        "ITACHI UCHIHA 140: com a mão adversária vazia ainda pode derrotar uma carta virada, que conta como custo 0."
+      ],
+      "changes_it": [
+        "ITACHI UCHIHA 140: con la mano avversaria vuota può ancora sconfiggere una carta coperta, che vale costo 0."
+      ],
+      "changes_pl": [
+        "ITACHI UCHIHA 140: przy pustej ręce przeciwnika wciąż pokonuje zakrytą kartę, która liczy się jako koszt 0."
+      ],
+      "changes_ja": [
+        "ITACHI UCHIHA 140：相手の手札が空でも、コスト0として扱われる裏向きのカードを倒せます。"
+      ]
+    },
+    {
       "date": "2026-08-26",
       "title_fr": "La fouille de deck ne laisse plus rien sur le dessus",
       "title_en": "Deck searches no longer leave cards on top",
