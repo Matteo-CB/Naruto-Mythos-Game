@@ -12,6 +12,27 @@ import { QUESTS } from '@/lib/quests/questData';
 import { QUEST_XP_BY_LEVEL } from '@/lib/battlepass/constants';
 
 const RACINE = process.cwd();
+const LANGUES_AJOUTEES = ['es', 'pt', 'it', 'pl', 'ja'] as const;
+
+function lireLeDocument() {
+  const doc = readFileSync(join(RACINE, 'doc/QUETES_SET_2.txt'), 'utf8').split(/\r?\n/);
+  const entrees: Array<{ id: string; fr: string; en: string; target: number; scope: string }> = [];
+  for (let i = 0; i < doc.length; i += 1) {
+    const entete = /^\s*\d+\.\s+(.*)$/.exec(doc[i]);
+    if (!entete) continue;
+    const en = doc[i + 1]?.trim() ?? '';
+    const meta = /^id\s+(\S+)\s+\|\s+cible\s+(\d+)\s+\|\s+portée\s+(\S+)/.exec(doc[i + 2]?.trim() ?? '');
+    if (!en.startsWith('EN ') || !meta) continue;
+    entrees.push({
+      id: meta[1],
+      fr: entete[1].trim(),
+      en: en.slice(3).trim(),
+      target: Number(meta[2]),
+      scope: meta[3],
+    });
+  }
+  return entrees;
+}
 
 describe('quetes annoncees de la saison Shinobi Shiren', () => {
   it('annonce la saison en cours et archive la precedente', () => {
@@ -19,10 +40,33 @@ describe('quetes annoncees de la saison Shinobi Shiren', () => {
     expect(SAISON_ARCHIVEE).toBe('KS');
   });
 
-  it('propose six quetes par niveau', () => {
-    for (const niveau of [1, 2, 3, 4] as const) {
+  it('reprend les 183 quetes du document, dans sa repartition par niveau', () => {
+    expect(QUETES_SHINOBI_SHIREN.length).toBe(183);
+    const attendu: Record<number, number> = { 1: 46, 2: 46, 3: 46, 4: 45 };
+    for (const niveau of [1, 2, 3, 4]) {
       const lot = QUETES_SHINOBI_SHIREN.filter((q) => q.level === niveau);
-      expect(lot.length, `niveau ${niveau}`).toBe(6);
+      expect(lot.length, `niveau ${niveau}`).toBe(attendu[niveau]);
+    }
+  });
+
+  it('reprend mot pour mot le francais, l anglais, la cible et la portee du document', () => {
+    const entrees = lireLeDocument();
+    expect(entrees.length).toBe(183);
+    const parId = new Map(QUETES_SHINOBI_SHIREN.map((q) => [q.id, q]));
+    for (const entree of entrees) {
+      const quete = parId.get(entree.id);
+      expect(quete, `quete ${entree.id} absente des donnees`).toBeDefined();
+      expect(quete!.text_fr, entree.id).toBe(entree.fr);
+      expect(quete!.text_en, entree.id).toBe(entree.en);
+      expect(quete!.target, entree.id).toBe(entree.target);
+      expect(quete!.scope, entree.id).toBe(entree.scope);
+    }
+  });
+
+  it('n ajoute aucune quete que le document ne porte pas', () => {
+    const duDocument = new Set(lireLeDocument().map((e) => e.id));
+    for (const quete of QUETES_SHINOBI_SHIREN) {
+      expect(duDocument.has(quete.id), `${quete.id} absente du document`).toBe(true);
     }
   });
 
@@ -39,9 +83,30 @@ describe('quetes annoncees de la saison Shinobi Shiren', () => {
         const texte = texteDeQuete(quete, locale);
         expect(texte.length, `${quete.id} en ${locale}`).toBeGreaterThan(0);
         if (locale !== 'en') {
-          expect(texte, `${quete.id} en ${locale} retombe sur l anglais`).not.toBe(
-            texteDeQuete(quete, 'en'),
-          );
+          expect(texte, `${quete.id} en ${locale} retombe sur l anglais`).not.toBe(quete.text_en);
+        }
+      }
+    }
+  });
+
+  it('garde le numero imprime de la carte dans chaque langue', () => {
+    for (const quete of QUETES_SHINOBI_SHIREN) {
+      const numeros = (quete.text_en.match(/\b\d{3}\b/g) ?? []).sort();
+      if (numeros.length === 0) continue;
+      for (const locale of LANGUES_AJOUTEES) {
+        const traduit = (texteDeQuete(quete, locale).match(/\b\d{3}\b/g) ?? []).sort();
+        expect(traduit, `${quete.id} en ${locale}`).toEqual(numeros);
+      }
+    }
+  });
+
+  it('ne traduit jamais les mots cles du jeu', () => {
+    const motsCles = ['DUEL', 'FIRST STRIKE', 'MAIN', 'AMBUSH', 'UPGRADE', 'SCORE', 'ATTACH', 'POWERUP'];
+    for (const quete of QUETES_SHINOBI_SHIREN) {
+      for (const mot of motsCles) {
+        if (!quete.text_en.includes(mot)) continue;
+        for (const locale of LANGUES_AJOUTEES) {
+          expect(texteDeQuete(quete, locale), `${quete.id} en ${locale} perd ${mot}`).toContain(mot);
         }
       }
     }
@@ -58,7 +123,7 @@ describe('quetes annoncees de la saison Shinobi Shiren', () => {
     }
   });
 
-  it('reste annoncee et non suivie: aucun hook n est declare', () => {
+  it('reste annoncee et non suivie: aucun declencheur n est declare', () => {
     const source = readFileSync(join(RACINE, 'lib/quests/saisonShinobiShiren.ts'), 'utf8');
     expect(source).not.toMatch(/\bhook\s*:/);
     for (const quete of QUETES_SHINOBI_SHIREN) {

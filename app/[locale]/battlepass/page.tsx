@@ -149,6 +149,7 @@ export default function RewardsHubPage() {
   const [quests, setQuests] = useState<QuestRow[]>([]);
   const [seasonQuests, setSeasonQuests] = useState<SeasonQuestRow[]>([]);
   const [voirArchive, setVoirArchive] = useState(false);
+  const [niveauDeSaison, setNiveauDeSaison] = useState<number>(1);
   const [daily, setDaily] = useState<DailyRow | null>(null);
   const { inventory, totalUnopened, loading: invLoading, refresh: refreshInventory } = useBoosterInventory();
 
@@ -453,6 +454,7 @@ export default function RewardsHubPage() {
   }));
 
   const filteredQuests = mainQuests.filter((q) => q.level === activeLevel);
+  const quetesDeSaisonDuNiveau = seasonQuests.filter((q) => q.level === niveauDeSaison);
 
   return (
     <main className="relative min-h-screen flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--t-bg)', color: 'var(--t-text)' }}>
@@ -863,22 +865,36 @@ export default function RewardsHubPage() {
                           {tQuests('seasonSoon')}
                         </span>
                       </div>
-                      <p className="text-[11px] mb-4" style={{ color: 'var(--t-dim)' }}>
-                        {tQuests('seasonIntro')}
+                      <p className="text-[11px] mb-3" style={{ color: 'var(--t-dim)' }}>
+                        {tQuests('seasonIntro', { count: seasonQuests.length })}
                       </p>
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {[1, 2, 3, 4].map((level) => (
+                          <button
+                            key={level}
+                            type="button"
+                            onClick={() => setNiveauDeSaison(level)}
+                            className="px-3 py-1.5 text-[10px] tracking-widest font-display uppercase flex items-center gap-2"
+                            style={{
+                              backgroundColor: niveauDeSaison === level ? 'var(--t-surface-2)' : 'var(--t-bg-elevated)',
+                              color: niveauDeSaison === level ? LEVEL_COLOR[level] : 'var(--t-muted)',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            {tQuests('levelLabel', { level })}
+                            <span style={{ color: 'var(--t-dim)', fontVariantNumeric: 'tabular-nums' }}>
+                              {seasonQuests.filter((q) => q.level === level).length}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
                       <div className="grid gap-2 sm:grid-cols-2">
-                        {[...seasonQuests].sort((a, b) => a.level - b.level).map((q) => (
+                        {quetesDeSaisonDuNiveau.map((q) => (
                           <div
                             key={q.id}
                             className="flex items-center justify-between gap-3 px-3 py-2"
                             style={{ backgroundColor: 'var(--t-surface-2)', opacity: 0.85 }}
                           >
-                            <span
-                              className="text-[10px] font-display tracking-widest uppercase shrink-0"
-                              style={{ color: LEVEL_COLOR[q.level], width: 48 }}
-                            >
-                              {tQuests('levelLabel', { level: q.level })}
-                            </span>
                             <span className="text-[12px] flex-1" style={{ color: 'var(--t-text)' }}>
                               {questText(q, locale)}
                             </span>
