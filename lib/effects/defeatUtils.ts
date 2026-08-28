@@ -203,6 +203,12 @@ function removeCharacterFromPlay(
 
   const allCards = defeated.stack?.length > 0 ? [...defeated.stack] : [defeated.card];
   const attachedCards = defeated.attachments ?? [];
+
+  for (const att of attachedCards) {
+    if (att.owner !== owner) continue;
+    ownerState.discardPile = [...ownerState.discardPile, att.card as (typeof ownerState.discardPile)[number]];
+  }
+
   if (sidePlayer === owner && allCards.length > 0 && EffectEngine.hasTsunade004Active(state, owner)) {
     const topCard = allCards[allCards.length - 1];
     const underCards = allCards.slice(0, -1);
@@ -218,7 +224,7 @@ function removeCharacterFromPlay(
     [owner]: ownerState,
   };
 
-  
+
   if (sidePlayer !== owner) {
     const controllerState = { ...result[sidePlayer] };
     controllerState.charactersInPlay = Math.max(0, controllerState.charactersInPlay - 1);
@@ -229,6 +235,7 @@ function removeCharacterFromPlay(
   }
 
   for (const att of attachedCards) {
+    if (att.owner === owner) continue;
     const attOwnerState = { ...result[att.owner] };
     attOwnerState.discardPile = [...attOwnerState.discardPile, att.card as (typeof attOwnerState.discardPile)[number]];
     result = { ...result, [att.owner]: attOwnerState };

@@ -1,6 +1,40 @@
 {
   "entries": [
     {
+      "date": "2026-08-28",
+      "categories": [
+        "fix"
+      ],
+      "title_fr": "Mise à jour",
+      "changes_fr": [
+        "Un personnage vaincu qui portait un équipement part à la défausse tel quel, le personnage au-dessus"
+      ],
+      "title_en": "Update",
+      "changes_en": [
+        "A defeated character carrying an attachment goes to the discard as it stands, the character on top"
+      ],
+      "title_es": "Actualización",
+      "changes_es": [
+        "Un personaje derrotado con un objeto equipado va al descarte tal cual, el personaje encima"
+      ],
+      "title_pt": "Atualização",
+      "changes_pt": [
+        "Um personagem derrotado com um equipamento vai para o descarte tal como está, o personagem por cima"
+      ],
+      "title_it": "Aggiornamento",
+      "changes_it": [
+        "Un personaggio sconfitto con un equipaggiamento va negli scarti così com'è, il personaggio sopra"
+      ],
+      "title_pl": "Aktualizacja",
+      "changes_pl": [
+        "Pokonana postać z przedmiotem trafia na stos kart odrzuconych bez zmian, postać na wierzchu"
+      ],
+      "title_ja": "アップデート",
+      "changes_ja": [
+        "装備を着けたキャラクターが倒れると、そのままの重なりで捨て札に行き、キャラクターが上になる"
+      ]
+    },
+    {
       "date": "2026-08-27",
       "title_fr": "ITACHI UCHIHA 140 frappe meme quand la main adverse est vide",
       "title_en": "ITACHI UCHIHA 140 strikes even with an empty opponent hand",

@@ -23896,9 +23896,14 @@ export class EffectEngine {
         const owner = targetChar.originalOwner;
         const ownerState = { ...newState[owner] };
         const cardsToDiscard = targetChar.stack?.length > 0 ? [...targetChar.stack] : [targetChar.card];
+        for (const att of targetChar.attachments ?? []) {
+          if (att.owner !== owner) continue;
+          ownerState.discardPile = [...ownerState.discardPile, att.card as (typeof ownerState.discardPile)[number]];
+        }
         ownerState.discardPile = [...ownerState.discardPile, ...cardsToDiscard];
         newState[owner] = ownerState;
         for (const att of targetChar.attachments ?? []) {
+          if (att.owner === owner) continue;
           const attOwner = newState[att.owner];
           newState[att.owner] = {
             ...attOwner,
