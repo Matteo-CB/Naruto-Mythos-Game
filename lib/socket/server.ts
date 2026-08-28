@@ -41,6 +41,9 @@ import { isStaticRankedBanned } from '@/lib/data/rankedBans';
 import { cardVersionKey } from '@/lib/cards/versionKey';
 import { emitQuestEvent } from '@/lib/quests/hooks';
 import { emitDrawDiffEvents, emitTokenDiffEvents } from '@/lib/quests/engineEmit';
+import { emitAttachmentStateEvents } from '@/lib/quests/etatDeJeu';
+import { resumerLeDeck, compteParSet } from '@/lib/quests/resumeDeDeck';
+import { resumerLaPartie, oublierLaPartie } from '@/lib/quests/faitsDePartie';
 import { ensureQuestPersistenceListener } from '@/lib/quests/listenerSetup';
 import type { GameMode } from '@/lib/quests/hooks';
 import { validateChatMessage, isOnChatCooldown, decideChatDelivery } from '@/lib/chat/chatDelivery';
@@ -783,6 +786,7 @@ function applyChessClockIdleAuto(room: RoomData, player: PlayerID, io: SocketIOS
   }
   emitDrawDiffEvents(oldState, newState);
   emitTokenDiffEvents(oldState, newState);
+  emitAttachmentStateEvents(newState);
   room.gameState = newState;
   markRoomProgress(room);
   room.chessClock = consumeChessClockIdleWarning(room.chessClock);
@@ -1909,6 +1913,7 @@ async function finalizeGameEnd(
           if (p1Wins >= 2) emitQuestEvent('ranked.win.streak', room.hostId, { gameMode: 'ranked', streak: p1Wins });
           if (p2Wins >= 2) emitQuestEvent('ranked.win.streak', room.guestId, { gameMode: 'ranked', streak: p2Wins });
 
+
           const winnerIsP1 = winner === 'player1';
           const winnerUserId = winnerIsP1 ? room.hostId : room.guestId;
           const winnerDeck = winnerIsP1 ? room.hostDeck : room.guestDeck;
@@ -1916,10 +1921,28 @@ async function finalizeGameEnd(
             const charNames = winnerDeck.characters.map((c) => c.name_fr.toUpperCase());
             const groups = new Set(winnerDeck.characters.map((c) => c.group).filter(Boolean));
             const monoGroup = groups.size === 1 ? Array.from(groups)[0] : undefined;
-            if (monoGroup) {
-              emitQuestEvent('ranked.win.deck', winnerUserId, { gameMode: 'ranked', monoGroup });
-            }
-            emitQuestEvent('ranked.win.deck.contains', winnerUserId, { gameMode: 'ranked', names: charNames });
+            const resume = resumerLeDeck(winnerDeck.characters);
+            const parSet = compteParSet(winnerDeck.characters);
+            const partie = resumerLaPartie(room.gameState?.gameId ?? '', winnerUserId);
+            const faitsDuDeck = {
+              deckSet: resume.deckSet,
+              deckSets: resume.deckSets,
+              deckSetCounts: parSet,
+              deckNumbers: resume.deckNumbers,
+              deckHasAttachment: resume.deckHasAttachment,
+              ...partie,
+            };
+            emitQuestEvent('ranked.win.deck', winnerUserId, {
+              gameMode: 'ranked', monoGroup, ...faitsDuDeck,
+            });
+            emitQuestEvent('ranked.win.deck.contains', winnerUserId, {
+              gameMode: 'ranked', names: charNames, monoGroup, ...faitsDuDeck,
+            });
+            emitQuestEvent('ranked.win.streak', winnerUserId, {
+              gameMode: 'ranked',
+              streak: winnerIsP1 ? changes.player1NewConsecWins : changes.player2NewConsecWins,
+              ...faitsDuDeck,
+            });
             const allHighPower = winnerDeck.characters.every((c) => (c.power ?? 0) >= 4);
             if (allHighPower) {
               emitQuestEvent('match.won.deck.power_minimum', winnerUserId, { gameMode: 'ranked', minPrinted: 4 });
@@ -4191,6 +4214,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
         emitDrawDiffEvents(prevState, room.gameState);
         emitTokenDiffEvents(prevState, room.gameState);
+        emitAttachmentStateEvents(room.gameState);
 
         syncChessClock(room);
 

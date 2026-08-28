@@ -209,18 +209,26 @@ function handlePlayCharacter(
   const updatedChars = player === 'player1' ? updatedMission.player1Characters : updatedMission.player2Characters;
   const playedChar = updatedChars[updatedChars.length - 1]; // Just added as last
   if (playedChar) {
+    const sommetJoue = playedChar.stack?.length > 0
+      ? playedChar.stack[playedChar.stack.length - 1]
+      : playedChar.card;
     emitEngineQuestEvent(newState, player, 'character.played', {
       targetName: playedChar.card.name_fr,
       targetKeywords: playedChar.card.keywords ?? [],
       group: playedChar.card.group,
+      sourceCardId: sommetJoue.id,
     });
-    if (playedChar.card.group) {
+    if (sommetJoue.group) {
       emitEngineQuestEvent(newState, player, 'character.played.group', {
-        group: playedChar.card.group,
+        group: sommetJoue.group,
+        sourceCardId: sommetJoue.id,
       });
     }
-    for (const kw of playedChar.card.keywords ?? []) {
-      emitEngineQuestEvent(newState, player, 'character.played.keyword', { keyword: kw });
+    for (const kw of sommetJoue.keywords ?? []) {
+      emitEngineQuestEvent(newState, player, 'character.played.keyword', {
+        keyword: kw,
+        sourceCardId: sommetJoue.id,
+      });
     }
     const rarity = playedChar.card.rarity;
     if (rarity === 'RA' || rarity === 'MV' || rarity === 'SV' || rarity === 'L') {
@@ -228,7 +236,10 @@ function handlePlayCharacter(
     }
     const stackDepth = playedChar.stack?.length ?? 1;
     if (stackDepth >= 3) {
-      emitEngineQuestEvent(newState, player, 'upgrade.stack.depth', { depth: stackDepth });
+      emitEngineQuestEvent(newState, player, 'upgrade.stack.depth', {
+        depth: stackDepth,
+        sourceCardId: sommetJoue.id,
+      });
     }
     const sideKey: 'player1Characters' | 'player2Characters' = player === 'player1' ? 'player1Characters' : 'player2Characters';
     const friendlyNamesOnMission = Array.from(new Set(

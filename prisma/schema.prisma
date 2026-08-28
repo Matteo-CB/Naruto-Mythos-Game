@@ -98,6 +98,7 @@ model QuestProgress {
   questId     String
   progress    Int       @default(0)
   target      Int
+  seenKeys    String[]  @default([])
   completed   Boolean   @default(false)
   completedAt DateTime?
   claimed     Boolean   @default(false)

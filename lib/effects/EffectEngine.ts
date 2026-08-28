@@ -88,6 +88,11 @@ import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findHiddenLeafOn
 import { isCharacterCopyable, isCopyableCharacter, isCopyableEffect } from './handlers/KS/shared/copyExclusions';
 import { annoncerRevelationPublique, annoncerRevelationSs002, apercuRevele } from './publicReveal';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
+import { resoudreEffetAvecQuete } from './resolutionEffet';
+import { avecSource } from '@/lib/quests/sourceCourante';
+import { getCardById } from '@/lib/data/cardIndex';
+import { champsDeLaSource } from '@/lib/quests/sourceCourante';
+import { annoncerEquipementDefausse, annoncerDefaiteParEquipement } from '@/lib/quests/equipementPose';
 import { hasFlexibleUpgradeRestriction, isRestrictedUpgradeTarget } from '@/lib/engine/rules/flexibleUpgradeRestriction';
 import { forestOfDeathActive, textIsBlanked } from './handlers/SS/attachmentStatics';
 import { rememberPeek } from './handlers/SS/hiddenPeek';
@@ -577,7 +582,7 @@ export class EffectEngine {
           tokensBeforePlay,
           wasFirstCard: wasFirstCardOfRound,
         };
-        const result = envelopperResultat(handler(ctx), ctx, effectType as EffectType);
+        const result = resoudreEffetAvecQuete(handler, ctx, effectType as EffectType);
 
         if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
           
@@ -626,7 +631,7 @@ export class EffectEngine {
         wasRevealed,
         wasFirstCard: true,
       };
-      const result = envelopperResultat(handler(ctx), ctx, 'FIRST_STRIKE' as EffectType);
+      const result = resoudreEffetAvecQuete(handler, ctx, 'FIRST_STRIKE' as EffectType);
       if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
         return EffectEngine.createPendingTargetSelection(
           result.state, player, character, missionIndex, 'FIRST_STRIKE' as EffectType, false, result, [],
@@ -723,7 +728,7 @@ export class EffectEngine {
           wasRevealed: true,
           wasFirstCard: wasFirstCardOfRoundReveal,
         };
-        const result = envelopperResultat(handler(ctx), ctx, effectType as EffectType);
+        const result = resoudreEffetAvecQuete(handler, ctx, effectType as EffectType);
 
         if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
           
@@ -815,7 +820,7 @@ export class EffectEngine {
             wasRevealed: true,
             wasFirstCard: wasFirstCardOfReveal,
           };
-          const result = envelopperResultat(handler(ctx), ctx, 'MAIN' as EffectType);
+          const result = resoudreEffetAvecQuete(handler, ctx, 'MAIN' as EffectType);
 
           if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
 
@@ -855,7 +860,7 @@ export class EffectEngine {
             wasRevealed: true,
             wasFirstCard: wasFirstCardOfReveal,
           };
-          const result = envelopperResultat(handler(ctx), ctx, 'AMBUSH' as EffectType);
+          const result = resoudreEffetAvecQuete(handler, ctx, 'AMBUSH' as EffectType);
 
           if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
 
@@ -891,7 +896,7 @@ export class EffectEngine {
             wasRevealed: true,
             wasFirstCard: wasFirstCardOfReveal,
           };
-          const result = duelHandler(ctx);
+          const result = resoudreEffetAvecQuete(duelHandler, ctx, 'DUEL' as EffectType);
 
           if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
             newState = EffectEngine.createPendingTargetSelection(
@@ -940,7 +945,7 @@ export class EffectEngine {
             triggerType: 'SCORE',
             isUpgrade: false,
           };
-          const result = envelopperResultat(handler(ctx), ctx, 'SCORE' as EffectType);
+          const result = resoudreEffetAvecQuete(handler, ctx, 'SCORE' as EffectType);
 
           if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
             newState = EffectEngine.createPendingTargetSelection(
@@ -974,7 +979,7 @@ export class EffectEngine {
               triggerType: 'SCORE',
               isUpgrade: false,
             };
-            const result = envelopperResultat(handler(ctx), ctx, 'SCORE' as EffectType);
+            const result = resoudreEffetAvecQuete(handler, ctx, 'SCORE' as EffectType);
 
             if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
               newState = EffectEngine.createPendingTargetSelection(
@@ -1018,7 +1023,7 @@ export class EffectEngine {
         triggerType: 'SCORE',
         isUpgrade: false,
       };
-      const result = envelopperResultat(handler(ctx), ctx, 'SCORE' as EffectType);
+      const result = resoudreEffetAvecQuete(handler, ctx, 'SCORE' as EffectType);
 
       if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
         
@@ -1528,7 +1533,13 @@ export class EffectEngine {
     selectedTargets: string[],
   ): GameState {
     const knownPendingIds = new Set(state.pendingEffects.map((pe) => pe.id));
-    const resolved = EffectEngine.dispatchTargetedEffect(state, pendingEffect, selectedTargets);
+    const carteSource = getCardById(pendingEffect.sourceCardId);
+    const resolved = avecSource(
+      pendingEffect.sourceCardId
+        ? { cardId: pendingEffect.sourceCardId, name: carteSource?.name_fr ?? carteSource?.name_en }
+        : null,
+      () => EffectEngine.dispatchTargetedEffect(state, pendingEffect, selectedTargets),
+    );
     return inheritPlayContext(resolved, knownPendingIds, pendingEffect);
   }
 
@@ -2891,11 +2902,11 @@ export class EffectEngine {
       
       case 'NEJI116_DEFEAT_TARGET':
       case 'NEJI116_DEFEAT_POWER4':
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.defeated.with.source', { sourceName: 'NEJI HYÛGA' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.defeated.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'NEJI HYÛGA' });
         newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
         break;
       case 'NEJI116_DEFEAT_POWER6':
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.defeated.with.source', { sourceName: 'NEJI HYÛGA' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.defeated.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'NEJI HYÛGA' });
         emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.defeated.with.source.power.combo', {
           sourceName: 'NEJI HYÛGA',
           powers: [4, 6],
@@ -2903,7 +2914,7 @@ export class EffectEngine {
         newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
         break;
       case 'KIDOMARU124_DEFEAT_TARGET':
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.defeated.with.source', { sourceName: 'KIDÔMARU' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.defeated.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'KIDÔMARU' });
         newState = EffectEngine.defeatCharacter(newState, targetId, pendingEffect.sourcePlayer);
         break;
       case 'KURENAI116B_DEFEAT_TARGET':
@@ -3082,7 +3093,7 @@ export class EffectEngine {
       
       
       case 'HIRUZEN001_CONFIRM_MAIN': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'cost_reduction.with.source', { sourceName: 'HIRUZEN SARUTOBI', targetGroup: 'Leaf Village' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'cost_reduction.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'HIRUZEN SARUTOBI', targetGroup: 'Leaf Village' });
         
         const h001Targets: string[] = [];
         const h001FriendlySide = pendingEffect.sourcePlayer === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -3124,7 +3135,7 @@ export class EffectEngine {
       }
 
       case 'HIRUZEN002_CONFIRM_MAIN': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'cost_reduction.with.source', { sourceName: 'HIRUZEN SARUTOBI', targetGroup: 'Leaf Village' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'cost_reduction.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'HIRUZEN SARUTOBI', targetGroup: 'Leaf Village' });
         
         newState = EffectEngine.queueHiruzen002Choose(newState, pendingEffect, pendingEffect.isUpgrade);
         pendingEffect.remainingEffectTypes = undefined; // propagated into queueHiruzen002Choose
@@ -3573,7 +3584,7 @@ export class EffectEngine {
       }
 
       case 'SASUKE014_CONFIRM_AMBUSH': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'ambush.activated.with.source', { sourceName: 'SASUKE UCHIWA' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'ambush.activated.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'SASUKE UCHIWA' });
 
         let s014Meta: { isUpgrade?: boolean; modifierDecided?: boolean; applyModifier?: boolean } = {};
         try { s014Meta = JSON.parse(pendingEffect.effectDescription); } catch {}
@@ -3655,7 +3666,8 @@ export class EffectEngine {
       }
 
       case 'KAKASHI016_CONFIRM_MAIN': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.with.source', { sourceName: 'KAKASHI HATAKE' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'KAKASHI HATAKE' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.by.card', { ...champsDeLaSource() });
         
         let k016Meta: { isUpgrade?: boolean } = {};
         try { k016Meta = JSON.parse(pendingEffect.effectDescription); } catch {}
@@ -3844,7 +3856,7 @@ export class EffectEngine {
       }
 
       case 'INO020_CONFIRM_MAIN': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.controlled.with.source', { sourceName: 'INO YAMANAKA' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.controlled.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'INO YAMANAKA' });
         
         let i020Meta: { isUpgrade?: boolean } = {};
         try { i020Meta = JSON.parse(pendingEffect.effectDescription); } catch {}
@@ -4159,7 +4171,7 @@ export class EffectEngine {
       }
 
       case 'ASUMA024_CONFIRM_AMBUSH': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'ambush.activated.with.source', { sourceName: 'ASUMA SARUTOBI' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'ambush.activated.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'ASUMA SARUTOBI' });
         
         const ps024 = { ...newState[pendingEffect.sourcePlayer] };
         if (ps024.deck.length > 0) {
@@ -4208,8 +4220,8 @@ export class EffectEngine {
       }
 
       case 'KIBA026_CONFIRM_MAIN': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.hidden.weakest.with.source', { sourceName: 'KIBA INUZUKA' });
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.hidden.with.source', { sourceName: 'KIBA INUZUKA' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.hidden.weakest.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'KIBA INUZUKA' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.hidden.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'KIBA INUZUKA' });
         
         const k026SrcChar = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
         if (!k026SrcChar) break;
@@ -4702,7 +4714,7 @@ export class EffectEngine {
       }
 
       case 'NEJI036_CONFIRM_MAIN': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'tokens.removed.with.source', { sourceName: 'NEJI HYÛGA' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'tokens.removed.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'NEJI HYÛGA' });
         
         const n036EnemySide: 'player1Characters' | 'player2Characters' =
           pendingEffect.sourcePlayer === 'player1' ? 'player2Characters' : 'player1Characters';
@@ -4746,7 +4758,7 @@ export class EffectEngine {
       }
 
       case 'NEJI037_CONFIRM_UPGRADE': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'tokens.removed.with.source', { sourceName: 'NEJI HYÛGA' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'tokens.removed.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'NEJI HYÛGA' });
         
         const n037Player = pendingEffect.sourcePlayer;
         const n037Opponent = n037Player === 'player1' ? 'player2' : 'player1';
@@ -5051,7 +5063,7 @@ export class EffectEngine {
       }
 
       case 'EBISU046_CONFIRM_MAIN': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'card.drawn.via_effect.source', { sourceName: 'EBISU' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'card.drawn.via_effect.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'EBISU' });
         
         const e046SrcChar = EffectEngine.findCharByInstanceId(newState, pendingEffect.sourceInstanceId);
         if (!e046SrcChar) break;
@@ -6170,7 +6182,8 @@ export class EffectEngine {
       }
 
       case 'SAKON062_CONFIRM_AMBUSH': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.with.source', { sourceName: 'SAKON' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'SAKON' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.by.card', { ...champsDeLaSource() });
         const s062Player = pendingEffect.sourcePlayer;
         const s062FriendlySide = s062Player === 'player1' ? 'player1Characters' : 'player2Characters';
         const s062Targets: string[] = [];
@@ -8886,7 +8899,7 @@ export class EffectEngine {
       
 
       case 'KISAME092_CONFIRM_AMBUSH': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'tokens.removed.with.source', { sourceName: 'KISAME HOSHIGAKI' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'tokens.removed.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'KISAME HOSHIGAKI' });
         
         const k092Player = pendingEffect.sourcePlayer;
         const k092MI = pendingEffect.sourceMissionIndex;
@@ -10117,7 +10130,8 @@ export class EffectEngine {
       }
 
       case 'SAKON127_CONFIRM_AMBUSH': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.with.source', { sourceName: 'SAKON' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'SAKON' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.by.card', { ...champsDeLaSource() });
         
         const s127Player = pendingEffect.sourcePlayer;
         const s127Opponent = s127Player === 'player1' ? 'player2' as const : 'player1' as const;
@@ -11255,7 +11269,7 @@ export class EffectEngine {
       }
 
       case 'KISAME093_CONFIRM_MAIN': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'tokens.removed.with.source', { sourceName: 'KISAME HOSHIGAKI' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'tokens.removed.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'KISAME HOSHIGAKI' });
         
         const k093Player = pendingEffect.sourcePlayer;
         const k093EnemySide = k093Player === 'player1' ? 'player2Characters' : 'player1Characters';
@@ -11364,8 +11378,9 @@ export class EffectEngine {
       }
 
       case 'KAKASHI106_CONFIRM_MAIN': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.with.source', { sourceName: 'KAKASHI HATAKE' });
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.via_ambush.with.source', { sourceName: 'KAKASHI HATAKE' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'KAKASHI HATAKE' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.by.card', { ...champsDeLaSource() });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.via_ambush.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'KAKASHI HATAKE' });
         const k106Player = pendingEffect.sourcePlayer;
         const k106EnemySide = k106Player === 'player1' ? 'player2Characters' : 'player1Characters';
         const k106ValidTargets: string[] = [];
@@ -11888,7 +11903,7 @@ export class EffectEngine {
       
 
       case 'ZABUZA087_CONFIRM_MAIN': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.hidden.with.source', { sourceName: 'ZABUZA MOMOCHI' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.hidden.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'ZABUZA MOMOCHI' });
         
         const z087Player = pendingEffect.sourcePlayer;
         const z087Opponent = z087Player === 'player1' ? 'player2' : 'player1';
@@ -13338,6 +13353,8 @@ export class EffectEngine {
           player2Characters: m.player2Characters.map((c) => c.instanceId === hote088.character.instanceId ? { ...c, attachments: restants } : c),
         }));
         newState.activeMissions = missions088;
+        annoncerEquipementDefausse(newState, pendingEffect.sourcePlayer,
+          { id: 'SS-088-UC', name_fr: 'PARADIS DU BATIFOLAGE' }, autres.length);
         for (const att of autres) {
           newState[att.owner] = { ...newState[att.owner], discardPile: [...newState[att.owner].discardPile, att.card as never] };
           newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
@@ -14200,6 +14217,8 @@ export class EffectEngine {
             'game.log.effect.noTarget', { card: SNAKE_SWORD_NAME, id: SNAKE_SWORD_ID });
           break;
         }
+        annoncerDefaiteParEquipement(newState, pendingEffect.sourcePlayer,
+          { id: SNAKE_SWORD_ID, name_fr: SNAKE_SWORD_NAME }, ss101Cibles.length);
         for (const ss101Cible of ss101Cibles) {
           const ss101Top = ss101Cible.stack?.length > 0 ? ss101Cible.stack[ss101Cible.stack.length - 1] : ss101Cible.card;
           newState = EffectEngine.defeatCharacter(newState, ss101Cible.instanceId, pendingEffect.sourcePlayer);
@@ -14212,7 +14231,7 @@ export class EffectEngine {
       }
 
       case 'SS124_TAKE_CONTROL': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.controlled.with.source', { sourceName: INO_124_NAME });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.controlled.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: INO_124_NAME });
         newState = EffectEngine.takeControlOfEnemy(newState, pendingEffect, targetId, INO_124_NAME, INO_124_ID);
         break;
       }
@@ -14382,7 +14401,7 @@ export class EffectEngine {
       case 'ITACHI152_CHOOSE_MOVE':
       case 'ITACHI128_MOVE_FRIENDLY': {
         if (pendingEffect.targetSelectionType === 'TEMARI121_MOVE_FRIENDLY') {
-          emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.moved.with.source', { sourceName: 'TEMARI', friendly: true });
+          emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.moved.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'TEMARI', friendly: true });
         }
         
         const moveCharResult = EffectEngine.findCharByInstanceId(newState, targetId);
@@ -14502,7 +14521,7 @@ export class EffectEngine {
 
       
       case 'GIANT_SPIDER103_CHOOSE_HIDE_TARGET': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.hidden.with.source', { sourceName: 'KYODAIGUMO' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.hidden.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'KYODAIGUMO' });
         
         newState = EffectEngine.hideCharacterWithLog(newState, targetId, pendingEffect.sourcePlayer);
         
@@ -16530,7 +16549,7 @@ export class EffectEngine {
 
       
       case 'KISAME144_CONFIRM_MAIN': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'tokens.removed.with.source', { sourceName: 'KISAME HOSHIGAKI' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'tokens.removed.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'KISAME HOSHIGAKI' });
         const k144Player = pendingEffect.sourcePlayer;
         const k144Opponent: PlayerID = k144Player === 'player1' ? 'player2' : 'player1';
 
@@ -16607,8 +16626,9 @@ export class EffectEngine {
 
       
       case 'KAKASHI148_CONFIRM_AMBUSH': {
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.with.source', { sourceName: 'KAKASHI HATAKE' });
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.via_ambush.with.source', { sourceName: 'KAKASHI HATAKE' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'KAKASHI HATAKE' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.by.card', { ...champsDeLaSource() });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'effect.copied.via_ambush.with.source', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'KAKASHI HATAKE' });
         const k148aPlayer = pendingEffect.sourcePlayer;
         const k148aFriendlySide: 'player1Characters' | 'player2Characters' =
           k148aPlayer === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -17724,7 +17744,7 @@ export class EffectEngine {
         try { g049Data = JSON.parse(pendingEffect.effectDescription); } catch {}
         const gemmaId = g049Data.sacrificeInstanceId ?? targetId;
         const gemmaResult = EffectEngine.findCharByInstanceId(newState, gemmaId);
-        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.sacrificed.with', { sourceName: 'GEMMA SHIRANUI' });
+        emitEngineQuestEvent(newState, pendingEffect.sourcePlayer, 'character.sacrificed.with', { sourceCardId: pendingEffect.sourceCardId, sourceName: 'GEMMA SHIRANUI' });
         newState = EffectEngine.defeatCharacterDirect(newState, gemmaId);
         if (gemmaResult) {
           newState = triggerOnDefeatEffects(newState, gemmaResult.character, gemmaResult.player);
@@ -19967,7 +19987,7 @@ export class EffectEngine {
         wasFirstCard: resolvedPending.wasFirstCard,
       };
 
-      const result = envelopperResultat(handler(ctx), ctx, effectType as EffectType);
+      const result = resoudreEffetAvecQuete(handler, ctx, effectType as EffectType);
 
       if (result.requiresTargetSelection && result.validTargets && result.validTargets.length > 0) {
         
@@ -20184,6 +20204,10 @@ export class EffectEngine {
     emitEngineQuestEvent(state, charResult.player, 'character.moved', {
       targetName: movedChar.card.name_fr,
       friendly: true,
+    });
+    emitEngineQuestEvent(state, charResult.player, 'character.moved.by.card', {
+      ...champsDeLaSource(),
+      targetName: movedChar.card.name_fr,
     });
 
     
@@ -21598,6 +21622,10 @@ export class EffectEngine {
     emitEngineQuestEvent(state, sourcePlayer, 'character.hidden', {
       targetName,
       targetKeywords: charResult.character.card.keywords ?? [],
+    });
+    emitEngineQuestEvent(state, sourcePlayer, 'character.hidden.by.card', {
+      ...champsDeLaSource(),
+      targetName,
     });
     newState = {
       ...newState,

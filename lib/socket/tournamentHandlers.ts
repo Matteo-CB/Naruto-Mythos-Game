@@ -28,9 +28,10 @@ import {
   type DEBracket,
 } from '@/lib/tournament/doubleElimEngine';
 import { MAIN_BRACKET, THIRD_PLACE_BRACKET } from '@/lib/tournament/tournamentEngine';
-import { getCharacterById, getMissionById } from '@/lib/data/cardIndex';
+import { getCharacterById, getMissionById, getCardById } from '@/lib/data/cardIndex';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { computeDeckEvolvingPoints } from '@/lib/evolving/computePoints';
+import { resumerLeDeck } from '@/lib/quests/resumeDeDeck';
 import {
   grantWinnerPrize,
   grantParticipantReward,
@@ -42,6 +43,59 @@ import {
 } from '@/lib/tournament/prizes';
 
 const matchReadyPlayers = new Map<string, Set<string>>();
+
+async function cartesDuDeckDuVainqueur(tournamentId: string, winnerUserId: string): Promise<string[]> {
+  try {
+    const participant = await prisma.tournamentParticipant.findFirst({
+      where: { tournamentId, userId: winnerUserId },
+      select: { deckId: true, sealedDeck: true },
+    });
+    if (!participant) return [];
+    if (participant.deckId) {
+      const deck = await prisma.deck.findUnique({ where: { id: participant.deckId }, select: { cardIds: true } });
+      return deck?.cardIds ?? [];
+    }
+    if (participant.sealedDeck && typeof participant.sealedDeck === 'object') {
+      const sealed = participant.sealedDeck as { cardIds?: unknown };
+      if (Array.isArray(sealed.cardIds)) return sealed.cardIds.filter((id): id is string => typeof id === 'string');
+    }
+    return [];
+  } catch {
+    return [];
+  }
+}
+
+// Ce que les quetes de tournoi demandent du deck du vainqueur: son set, ses numeros, la
+// presence d un equipement, et s il a traverse le tournoi sans defaite.
+async function faitsDuTournoi(tournamentId: string, winnerUserId: string): Promise<Record<string, unknown>> {
+  const cardIds = await cartesDuDeckDuVainqueur(tournamentId, winnerUserId);
+  const cartes = cardIds.map((id) => getCardById(id)).filter((c): c is NonNullable<typeof c> => !!c);
+  const resume = resumerLeDeck(cartes as never);
+  let tournamentUndefeated = false;
+  try {
+    const perdues = await prisma.tournamentMatch.count({
+      where: {
+        tournamentId,
+        status: { in: ['completed', 'forfeit'] },
+        OR: [
+          { player1Id: winnerUserId, NOT: { winnerId: winnerUserId } },
+          { player2Id: winnerUserId, NOT: { winnerId: winnerUserId } },
+        ],
+      },
+    });
+    tournamentUndefeated = perdues === 0;
+  } catch {
+    tournamentUndefeated = false;
+  }
+  return {
+    deckSet: resume.deckSet,
+    deckSets: resume.deckSets,
+    deckNumbers: resume.deckNumbers,
+    deckHasAttachment: resume.deckHasAttachment,
+    monoGroup: resume.monoGroup,
+    tournamentUndefeated,
+  };
+}
 
 async function isWinnerDeckMonoVillage(tournamentId: string, winnerUserId: string): Promise<boolean> {
   try {
@@ -1787,7 +1841,7 @@ export async function handleSwissMatchEnd(
       awardNwlPrizeIfNeeded(tournamentId).catch(() => {});
 
       try {
-        emitQuestEvent('tournament.won.swiss', winner.userId);
+        emitQuestEvent('tournament.won.swiss', winner.userId, await faitsDuTournoi(tournamentId, winner.userId));
         const isMono = await isWinnerDeckMonoVillage(tournamentId, winner.userId);
         if (isMono) emitQuestEvent('tournament.won.mono_village', winner.userId);
       } catch (err) {
@@ -2044,10 +2098,11 @@ export async function advanceMatchWinner(
         select: { format: true, gameMode: true },
       });
       const format: string = meta?.format ?? 'single';
-      if (format === 'swiss') emitQuestEvent('tournament.won.swiss', winnerId);
-      else emitQuestEvent('tournament.won.single', winnerId);
+      const faits = await faitsDuTournoi(tournamentId, winnerId);
+      if (format === 'swiss') emitQuestEvent('tournament.won.swiss', winnerId, faits);
+      else emitQuestEvent('tournament.won.single', winnerId, faits);
       const isMono = await isWinnerDeckMonoVillage(tournamentId, winnerId);
-      if (isMono) emitQuestEvent('tournament.won.mono_village', winnerId);
+      if (isMono) emitQuestEvent('tournament.won.mono_village', winnerId, { ...faits, set: faits.deckSet });
 
       const acquired = await acquirePrizeAwardLock(tournamentId);
       if (acquired) {

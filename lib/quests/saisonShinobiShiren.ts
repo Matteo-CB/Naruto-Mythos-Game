@@ -1,28 +1,15 @@
-import type { QuestLevel } from '@/lib/quests/questData';
+import type { Quest, QuestSeason } from './types';
 
-export const SAISON_ARCHIVEE = 'KS';
-export const SAISON_COURANTE = 'SS';
+export const SAISON_ARCHIVEE: QuestSeason = 'KS';
+export const SAISON_COURANTE: QuestSeason = 'SS';
 
-// Les quetes de la saison Shinobi Shiren sont annoncees mais pas encore suivies:
-// aucune ne porte de declencheur, la page les affiche sans progression ni reclamation.
-// Source: doc/QUETES_SET_2.txt, 183 quetes, 46/46/46/45 par niveau.
-export interface QueteAnnoncee {
-  id: string;
-  level: QuestLevel;
-  target: number;
-  scope: 'cumulative' | 'match' | 'session';
-  text_fr: string;
-  text_en: string;
-  text_es: string;
-  text_pt: string;
-  text_it: string;
-  text_pl: string;
-  text_ja: string;
-}
-
-export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
+// Genere depuis doc/QUETES_SET_2.txt: 183 quetes, 46/46/46/45 par niveau.
+// Le document reste la reference du texte, des identifiants, des cibles et des portees.
+export const QUETES_SHINOBI_SHIREN: Quest[] = [
   {
     id: 'ss-duel-078', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 78 },
     text_fr: 'déclencher le DUEL de GAARA 078 : le sable contre les os',
     text_en: 'trigger the DUEL of GAARA 078: sand against bone',
     text_es: 'activa el DUEL de GAARA 078: la arena contra los huesos',
@@ -33,6 +20,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-111', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 111 },
     text_fr: 'déclencher le DUEL de HINATA HYÛGA 111 : la revanche des Hyûga',
     text_en: 'trigger the DUEL of HINATA HYUGA 111: the Hyuga rematch',
     text_es: 'activa el DUEL de HINATA HYUGA 111: la revancha de los Hyuga',
@@ -43,6 +32,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-112', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 112 },
     text_fr: 'déclencher le DUEL de NEJI HYÛGA 112 : le Poing Souple contre sa cousine',
     text_en: 'trigger the DUEL of NEJI HYUGA 112: Gentle Fist against his cousin',
     text_es: 'activa el DUEL de NEJI HYUGA 112: el Puño Suave contra su prima',
@@ -53,6 +44,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-115', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 115 },
     text_fr: 'déclencher le DUEL de ROCK LEE 115 : le fauve de Konoha contre le Sable',
     text_en: 'trigger the DUEL of ROCK LEE 115: Konoha\'s beast against the Sand',
     text_es: 'activa el DUEL de ROCK LEE 115: la bestia de Konoha contra la Arena',
@@ -63,6 +56,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-117', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 117 },
     text_fr: 'déclencher le DUEL de KANKURÔ 117 : marionnettes contre insectes',
     text_en: 'trigger the DUEL of KANKURO 117: puppets against insects',
     text_es: 'activa el DUEL de KANKURO 117: marionetas contra insectos',
@@ -73,6 +68,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-118', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 118 },
     text_fr: 'déclencher le DUEL de SHIKAMARU NARA 118 : l\'ombre contre le vent',
     text_en: 'trigger the DUEL of SHIKAMARU NARA 118: shadow against wind',
     text_es: 'activa el DUEL de SHIKAMARU NARA 118: la sombra contra el viento',
@@ -83,6 +80,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-119', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 119 },
     text_fr: 'déclencher le DUEL de TEMARI 119 : le vent contre l\'ombre',
     text_en: 'trigger the DUEL of TEMARI 119: wind against shadow',
     text_es: 'activa el DUEL de TEMARI 119: el viento contra la sombra',
@@ -93,6 +92,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-120', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 120 },
     text_fr: 'déclencher le DUEL de KIBA INUZUKA 120 : crocs contre clones',
     text_en: 'trigger the DUEL of KIBA INUZUKA 120: fangs against clones',
     text_es: 'activa el DUEL de KIBA INUZUKA 120: colmillos contra clones',
@@ -103,6 +104,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-121', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 121 },
     text_fr: 'déclencher le DUEL de NARUTO UZUMAKI 121 : clones contre crocs',
     text_en: 'trigger the DUEL of NARUTO UZUMAKI 121: clones against fangs',
     text_es: 'activa el DUEL de NARUTO UZUMAKI 121: clones contra colmillos',
@@ -113,6 +116,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-123', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 123 },
     text_fr: 'déclencher le DUEL de SAKURA HARUNO 123 : l\'amitié brisée des kunoichi',
     text_en: 'trigger the DUEL of SAKURA HARUNO 123: the broken kunoichi friendship',
     text_es: 'activa el DUEL de SAKURA HARUNO 123: la amistad rota de las kunoichi',
@@ -123,6 +128,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-124', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 124 },
     text_fr: 'déclencher le DUEL de INO YAMANAKA 124 : l\'esprit contre le front',
     text_en: 'trigger the DUEL of INO YAMANAKA 124: mind against forehead',
     text_es: 'activa el DUEL de INO YAMANAKA 124: la mente contra la frente',
@@ -133,6 +140,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-125', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 125 },
     text_fr: 'déclencher le DUEL de DOSU KINUTA 125 : le son contre la chair',
     text_en: 'trigger the DUEL of DOSU KINUTA 125: sound against flesh',
     text_es: 'activa el DUEL de DOSU KINUTA 125: el sonido contra la carne',
@@ -143,6 +152,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-126', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 126 },
     text_fr: 'déclencher le DUEL de SASUKE UCHIWA 126 : la marque maudite',
     text_en: 'trigger the DUEL of SASUKE UCHIHA 126: the cursed mark',
     text_es: 'activa el DUEL de SASUKE UCHIHA 126: la marca maldita',
@@ -153,6 +164,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-128', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 128 },
     text_fr: 'déclencher le DUEL de CHÔJI AKIMICHI 128 : le poids de la volonté',
     text_en: 'trigger the DUEL of CHOJI AKIMICHI 128: the weight of will',
     text_es: 'activa el DUEL de CHOJI AKIMICHI 128: el peso de la voluntad',
@@ -163,6 +176,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-133', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 133 },
     text_fr: 'déclencher le DUEL de HIRUZEN SARUTOBI 133 : le maître contre son élève',
     text_en: 'trigger the DUEL of HIRUZEN SARUTOBI 133: the master against his student',
     text_es: 'activa el DUEL de HIRUZEN SARUTOBI 133: el maestro contra su alumno',
@@ -173,6 +188,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-134', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 134 },
     text_fr: 'déclencher le DUEL de KURENAI YUHI 134 : le genjutsu contre l\'Uchiwa',
     text_en: 'trigger the DUEL of KURENAI YUHI 134: genjutsu against the Uchiha',
     text_es: 'activa el DUEL de KURENAI YUHI 134: el genjutsu contra el Uchiha',
@@ -183,6 +200,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-137', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 137 },
     text_fr: 'déclencher le DUEL de ITACHI UCHIWA 137 : Tsukuyomi sur Kurenai',
     text_en: 'trigger the DUEL of ITACHI UCHIHA 137: Tsukuyomi on Kurenai',
     text_es: 'activa el DUEL de ITACHI UCHIHA 137: Tsukuyomi sobre Kurenai',
@@ -193,6 +212,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-147', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 147 },
     text_fr: 'déclencher le DUEL de NARUTO UZUMAKI 147 : la Vallée de la Fin',
     text_en: 'trigger the DUEL of NARUTO UZUMAKI 147: the Valley of the End',
     text_es: 'activa el DUEL de NARUTO UZUMAKI 147: el Valle del Fin',
@@ -203,6 +224,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-148', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 148 },
     text_fr: 'déclencher le DUEL de SASUKE UCHIWA 148 : la Vallée de la Fin, l\'autre camp',
     text_en: 'trigger the DUEL of SASUKE UCHIHA 148: the Valley of the End, the other side',
     text_es: 'activa el DUEL de SASUKE UCHIHA 148: el Valle del Fin, el otro bando',
@@ -213,6 +236,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-149', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 149 },
     text_fr: 'déclencher le DUEL de KAKASHI HATAKE 149 : le ninja copieur contre le Démon',
     text_en: 'trigger the DUEL of KAKASHI HATAKE 149: the copy ninja against the Demon',
     text_es: 'activa el DUEL de KAKASHI HATAKE 149: el ninja copia contra el Demonio',
@@ -223,6 +248,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-150', level: 1, target: 1, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 150 },
     text_fr: 'déclencher le DUEL de ZABUZA MOMOCHI 150 : le Démon contre le ninja copieur',
     text_en: 'trigger the DUEL of ZABUZA MOMOCHI 150: the Demon against the copy ninja',
     text_es: 'activa el DUEL de ZABUZA MOMOCHI 150: el Demonio contra el ninja copia',
@@ -233,6 +260,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-first-strike-008', level: 1, target: 1, scope: 'cumulative',
+    hook: 'first_strike.used.with.source',
+    predicate: { set: 'SS', sourceNumber: 8 },
     text_fr: 'ouvrir une manche avec la FIRST STRIKE de KAKASHI HATAKE 008',
     text_en: 'open a round with the FIRST STRIKE of KAKASHI HATAKE 008',
     text_es: 'abre una ronda con el FIRST STRIKE de KAKASHI HATAKE 008',
@@ -243,6 +272,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-first-strike-014', level: 1, target: 1, scope: 'cumulative',
+    hook: 'first_strike.used.with.source',
+    predicate: { set: 'SS', sourceNumber: 14 },
     text_fr: 'ouvrir une manche avec la FIRST STRIKE de KIBA INUZUKA 014',
     text_en: 'open a round with the FIRST STRIKE of KIBA INUZUKA 014',
     text_es: 'abre una ronda con el FIRST STRIKE de KIBA INUZUKA 014',
@@ -253,6 +284,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-first-strike-021', level: 1, target: 1, scope: 'cumulative',
+    hook: 'first_strike.used.with.source',
+    predicate: { set: 'SS', sourceNumber: 21 },
     text_fr: 'ouvrir une manche avec la FIRST STRIKE de TENTEN 021',
     text_en: 'open a round with the FIRST STRIKE of TENTEN 021',
     text_es: 'abre una ronda con el FIRST STRIKE de TENTEN 021',
@@ -263,6 +296,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-first-strike-030', level: 1, target: 1, scope: 'cumulative',
+    hook: 'first_strike.used.with.source',
+    predicate: { set: 'SS', sourceNumber: 30 },
     text_fr: 'ouvrir une manche avec la FIRST STRIKE de KABUTO YAKUSHI 030',
     text_en: 'open a round with the FIRST STRIKE of KABUTO YAKUSHI 030',
     text_es: 'abre una ronda con el FIRST STRIKE de KABUTO YAKUSHI 030',
@@ -273,6 +308,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-first-strike-032', level: 1, target: 1, scope: 'cumulative',
+    hook: 'first_strike.used.with.source',
+    predicate: { set: 'SS', sourceNumber: 32 },
     text_fr: 'ouvrir une manche avec la FIRST STRIKE de JIRÔBÔ 032',
     text_en: 'open a round with the FIRST STRIKE of JIROBO 032',
     text_es: 'abre una ronda con el FIRST STRIKE de JIROBO 032',
@@ -283,6 +320,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-first-strike-034', level: 1, target: 1, scope: 'cumulative',
+    hook: 'first_strike.used.with.source',
+    predicate: { set: 'SS', sourceNumber: 34 },
     text_fr: 'ouvrir une manche avec la FIRST STRIKE de KIDÔMARU 034',
     text_en: 'open a round with the FIRST STRIKE of KIDOMARU 034',
     text_es: 'abre una ronda con el FIRST STRIKE de KIDOMARU 034',
@@ -293,6 +332,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-first-strike-036', level: 1, target: 1, scope: 'cumulative',
+    hook: 'first_strike.used.with.source',
+    predicate: { set: 'SS', sourceNumber: 36 },
     text_fr: 'ouvrir une manche avec la FIRST STRIKE de SAKON 036',
     text_en: 'open a round with the FIRST STRIKE of SAKON 036',
     text_es: 'abre una ronda con el FIRST STRIKE de SAKON 036',
@@ -303,6 +344,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-first-strike-039', level: 1, target: 1, scope: 'cumulative',
+    hook: 'first_strike.used.with.source',
+    predicate: { set: 'SS', sourceNumber: 39 },
     text_fr: 'ouvrir une manche avec la FIRST STRIKE de TAYUYA 039',
     text_en: 'open a round with the FIRST STRIKE of TAYUYA 039',
     text_es: 'abre una ronda con el FIRST STRIKE de TAYUYA 039',
@@ -313,6 +356,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-first-strike-049', level: 1, target: 1, scope: 'cumulative',
+    hook: 'first_strike.used.with.source',
+    predicate: { set: 'SS', sourceNumber: 49 },
     text_fr: 'ouvrir une manche avec la FIRST STRIKE de TEMARI 049',
     text_en: 'open a round with the FIRST STRIKE of TEMARI 049',
     text_es: 'abre una ronda con el FIRST STRIKE de TEMARI 049',
@@ -323,6 +368,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-first-strike-053', level: 1, target: 1, scope: 'cumulative',
+    hook: 'first_strike.used.with.source',
+    predicate: { set: 'SS', sourceNumber: 53 },
     text_fr: 'ouvrir une manche avec la FIRST STRIKE de ITACHI UCHIWA 053',
     text_en: 'open a round with the FIRST STRIKE of ITACHI UCHIHA 053',
     text_es: 'abre una ronda con el FIRST STRIKE de ITACHI UCHIHA 053',
@@ -333,6 +380,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-first-strike-130', level: 1, target: 1, scope: 'cumulative',
+    hook: 'first_strike.used.with.source',
+    predicate: { set: 'SS', sourceNumber: 130 },
     text_fr: 'ouvrir une manche avec la FIRST STRIKE de OROCHIMARU 130',
     text_en: 'open a round with the FIRST STRIKE of OROCHIMARU 130',
     text_es: 'abre una ronda con el FIRST STRIKE de OROCHIMARU 130',
@@ -343,6 +392,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-080', level: 1, target: 1, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', sourceNumber: 80 },
     text_fr: 'équiper un allié avec KUNAI 080',
     text_en: 'equip an ally with KUNAI KNIFE 080',
     text_es: 'equipa a un aliado con KUNAI 080',
@@ -353,6 +404,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-085', level: 1, target: 1, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', sourceNumber: 85 },
     text_fr: 'équiper un allié avec ÉVENTAIL GÉANT 085',
     text_en: 'equip an ally with GIANT FAN 085',
     text_es: 'equipa a un aliado con ABANICO GIGANTE 085',
@@ -363,6 +416,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-090', level: 1, target: 1, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', sourceNumber: 90 },
     text_fr: 'équiper un allié avec SAMEHADA 090',
     text_en: 'equip an ally with SHARK SKIN 090',
     text_es: 'equipa a un aliado con SAMEHADA 090',
@@ -373,6 +428,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-099', level: 1, target: 1, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', sourceNumber: 99 },
     text_fr: 'équiper un allié avec SABRE DU DIEU DE LA FOUDRE 099',
     text_en: 'equip an ally with BLADE OF THE THUNDER GOD 099',
     text_es: 'equipa a un aliado con ESPADA DEL DIOS DEL TRUENO 099',
@@ -383,6 +440,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-101', level: 1, target: 1, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', sourceNumber: 101 },
     text_fr: 'équiper un allié avec ÉPÉE SERPENT 101',
     text_en: 'equip an ally with SNAKE SWORD 101',
     text_es: 'equipa a un aliado con ESPADA SERPIENTE 101',
@@ -393,6 +452,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equipe-team-guy-3', level: 1, target: 3, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Team Guy', set: 'SS' },
     text_fr: 'aligner 3 personnages Équipe Gaï',
     text_en: 'field 3 Team Guy characters',
     text_es: 'despliega 3 personajes Equipo Guy',
@@ -403,6 +464,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equipe-team-8-3', level: 1, target: 3, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Team 8', set: 'SS' },
     text_fr: 'aligner 3 personnages Équipe 8',
     text_en: 'field 3 Team 8 characters',
     text_es: 'despliega 3 personajes Equipo 8',
@@ -413,6 +476,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equipe-team-10-3', level: 1, target: 3, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Team 10', set: 'SS' },
     text_fr: 'aligner 3 personnages Équipe 10',
     text_en: 'field 3 Team 10 characters',
     text_es: 'despliega 3 personajes Equipo 10',
@@ -423,6 +488,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equipe-team-baki-3', level: 1, target: 3, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Team Baki', set: 'SS' },
     text_fr: 'aligner 3 personnages Équipe Baki',
     text_en: 'field 3 Team Baki characters',
     text_es: 'despliega 3 personajes Equipo Baki',
@@ -433,6 +500,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equipe-team-dosu-3', level: 1, target: 3, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Team Dosu', set: 'SS' },
     text_fr: 'aligner 3 personnages Équipe Dosu',
     text_en: 'field 3 Team Dosu characters',
     text_es: 'despliega 3 personajes Equipo Dosu',
@@ -443,6 +512,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equipe-sound-four-3', level: 1, target: 3, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Sound Four', set: 'SS' },
     text_fr: 'réunir 3 membres du Quatuor du Son',
     text_en: 'gather 3 members of the Sound Four',
     text_es: 'reúne a 3 miembros de los Cuatro del Sonido',
@@ -453,6 +524,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mission-priorite-1', level: 1, target: 1, scope: 'cumulative',
+    hook: 'mission.won',
+    predicate: { missionNumber: 4, set: 'SS' },
     text_fr: 'remporter la mission Mission prioritaire et encaisser son double score',
     text_en: 'win the High Priority Mission and cash in its double score',
     text_es: 'gana la Misión prioritaria y cobra su puntuación doble',
@@ -463,6 +536,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mission-sabotage-1', level: 1, target: 1, scope: 'cumulative',
+    hook: 'mission.won',
+    predicate: { missionNumber: 10, set: 'SS' },
     text_fr: 'remporter la mission Sabotage',
     text_en: 'win the Sabotage mission',
     text_es: 'gana la misión Sabotaje',
@@ -473,6 +548,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mission-colline-1', level: 1, target: 1, scope: 'cumulative',
+    hook: 'mission.won',
+    predicate: { missionNumber: 7, set: 'SS' },
     text_fr: 'remporter la mission Roi de la colline',
     text_en: 'win the King of the Hill mission',
     text_es: 'gana la misión Rey de la colina',
@@ -483,6 +560,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-bandeau-091', level: 2, target: 1, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', sourceNumber: 91 },
     text_fr: 'poser BANDEAU DU VILLAGE DE LA FEUILLE 091 sur un personnage',
     text_en: 'put LEAF VILLAGE HEADBAND 091 on a character',
     text_es: 'coloca BANDA DE LA ALDEA DE LA HOJA 091 sobre un personaje',
@@ -493,6 +572,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-bandeau-092', level: 2, target: 1, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', sourceNumber: 92 },
     text_fr: 'poser BANDEAU DU VILLAGE DU SABLE 092 sur un personnage',
     text_en: 'put SAND VILLAGE HEADBAND 092 on a character',
     text_es: 'coloca BANDA DE LA ALDEA DE LA ARENA 092 sobre un personaje',
@@ -503,6 +584,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-bandeau-093', level: 2, target: 1, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', sourceNumber: 93 },
     text_fr: 'poser BANDEAU DU VILLAGE DU SON 093 sur un personnage',
     text_en: 'put SOUND VILLAGE HEADBAND 093 on a character',
     text_es: 'coloca BANDA DE LA ALDEA DEL SONIDO 093 sobre un personaje',
@@ -513,6 +596,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-bandeau-094', level: 2, target: 1, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', sourceNumber: 94 },
     text_fr: 'poser BANDEAU DE NINJA DÉSERTEUR 094 sur un personnage',
     text_en: 'put ROGUE NINJA HEADBAND 094 on a character',
     text_es: 'coloca BANDA DE NINJA RENEGADO 094 sobre un personaje',
@@ -523,6 +608,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-soin-081', level: 2, target: 1, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', sourceNumber: 81 },
     text_fr: 'utiliser RÂMEN 081 sur un de tes ninjas',
     text_en: 'use RAMEN 081 on one of your ninja',
     text_es: 'usa RAMEN 081 en uno de tus ninja',
@@ -533,6 +620,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-soin-087', level: 2, target: 1, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', sourceNumber: 87 },
     text_fr: 'utiliser POIDS 087 sur un de tes ninjas',
     text_en: 'use WEIGHTS 087 on one of your ninja',
     text_es: 'usa PESAS 087 en uno de tus ninja',
@@ -543,6 +632,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-parchemins-paire', level: 2, target: 1, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { pairNumbers: [96, 97], set: 'SS' },
     text_fr: 'réunir le Parchemin du Ciel 096 et le Parchemin de la Terre 097 sur la même mission',
     text_en: 'gather the Heaven Scroll 096 and the Earth Scroll 097 on the same mission',
     text_es: 'reúne el Pergamino del Cielo 096 y el Pergamino de la Tierra 097 en la misma misión',
@@ -553,6 +644,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-111-x3', level: 2, target: 3, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 111 },
     text_fr: 'déclencher 3 fois le DUEL de HINATA HYÛGA 111',
     text_en: 'trigger the DUEL of HINATA HYUGA 111 three times',
     text_es: 'activa el DUEL de HINATA HYUGA 111 3 veces',
@@ -563,6 +656,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-112-x3', level: 2, target: 3, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 112 },
     text_fr: 'déclencher 3 fois le DUEL de NEJI HYÛGA 112',
     text_en: 'trigger the DUEL of NEJI HYUGA 112 three times',
     text_es: 'activa el DUEL de NEJI HYUGA 112 3 veces',
@@ -573,6 +668,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-115-x3', level: 2, target: 3, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 115 },
     text_fr: 'déclencher 3 fois le DUEL de ROCK LEE 115',
     text_en: 'trigger the DUEL of ROCK LEE 115 three times',
     text_es: 'activa el DUEL de ROCK LEE 115 3 veces',
@@ -583,6 +680,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-123-x3', level: 2, target: 3, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 123 },
     text_fr: 'déclencher 3 fois le DUEL de SAKURA HARUNO 123',
     text_en: 'trigger the DUEL of SAKURA HARUNO 123 three times',
     text_es: 'activa el DUEL de SAKURA HARUNO 123 3 veces',
@@ -593,6 +692,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-124-x3', level: 2, target: 3, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 124 },
     text_fr: 'déclencher 3 fois le DUEL de INO YAMANAKA 124',
     text_en: 'trigger the DUEL of INO YAMANAKA 124 three times',
     text_es: 'activa el DUEL de INO YAMANAKA 124 3 veces',
@@ -603,6 +704,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-126-x3', level: 2, target: 3, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 126 },
     text_fr: 'déclencher 3 fois le DUEL de SASUKE UCHIWA 126',
     text_en: 'trigger the DUEL of SASUKE UCHIHA 126 three times',
     text_es: 'activa el DUEL de SASUKE UCHIHA 126 3 veces',
@@ -613,6 +716,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-147-x3', level: 2, target: 3, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 147 },
     text_fr: 'déclencher 3 fois le DUEL de NARUTO UZUMAKI 147',
     text_en: 'trigger the DUEL of NARUTO UZUMAKI 147 three times',
     text_es: 'activa el DUEL de NARUTO UZUMAKI 147 3 veces',
@@ -623,6 +728,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-148-x3', level: 2, target: 3, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 148 },
     text_fr: 'déclencher 3 fois le DUEL de SASUKE UCHIWA 148',
     text_en: 'trigger the DUEL of SASUKE UCHIHA 148 three times',
     text_es: 'activa el DUEL de SASUKE UCHIHA 148 3 veces',
@@ -633,6 +740,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-149-x3', level: 2, target: 3, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 149 },
     text_fr: 'déclencher 3 fois le DUEL de KAKASHI HATAKE 149',
     text_en: 'trigger the DUEL of KAKASHI HATAKE 149 three times',
     text_es: 'activa el DUEL de KAKASHI HATAKE 149 3 veces',
@@ -643,6 +752,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-150-x3', level: 2, target: 3, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 150 },
     text_fr: 'déclencher 3 fois le DUEL de ZABUZA MOMOCHI 150',
     text_en: 'trigger the DUEL of ZABUZA MOMOCHI 150 three times',
     text_es: 'activa el DUEL de ZABUZA MOMOCHI 150 3 veces',
@@ -652,7 +763,9 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_ja: '桃地再不斬 150 の DUEL を3回発動する',
   },
   {
-    id: 'ss-duel-varies-5', level: 2, target: 5, scope: 'cumulative',
+    id: 'ss-duel-varies-5', level: 2, target: 5, scope: 'match',
+    hook: 'duel.triggered.with.source',
+    predicate: { distinct: true, set: 'SS' },
     text_fr: 'déclencher 5 DUELS différents du set 2 dans la même partie',
     text_en: 'trigger 5 different set 2 DUELS in the same match',
     text_es: 'activa 5 DUEL distintos del set 2 en la misma partida',
@@ -662,7 +775,9 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_ja: '同じ対戦でセット2の異なる DUEL を5つ発動する',
   },
   {
-    id: 'ss-first-strike-4', level: 2, target: 4, scope: 'cumulative',
+    id: 'ss-first-strike-4', level: 2, target: 4, scope: 'match',
+    hook: 'first_strike.used.with.source',
+    predicate: { everyRound: true, set: 'SS' },
     text_fr: 'utiliser une FIRST STRIKE lors des 4 manches de la même partie',
     text_en: 'use a FIRST STRIKE in all 4 rounds of the same match',
     text_es: 'usa un FIRST STRIKE en las 4 rondas de la misma partida',
@@ -673,6 +788,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-serpent-defaites', level: 2, target: 6, scope: 'cumulative',
+    hook: 'character.defeated.by.attachment',
+    predicate: { set: 'SS', sourceNumber: 101 },
     text_fr: 'vaincre 6 personnages avec l\'Épée serpent 101',
     text_en: 'defeat 6 characters with the Snake Sword 101',
     text_es: 'derrota a 6 personajes con la Espada serpiente 101',
@@ -683,6 +800,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-samehada-jetons', level: 2, target: 9, scope: 'cumulative',
+    hook: 'tokens.removed.by.card',
+    predicate: { set: 'SS', sourceNumber: 90 },
     text_fr: 'retirer 9 jetons de puissance avec Samehada 090',
     text_en: 'remove 9 Power tokens with Samehada 090',
     text_es: 'retira 9 fichas de Poder con Samehada 090',
@@ -693,6 +812,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-aiguilles-jetons', level: 2, target: 6, scope: 'cumulative',
+    hook: 'tokens.removed.by.card',
+    predicate: { set: 'SS', sourceNumber: 84 },
     text_fr: 'vider les jetons de 6 porteurs avec les Aiguilles empoisonnées 084',
     text_en: 'empty the tokens of 6 bearers with the Poison Needles 084',
     text_es: 'vacía las fichas de 6 portadores con las Agujas envenenadas 084',
@@ -703,6 +824,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-eventail-deplacements', level: 2, target: 5, scope: 'cumulative',
+    hook: 'character.moved.by.card',
+    predicate: { set: 'SS', sourceNumber: 85 },
     text_fr: 'chasser 5 ennemis avec l\'Éventail géant 085',
     text_en: 'blow 5 enemies away with the Giant Fan 085',
     text_es: 'expulsa a 5 enemigos con el Abanico gigante 085',
@@ -713,6 +836,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-bombe-aveuglante', level: 2, target: 4, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', sourceNumber: 83 },
     text_fr: 'museler 4 ennemis avec la Bombe aveuglante 083',
     text_en: 'silence 4 enemies with the Flash Bomb 083',
     text_es: 'silencia a 4 enemigos con la Bomba de destello 083',
@@ -723,6 +848,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-batifolage', level: 2, target: 3, scope: 'cumulative',
+    hook: 'attachment.discarded.with.source',
+    predicate: { set: 'SS', sourceNumber: 88 },
     text_fr: 'faire sauter 3 équipements avec Le Paradis du batifolage 088',
     text_en: 'blow away 3 attachments with Make-Out Paradise 088',
     text_es: 'hace saltar 3 equipos con El paraíso del cortejo 088',
@@ -733,6 +860,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mot-jutsu-15', level: 2, target: 15, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Jutsu', set: 'SS' },
     text_fr: 'jouer 15 personnages Jutsu du set 2',
     text_en: 'play 15 Jutsu characters from set 2',
     text_es: 'juega 15 personajes Jutsu del set 2',
@@ -743,6 +872,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mot-rogue-ninja-10', level: 2, target: 10, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Rogue Ninja', set: 'SS' },
     text_fr: 'jouer 10 personnages Rogue Ninja du set 2',
     text_en: 'play 10 Rogue Ninja characters from set 2',
     text_es: 'juega 10 personajes Ninja Renegado del set 2',
@@ -753,6 +884,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mot-sannin-8', level: 2, target: 8, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Sannin', set: 'SS' },
     text_fr: 'jouer 8 personnages Sannin du set 2',
     text_en: 'play 8 Sannin characters from set 2',
     text_es: 'juega 8 personajes Sannin del set 2',
@@ -763,6 +896,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mot-special-jonin-8', level: 2, target: 8, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Special Jonin', set: 'SS' },
     text_fr: 'jouer 8 personnages Special Jonin du set 2',
     text_en: 'play 8 Special Jonin characters from set 2',
     text_es: 'juega 8 personajes Jonin Especial del set 2',
@@ -773,6 +908,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-groupe-sand-village-12', level: 2, target: 12, scope: 'cumulative',
+    hook: 'character.played.group',
+    predicate: { group: 'Sand Village', set: 'SS' },
     text_fr: 'jouer 12 ninjas du Village du Sable',
     text_en: 'play 12 Sand Village ninja',
     text_es: 'juega 12 ninja de la Aldea de la Arena',
@@ -783,6 +920,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-groupe-sound-village-12', level: 2, target: 12, scope: 'cumulative',
+    hook: 'character.played.group',
+    predicate: { group: 'Sound Village', set: 'SS' },
     text_fr: 'jouer 12 ninjas du Village du Son',
     text_en: 'play 12 Sound Village ninja',
     text_es: 'juega 12 ninja de la Aldea del Sonido',
@@ -793,6 +932,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-groupe-akatsuki-6', level: 2, target: 6, scope: 'cumulative',
+    hook: 'character.played.group',
+    predicate: { group: 'Akatsuki', set: 'SS' },
     text_fr: 'jouer 6 membres de l\'Akatsuki',
     text_en: 'play 6 Akatsuki members',
     text_es: 'juega 6 miembros de Akatsuki',
@@ -803,6 +944,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-groupe-leaf-village-20', level: 2, target: 20, scope: 'cumulative',
+    hook: 'character.played.group',
+    predicate: { group: 'Leaf Village', set: 'SS' },
     text_fr: 'jouer 20 ninjas du Village de la Feuille',
     text_en: 'play 20 Leaf Village ninja',
     text_es: 'juega 20 ninja de la Aldea de la Hoja',
@@ -813,6 +956,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mission-foret-mort', level: 2, target: 5, scope: 'cumulative',
+    hook: 'mission.won',
+    predicate: { attachmentNumber: 107, set: 'SS' },
     text_fr: 'remporter 5 fois une mission portant La Forêt de la mort 107',
     text_en: 'win 5 missions carrying the Forest of Death 107',
     text_es: 'gana 5 misiones que lleven El bosque de la muerte 107',
@@ -823,6 +968,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mission-stade', level: 2, target: 3, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { attachmentNumber: 108, set: 'SS' },
     text_fr: 'déclencher 3 DUELS grâce au Stade d\'examen 108',
     text_en: 'trigger 3 DUELS thanks to the Exam Stadium 108',
     text_es: 'activa 3 DUEL gracias al Estadio del examen 108',
@@ -833,6 +980,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mission-rang', level: 2, target: 4, scope: 'cumulative',
+    hook: 'mission.won',
+    predicate: { attachmentNumber: 103, set: 'SS' },
     text_fr: 'remporter 4 missions dont le rang a été relevé par Changement de rang 103',
     text_en: 'win 4 missions whose rank was raised by Change of Rank 103',
     text_es: 'gana 4 misiones cuyo rango haya subido Cambio de rango 103',
@@ -843,6 +992,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mission-falaise', level: 2, target: 4, scope: 'cumulative',
+    hook: 'mission.won',
+    predicate: { attachmentNumber: 106, set: 'SS' },
     text_fr: 'remporter 4 missions sous La Falaise des Hokage 106',
     text_en: 'win 4 missions under the Hokage Rocks 106',
     text_es: 'gana 4 misiones bajo el Monumento Hokage 106',
@@ -853,6 +1004,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-gaara-defaites', level: 2, target: 8, scope: 'cumulative',
+    hook: 'character.defeated.by.card',
+    predicate: { set: 'SS', sourceName: 'GAARA' },
     text_fr: 'écraser 8 ennemis avec un Gaara du set 2',
     text_en: 'crush 8 enemies with a set 2 Gaara',
     text_es: 'aplasta a 8 enemigos con un Gaara del set 2',
@@ -863,6 +1016,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-itachi-defaites', level: 2, target: 6, scope: 'cumulative',
+    hook: 'character.defeated.by.card',
+    predicate: { set: 'SS', sourceName: 'ITACHI UCHIWA' },
     text_fr: 'faire tomber 6 ennemis avec un Itachi du set 2',
     text_en: 'bring down 6 enemies with a set 2 Itachi',
     text_es: 'abate a 6 enemigos con un Itachi del set 2',
@@ -873,6 +1028,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-neji-cachettes', level: 2, target: 6, scope: 'cumulative',
+    hook: 'character.hidden.by.card',
+    predicate: { set: 'SS', sourceName: 'NEJI HYÛGA' },
     text_fr: 'cacher 6 ennemis avec un Neji du set 2',
     text_en: 'hide 6 enemies with a set 2 Neji',
     text_es: 'oculta a 6 enemigos con un Neji del set 2',
@@ -883,6 +1040,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-temari-deplacements', level: 2, target: 6, scope: 'cumulative',
+    hook: 'character.moved.by.card',
+    predicate: { set: 'SS', sourceName: 'TEMARI' },
     text_fr: 'balayer 6 personnages avec une Temari du set 2',
     text_en: 'sweep 6 characters with a set 2 Temari',
     text_es: 'barre a 6 personajes con una Temari del set 2',
@@ -893,6 +1052,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-kakashi-copies', level: 2, target: 5, scope: 'cumulative',
+    hook: 'effect.copied.by.card',
+    predicate: { set: 'SS', sourceName: 'KAKASHI HATAKE' },
     text_fr: 'copier 5 effets avec un Kakashi du set 2',
     text_en: 'copy 5 effects with a set 2 Kakashi',
     text_es: 'copia 5 efectos con un Kakashi del set 2',
@@ -903,6 +1064,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-classe-1', level: 2, target: 3, scope: 'cumulative',
+    hook: 'ranked.win.deck.contains',
+    predicate: { deckSetCountAtLeast: 20, set: 'SS' },
     text_fr: 'gagner 3 parties classées avec un deck contenant au moins 20 cartes du set 2',
     text_en: 'win 3 ranked matches with a deck holding at least 20 set 2 cards',
     text_es: 'gana 3 partidas clasificatorias con un mazo que tenga al menos 20 cartas del set 2',
@@ -913,6 +1076,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-classe-2', level: 2, target: 3, scope: 'cumulative',
+    hook: 'ranked.win.deck.contains',
+    predicate: { deckHasAttachment: true, set: 'SS' },
     text_fr: 'gagner 3 parties classées avec au moins un équipement dans ton deck',
     text_en: 'win 3 ranked matches with at least one attachment in your deck',
     text_es: 'gana 3 partidas clasificatorias con al menos un equipo en tu mazo',
@@ -923,6 +1088,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-classe-3', level: 2, target: 2, scope: 'cumulative',
+    hook: 'ranked.win.deck.contains',
+    predicate: { monoGroup: 'Sound Village', set: 'SS' },
     text_fr: 'gagner 2 parties classées avec un deck 100 % Village du Son',
     text_en: 'win 2 ranked matches with a full Sound Village deck',
     text_es: 'gana 2 partidas clasificatorias con un mazo 100 % Aldea del Sonido',
@@ -933,6 +1100,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-classe-4', level: 2, target: 2, scope: 'cumulative',
+    hook: 'ranked.win.deck.contains',
+    predicate: { monoGroup: 'Sand Village', set: 'SS' },
     text_fr: 'gagner 2 parties classées avec un deck 100 % Village du Sable',
     text_en: 'win 2 ranked matches with a full Sand Village deck',
     text_es: 'gana 2 partidas clasificatorias con un mazo 100 % Aldea de la Arena',
@@ -943,6 +1112,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-111-x10', level: 3, target: 10, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 111 },
     text_fr: 'déclencher 10 fois le DUEL de HINATA HYÛGA 111',
     text_en: 'trigger the DUEL of HINATA HYUGA 111 ten times',
     text_es: 'activa el DUEL de HINATA HYUGA 111 10 veces',
@@ -953,6 +1124,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-112-x10', level: 3, target: 10, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 112 },
     text_fr: 'déclencher 10 fois le DUEL de NEJI HYÛGA 112',
     text_en: 'trigger the DUEL of NEJI HYUGA 112 ten times',
     text_es: 'activa el DUEL de NEJI HYUGA 112 10 veces',
@@ -963,6 +1136,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-128-x10', level: 3, target: 10, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 128 },
     text_fr: 'déclencher 10 fois le DUEL de CHÔJI AKIMICHI 128',
     text_en: 'trigger the DUEL of CHOJI AKIMICHI 128 ten times',
     text_es: 'activa el DUEL de CHOJI AKIMICHI 128 10 veces',
@@ -973,6 +1148,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-133-x10', level: 3, target: 10, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 133 },
     text_fr: 'déclencher 10 fois le DUEL de HIRUZEN SARUTOBI 133',
     text_en: 'trigger the DUEL of HIRUZEN SARUTOBI 133 ten times',
     text_es: 'activa el DUEL de HIRUZEN SARUTOBI 133 10 veces',
@@ -983,6 +1160,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-134-x10', level: 3, target: 10, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 134 },
     text_fr: 'déclencher 10 fois le DUEL de KURENAI YUHI 134',
     text_en: 'trigger the DUEL of KURENAI YUHI 134 ten times',
     text_es: 'activa el DUEL de KURENAI YUHI 134 10 veces',
@@ -993,6 +1172,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-137-x10', level: 3, target: 10, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 137 },
     text_fr: 'déclencher 10 fois le DUEL de ITACHI UCHIWA 137',
     text_en: 'trigger the DUEL of ITACHI UCHIHA 137 ten times',
     text_es: 'activa el DUEL de ITACHI UCHIHA 137 10 veces',
@@ -1003,6 +1184,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-147-x10', level: 3, target: 10, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 147 },
     text_fr: 'déclencher 10 fois le DUEL de NARUTO UZUMAKI 147',
     text_en: 'trigger the DUEL of NARUTO UZUMAKI 147 ten times',
     text_es: 'activa el DUEL de NARUTO UZUMAKI 147 10 veces',
@@ -1013,6 +1196,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-148-x10', level: 3, target: 10, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 148 },
     text_fr: 'déclencher 10 fois le DUEL de SASUKE UCHIWA 148',
     text_en: 'trigger the DUEL of SASUKE UCHIHA 148 ten times',
     text_es: 'activa el DUEL de SASUKE UCHIHA 148 10 veces',
@@ -1023,6 +1208,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-149-x10', level: 3, target: 10, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 149 },
     text_fr: 'déclencher 10 fois le DUEL de KAKASHI HATAKE 149',
     text_en: 'trigger the DUEL of KAKASHI HATAKE 149 ten times',
     text_es: 'activa el DUEL de KAKASHI HATAKE 149 10 veces',
@@ -1033,6 +1220,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-150-x10', level: 3, target: 10, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 150 },
     text_fr: 'déclencher 10 fois le DUEL de ZABUZA MOMOCHI 150',
     text_en: 'trigger the DUEL of ZABUZA MOMOCHI 150 ten times',
     text_es: 'activa el DUEL de ZABUZA MOMOCHI 150 10 veces',
@@ -1043,6 +1232,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-double-manche', level: 3, target: 2, scope: 'match',
+    hook: 'duel.triggered.with.source',
+    predicate: { sameRound: true, set: 'SS' },
     text_fr: 'déclencher deux DUELS dans la même manche',
     text_en: 'trigger two DUELS in the same round',
     text_es: 'activa dos DUEL en la misma ronda',
@@ -1053,6 +1244,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-vallee', level: 3, target: 1, scope: 'match',
+    hook: 'duel.triggered.with.source',
+    predicate: { pairNumbers: [147, 148], set: 'SS' },
     text_fr: 'déclencher le DUEL de Naruto 147 et celui de Sasuke 148 dans la même partie',
     text_en: 'trigger the DUEL of Naruto 147 and the one of Sasuke 148 in the same match',
     text_es: 'activa el DUEL de Naruto 147 y el de Sasuke 148 en la misma partida',
@@ -1063,6 +1256,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-sannin', level: 3, target: 1, scope: 'match',
+    hook: 'duel.triggered.with.source',
+    predicate: { pairNumbers: [130, 133], set: 'SS' },
     text_fr: 'déclencher le DUEL d\'Orochimaru 130 et celui d\'Hiruzen 133 dans la même partie',
     text_en: 'trigger the DUEL of Orochimaru 130 and the one of Hiruzen 133 in the same match',
     text_es: 'activa el DUEL de Orochimaru 130 y el de Hiruzen 133 en la misma partida',
@@ -1073,6 +1268,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-hyuga', level: 3, target: 1, scope: 'match',
+    hook: 'duel.triggered.with.source',
+    predicate: { pairNumbers: [111, 112], set: 'SS' },
     text_fr: 'déclencher le DUEL d\'Hinata 111 et celui de Neji 112 dans la même partie',
     text_en: 'trigger the DUEL of Hinata 111 and the one of Neji 112 in the same match',
     text_es: 'activa el DUEL de Hinata 111 y el de Neji 112 en la misma partida',
@@ -1083,6 +1280,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-kunoichi', level: 3, target: 1, scope: 'match',
+    hook: 'duel.triggered.with.source',
+    predicate: { pairNumbers: [123, 124], set: 'SS' },
     text_fr: 'déclencher le DUEL de Sakura 123 et celui d\'Ino 124 dans la même partie',
     text_en: 'trigger the DUEL of Sakura 123 and the one of Ino 124 in the same match',
     text_es: 'activa el DUEL de Sakura 123 y el de Ino 124 en la misma partida',
@@ -1093,6 +1292,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-brumes', level: 3, target: 1, scope: 'match',
+    hook: 'duel.triggered.with.source',
+    predicate: { pairNumbers: [149, 150], set: 'SS' },
     text_fr: 'déclencher le DUEL de Kakashi 149 et celui de Zabuza 150 dans la même partie',
     text_en: 'trigger the DUEL of Kakashi 149 and the one of Zabuza 150 in the same match',
     text_es: 'activa el DUEL de Kakashi 149 y el de Zabuza 150 en la misma partida',
@@ -1103,6 +1304,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-fs-tous', level: 3, target: 8, scope: 'cumulative',
+    hook: 'first_strike.used.with.source',
+    predicate: { distinct: true, set: 'SS' },
     text_fr: 'utiliser la FIRST STRIKE de 8 cartes différentes',
     text_en: 'use the FIRST STRIKE of 8 different cards',
     text_es: 'usa el FIRST STRIKE de 8 cartas distintas',
@@ -1113,6 +1316,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-fs-tenten', level: 3, target: 10, scope: 'cumulative',
+    hook: 'first_strike.used.with.source',
+    predicate: { set: 'SS', sourceNumber: 21 },
     text_fr: 'ouvrir 10 manches avec la FIRST STRIKE de Tenten 021',
     text_en: 'open 10 rounds with the FIRST STRIKE of Tenten 021',
     text_es: 'abre 10 rondas con el FIRST STRIKE de Tenten 021',
@@ -1123,6 +1328,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-fs-itachi-53', level: 3, target: 8, scope: 'cumulative',
+    hook: 'character.hidden.by.card',
+    predicate: { set: 'SS', sourceNumber: 53 },
     text_fr: 'cacher 8 personnages avec la FIRST STRIKE d\'Itachi 053',
     text_en: 'hide 8 characters with the FIRST STRIKE of Itachi 053',
     text_es: 'oculta a 8 personajes con el FIRST STRIKE de Itachi 053',
@@ -1133,6 +1340,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-fs-kiba-14', level: 3, target: 6, scope: 'cumulative',
+    hook: 'character.defeated.by.card',
+    predicate: { set: 'SS', sourceNumber: 14 },
     text_fr: 'démasquer et vaincre 6 cachés avec la FIRST STRIKE de Kiba 014',
     text_en: 'unmask and defeat 6 hidden characters with the FIRST STRIKE of Kiba 014',
     text_es: 'descubre y derrota a 6 ocultos con el FIRST STRIKE de Kiba 014',
@@ -1143,6 +1352,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-101-maitrise', level: 3, target: 12, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', sourceNumber: 101 },
     text_fr: 'vaincre 12 personnages avec l\'Épée serpent 101',
     text_en: 'defeat 12 characters with the Snake Sword 101',
     text_es: 'derrota a 12 personajes con la Espada serpiente 101',
@@ -1153,6 +1364,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-099-maitrise', level: 3, target: 8, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', sourceNumber: 99 },
     text_fr: 'cacher 8 ninjas Jutsu avec le Sabre du dieu de la foudre 099',
     text_en: 'hide 8 Jutsu ninja with the Sword of the Thunder God 099',
     text_es: 'oculta a 8 ninja Jutsu con la Espada del dios del trueno 099',
@@ -1163,6 +1376,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-090-maitrise', level: 3, target: 20, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', sourceNumber: 90 },
     text_fr: 'retirer 20 jetons avec Samehada 090',
     text_en: 'remove 20 tokens with Samehada 090',
     text_es: 'retira 20 fichas con Samehada 090',
@@ -1173,6 +1388,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-095-maitrise', level: 3, target: 6, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', sourceNumber: 95 },
     text_fr: 'révéler 6 ninjas Jutsu avec Le Parchemin des sceaux 095',
     text_en: 'reveal 6 Jutsu ninja with the Scroll of Seals 095',
     text_es: 'revela a 6 ninja Jutsu con El pergamino de los sellos 095',
@@ -1183,6 +1400,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-3-mission', level: 3, target: 3, scope: 'match',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', simultaneous: true },
     text_fr: 'avoir 3 équipements à toi en jeu en même temps',
     text_en: 'have 3 of your attachments in play at the same time',
     text_es: 'ten 3 equipos tuyos en juego al mismo tiempo',
@@ -1193,6 +1412,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-vol', level: 3, target: 3, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS', stolen: true },
     text_fr: 'voler 3 équipements adverses et les reposer chez toi',
     text_en: 'steal 3 enemy attachments and place them on your side',
     text_es: 'roba 3 equipos enemigos y colócalos en tu lado',
@@ -1203,6 +1424,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-artisans', level: 3, target: 6, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { attachmentNumber: 110, set: 'SS' },
     text_fr: 'profiter 6 fois du Village des artisans 110 en équipant une Arme ou une Armure',
     text_en: 'benefit 6 times from the Village of Artisans 110 by attaching a Weapon or an Armor',
     text_es: 'aprovecha 6 veces la Aldea de los artesanos 110 equipando un Arma o una Armadura',
@@ -1213,6 +1436,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-points-15', level: 3, target: 15, scope: 'match',
+    hook: 'mission_points.scored.match',
+    predicate: { set: 'SS', threshold: true },
     text_fr: 'marquer 15 points de mission dans une seule partie avec un deck du set 2',
     text_en: 'score 15 Mission points in a single match with a set 2 deck',
     text_es: 'consigue 15 puntos de misión en una sola partida con un mazo del set 2',
@@ -1223,6 +1448,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-points-20', level: 3, target: 20, scope: 'match',
+    hook: 'mission_points.scored.match',
+    predicate: { set: 'SS', threshold: true },
     text_fr: 'marquer 20 points de mission dans une seule partie avec un deck du set 2',
     text_en: 'score 20 Mission points in a single match with a set 2 deck',
     text_es: 'consigue 20 puntos de misión en una sola partida con un mazo del set 2',
@@ -1233,6 +1460,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-puissance-12', level: 3, target: 12, scope: 'cumulative',
+    hook: 'character.power.threshold',
+    predicate: { power: 12, set: 'SS' },
     text_fr: 'amener un personnage du set 2 à 12 de Puissance',
     text_en: 'bring a set 2 character to 12 Power',
     text_es: 'lleva a un personaje del set 2 hasta 12 de Poder',
@@ -1243,6 +1472,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-pile-4', level: 3, target: 4, scope: 'cumulative',
+    hook: 'upgrade.stack.depth',
+    predicate: { depth: 4, set: 'SS' },
     text_fr: 'construire une pile d\'améliorations de 4 cartes',
     text_en: 'build a 4 card upgrade stack',
     text_es: 'construye una pila de mejoras de 4 cartas',
@@ -1253,6 +1484,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-hashirama-noms', level: 3, target: 5, scope: 'cumulative',
+    hook: 'upgrade.stack.depth',
+    predicate: { set: 'SS', sourceNumbers: [129, 131] },
     text_fr: 'améliorer 5 fois par-dessus un nom différent grâce à Hashirama 129 ou Tobirama 131',
     text_en: 'upgrade 5 times over a different name thanks to Hashirama 129 or Tobirama 131',
     text_es: 'mejora 5 veces sobre un nombre distinto gracias a Hashirama 129 o Tobirama 131',
@@ -1263,6 +1496,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-groupe-sound-village-30', level: 3, target: 30, scope: 'cumulative',
+    hook: 'character.played.group',
+    predicate: { group: 'Sound Village', set: 'SS' },
     text_fr: 'jouer 30 ninjas du Village du Son',
     text_en: 'play 30 Sound Village ninja',
     text_es: 'juega 30 ninja de la Aldea del Sonido',
@@ -1273,6 +1508,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-groupe-sand-village-30', level: 3, target: 30, scope: 'cumulative',
+    hook: 'character.played.group',
+    predicate: { group: 'Sand Village', set: 'SS' },
     text_fr: 'jouer 30 ninjas du Village du Sable',
     text_en: 'play 30 Sand Village ninja',
     text_es: 'juega 30 ninja de la Aldea de la Arena',
@@ -1283,6 +1520,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-groupe-akatsuki-15', level: 3, target: 15, scope: 'cumulative',
+    hook: 'character.played.group',
+    predicate: { group: 'Akatsuki', set: 'SS' },
     text_fr: 'jouer 15 membres de l\'Akatsuki',
     text_en: 'play 15 Akatsuki members',
     text_es: 'juega 15 miembros de Akatsuki',
@@ -1293,6 +1532,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mot-jutsu-40', level: 3, target: 40, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Jutsu', set: 'SS' },
     text_fr: 'jouer 40 personnages Jutsu du set 2',
     text_en: 'play 40 Jutsu characters from set 2',
     text_es: 'juega 40 personajes Jutsu del set 2',
@@ -1303,6 +1544,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mot-rogue-ninja-25', level: 3, target: 25, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Rogue Ninja', set: 'SS' },
     text_fr: 'jouer 25 personnages Rogue Ninja du set 2',
     text_en: 'play 25 Rogue Ninja characters from set 2',
     text_es: 'juega 25 personajes Ninja Renegado del set 2',
@@ -1313,6 +1556,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mot-sound-four-20', level: 3, target: 20, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Sound Four', set: 'SS' },
     text_fr: 'jouer 20 personnages Sound Four du set 2',
     text_en: 'play 20 Sound Four characters from set 2',
     text_es: 'juega 20 personajes Cuatro del Sonido del set 2',
@@ -1323,6 +1568,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mot-sannin-20', level: 3, target: 20, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Sannin', set: 'SS' },
     text_fr: 'jouer 20 personnages Sannin du set 2',
     text_en: 'play 20 Sannin characters from set 2',
     text_es: 'juega 20 personajes Sannin del set 2',
@@ -1333,6 +1580,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-classe-avance-1', level: 3, target: 10, scope: 'cumulative',
+    hook: 'ranked.win.deck',
+    predicate: { deckSet: 'SS' },
     text_fr: 'gagner 10 parties classées avec un deck du set 2',
     text_en: 'win 10 ranked matches with a set 2 deck',
     text_es: 'gana 10 partidas clasificatorias con un mazo del set 2',
@@ -1343,6 +1592,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-classe-avance-2', level: 3, target: 5, scope: 'cumulative',
+    hook: 'ranked.win.streak',
+    predicate: { deckSet: 'SS' },
     text_fr: 'gagner 5 parties classées d\'affilée avec le même deck du set 2',
     text_en: 'win 5 ranked matches in a row with the same set 2 deck',
     text_es: 'gana 5 partidas clasificatorias seguidas con el mismo mazo del set 2',
@@ -1353,6 +1604,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-classe-avance-3', level: 3, target: 5, scope: 'cumulative',
+    hook: 'ranked.win.deck.contains',
+    predicate: { attachmentsPlacedAtLeast: 1, set: 'SS' },
     text_fr: 'gagner 5 parties classées en ayant équipé au moins un allié',
     text_en: 'win 5 ranked matches having equipped at least one ally',
     text_es: 'gana 5 partidas clasificatorias habiendo equipado al menos a un aliado',
@@ -1363,6 +1616,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-classe-avance-4', level: 3, target: 3, scope: 'cumulative',
+    hook: 'match.won.no_defeats_own',
+    predicate: { deckSet: 'SS' },
     text_fr: 'gagner 3 parties classées sans qu\'aucun de tes personnages ne soit vaincu',
     text_en: 'win 3 ranked matches without a single one of your characters being defeated',
     text_es: 'gana 3 partidas clasificatorias sin que ninguno de tus personajes sea derrotado',
@@ -1373,6 +1628,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-classe-avance-5', level: 3, target: 3, scope: 'cumulative',
+    hook: 'ranked.win.deck.contains',
+    predicate: { missionsWonLastRound: 4, set: 'SS' },
     text_fr: 'gagner 3 parties classées en remportant les 4 missions de la dernière manche',
     text_en: 'win 3 ranked matches taking all 4 missions of the last round',
     text_es: 'gana 3 partidas clasificatorias llevándote las 4 misiones de la última ronda',
@@ -1383,6 +1640,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-classe-avance-6', level: 3, target: 1, scope: 'cumulative',
+    hook: 'tournament.won.single',
+    predicate: { deckSet: 'SS' },
     text_fr: 'remporter un tournoi avec un deck contenant uniquement des cartes du set 2',
     text_en: 'win a tournament with a deck holding only set 2 cards',
     text_es: 'gana un torneo con un mazo formado solo por cartas del set 2',
@@ -1393,6 +1652,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-classe-avance-7', level: 3, target: 1, scope: 'cumulative',
+    hook: 'tournament.won.swiss',
+    predicate: { deckSet: 'SS' },
     text_fr: 'remporter un tournoi suisse avec un deck du set 2',
     text_en: 'win a Swiss tournament with a set 2 deck',
     text_es: 'gana un torneo suizo con un mazo del set 2',
@@ -1403,6 +1664,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-classe-maitre-1', level: 4, target: 5, scope: 'cumulative',
+    hook: 'ranked.win.deck.contains',
+    predicate: { attachmentsPlacedAtMost: 0, set: 'SS' },
     text_fr: 'gagner 5 parties classées sans jamais poser d\'équipement',
     text_en: 'win 5 ranked matches without ever placing an attachment',
     text_es: 'gana 5 partidas clasificatorias sin colocar nunca un equipo',
@@ -1413,6 +1676,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-classe-maitre-2', level: 4, target: 5, scope: 'cumulative',
+    hook: 'ranked.win.deck.contains',
+    predicate: { duelsTriggeredAtLeast: 1, set: 'SS' },
     text_fr: 'gagner 5 parties classées en ayant déclenché un DUEL dans chacune',
     text_en: 'win 5 ranked matches having triggered a DUEL in each',
     text_es: 'gana 5 partidas clasificatorias habiendo activado un DUEL en cada una',
@@ -1423,6 +1688,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-classe-maitre-3', level: 4, target: 3, scope: 'cumulative',
+    hook: 'ranked.win.deck.contains',
+    predicate: { monoGroup: 'Sound Village', set: 'SS' },
     text_fr: 'gagner 3 parties classées avec un deck 100 % Village du Son',
     text_en: 'win 3 ranked matches with a full Sound Village deck',
     text_es: 'gana 3 partidas clasificatorias con un mazo 100 % Aldea del Sonido',
@@ -1433,6 +1700,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-classe-maitre-4', level: 4, target: 3, scope: 'cumulative',
+    hook: 'ranked.win.deck.contains',
+    predicate: { monoGroup: 'Sand Village', set: 'SS' },
     text_fr: 'gagner 3 parties classées avec un deck 100 % Village du Sable',
     text_en: 'win 3 ranked matches with a full Sand Village deck',
     text_es: 'gana 3 partidas clasificatorias con un mazo 100 % Aldea de la Arena',
@@ -1443,6 +1712,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-126-x25', level: 4, target: 25, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 126 },
     text_fr: 'déclencher 25 fois le DUEL de SASUKE UCHIWA 126',
     text_en: 'trigger the DUEL of SASUKE UCHIHA 126 twenty five times',
     text_es: 'activa el DUEL de SASUKE UCHIHA 126 25 veces',
@@ -1453,6 +1724,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-133-x25', level: 4, target: 25, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 133 },
     text_fr: 'déclencher 25 fois le DUEL de HIRUZEN SARUTOBI 133',
     text_en: 'trigger the DUEL of HIRUZEN SARUTOBI 133 twenty five times',
     text_es: 'activa el DUEL de HIRUZEN SARUTOBI 133 25 veces',
@@ -1463,6 +1736,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-137-x25', level: 4, target: 25, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 137 },
     text_fr: 'déclencher 25 fois le DUEL de ITACHI UCHIWA 137',
     text_en: 'trigger the DUEL of ITACHI UCHIHA 137 twenty five times',
     text_es: 'activa el DUEL de ITACHI UCHIHA 137 25 veces',
@@ -1473,6 +1748,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-147-x25', level: 4, target: 25, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 147 },
     text_fr: 'déclencher 25 fois le DUEL de NARUTO UZUMAKI 147',
     text_en: 'trigger the DUEL of NARUTO UZUMAKI 147 twenty five times',
     text_es: 'activa el DUEL de NARUTO UZUMAKI 147 25 veces',
@@ -1483,6 +1760,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-148-x25', level: 4, target: 25, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 148 },
     text_fr: 'déclencher 25 fois le DUEL de SASUKE UCHIWA 148',
     text_en: 'trigger the DUEL of SASUKE UCHIHA 148 twenty five times',
     text_es: 'activa el DUEL de SASUKE UCHIHA 148 25 veces',
@@ -1493,6 +1772,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-149-x25', level: 4, target: 25, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 149 },
     text_fr: 'déclencher 25 fois le DUEL de KAKASHI HATAKE 149',
     text_en: 'trigger the DUEL of KAKASHI HATAKE 149 twenty five times',
     text_es: 'activa el DUEL de KAKASHI HATAKE 149 25 veces',
@@ -1503,6 +1784,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-150-x25', level: 4, target: 25, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { set: 'SS', sourceNumber: 150 },
     text_fr: 'déclencher 25 fois le DUEL de ZABUZA MOMOCHI 150',
     text_en: 'trigger the DUEL of ZABUZA MOMOCHI 150 twenty five times',
     text_es: 'activa el DUEL de ZABUZA MOMOCHI 150 25 veces',
@@ -1512,9 +1795,11 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_ja: '桃地再不斬 150 の DUEL を25回発動する',
   },
   {
-    id: 'ss-duel-tous', level: 4, target: 21, scope: 'cumulative',
-    text_fr: 'déclencher au moins une fois chacun des 21 DUELS du set 2',
-    text_en: 'trigger every one of the 21 set 2 DUELS at least once',
+    id: 'ss-duel-tous', level: 4, target: 29, scope: 'cumulative',
+    hook: 'duel.triggered.with.source',
+    predicate: { distinct: true, set: 'SS' },
+    text_fr: 'déclencher au moins une fois chacun des 29 DUELS du set 2',
+    text_en: 'trigger every one of the 29 set 2 DUELS at least once',
     text_es: 'activa al menos una vez cada uno de los 21 DUEL del set 2',
     text_pt: 'ative pelo menos uma vez cada um dos 21 DUEL do set 2',
     text_it: 'attiva almeno una volta ognuno dei 21 DUEL del set 2',
@@ -1523,6 +1808,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-quatre-manches', level: 4, target: 4, scope: 'match',
+    hook: 'duel.triggered.with.source',
+    predicate: { everyRound: true, set: 'SS' },
     text_fr: 'déclencher un DUEL dans chacune des 4 manches d\'une même partie',
     text_en: 'trigger a DUEL in each of the 4 rounds of the same match',
     text_es: 'activa un DUEL en cada una de las 4 rondas de la misma partida',
@@ -1533,6 +1820,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-trois-meme-manche', level: 4, target: 3, scope: 'match',
+    hook: 'duel.triggered.with.source',
+    predicate: { sameRound: true, set: 'SS' },
     text_fr: 'déclencher trois DUELS dans la même manche',
     text_en: 'trigger three DUELS in the same round',
     text_es: 'activa tres DUEL en la misma ronda',
@@ -1543,6 +1832,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-duel-et-gagner', level: 4, target: 5, scope: 'cumulative',
+    hook: 'ranked.win.deck.contains',
+    predicate: { duelsTriggeredAtLeast: 3, set: 'SS' },
     text_fr: 'gagner 5 parties classées en ayant déclenché au moins 3 DUELS dans chacune',
     text_en: 'win 5 ranked matches having triggered at least 3 DUELS in each',
     text_es: 'gana 5 partidas clasificatorias habiendo activado al menos 3 DUEL en cada una',
@@ -1552,9 +1843,11 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
     text_ja: '毎回 DUEL を3つ以上発動しながらランク戦に5勝する',
   },
   {
-    id: 'ss-fs-toutes', level: 4, target: 11, scope: 'cumulative',
-    text_fr: 'utiliser la FIRST STRIKE des 11 cartes qui en portent une',
-    text_en: 'use the FIRST STRIKE of all 11 cards that carry one',
+    id: 'ss-fs-toutes', level: 4, target: 12, scope: 'cumulative',
+    hook: 'first_strike.used.with.source',
+    predicate: { distinct: true, set: 'SS' },
+    text_fr: 'utiliser la FIRST STRIKE des 12 cartes qui en portent une',
+    text_en: 'use the FIRST STRIKE of all 12 cards that carry one',
     text_es: 'usa el FIRST STRIKE de las 11 cartas que lo llevan',
     text_pt: 'use o FIRST STRIKE das 11 cartas que o têm',
     text_it: 'usa il FIRST STRIKE di tutte le 11 carte che lo portano',
@@ -1563,6 +1856,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-fs-50', level: 4, target: 50, scope: 'cumulative',
+    hook: 'first_strike.used.with.source',
+    predicate: { set: 'SS' },
     text_fr: 'déclencher 50 PREMIÈRES FRAPPES',
     text_en: 'trigger 50 FIRST STRIKES',
     text_es: 'activa 50 FIRST STRIKE',
@@ -1573,6 +1868,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-tous', level: 4, target: 32, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { distinct: true, set: 'SS' },
     text_fr: 'poser au moins une fois chacun des 32 équipements du set 2',
     text_en: 'place every one of the 32 set 2 attachments at least once',
     text_es: 'coloca al menos una vez cada uno de los 32 equipos del set 2',
@@ -1583,6 +1880,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-100', level: 4, target: 100, scope: 'cumulative',
+    hook: 'attachment.attached.with.source',
+    predicate: { set: 'SS' },
     text_fr: 'poser 100 équipements',
     text_en: 'place 100 attachments',
     text_es: 'coloca 100 equipos',
@@ -1593,6 +1892,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-serpent-50', level: 4, target: 50, scope: 'cumulative',
+    hook: 'character.defeated.by.attachment',
+    predicate: { set: 'SS', sourceNumber: 101 },
     text_fr: 'vaincre 50 personnages avec l\'Épée serpent 101',
     text_en: 'defeat 50 characters with the Snake Sword 101',
     text_es: 'derrota a 50 personajes con la Espada serpiente 101',
@@ -1603,6 +1904,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-parchemins-5', level: 4, target: 5, scope: 'cumulative',
+    hook: 'mission_points.scored.match',
+    predicate: { pairNumbers: [96, 97], set: 'SS' },
     text_fr: 'encaisser 5 fois le point bonus du Parchemin du Ciel 096 et du Parchemin de la Terre 097',
     text_en: 'cash in the bonus point of the Heaven Scroll 096 and the Earth Scroll 097 five times',
     text_es: 'cobra 5 veces el punto extra del Pergamino del Cielo 096 y del Pergamino de la Tierra 097',
@@ -1613,6 +1916,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-equip-mission-quatre', level: 4, target: 4, scope: 'match',
+    hook: 'attachment.attached.with.source',
+    predicate: { attachTo: 'mission', set: 'SS', simultaneous: true },
     text_fr: 'avoir un équipement de mission sur les 4 missions en même temps',
     text_en: 'have a mission attachment on all 4 missions at the same time',
     text_es: 'ten un equipo de misión en las 4 misiones al mismo tiempo',
@@ -1623,6 +1928,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mission-priorite-double', level: 4, target: 10, scope: 'cumulative',
+    hook: 'mission.won',
+    predicate: { missionNumber: 4, set: 'SS' },
     text_fr: 'remporter 10 fois la Mission prioritaire et encaisser son double score',
     text_en: 'win the High Priority Mission ten times and cash in its double score',
     text_es: 'gana 10 veces la Misión prioritaria y cobra su puntuación doble',
@@ -1633,6 +1940,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mission-toutes', level: 4, target: 10, scope: 'cumulative',
+    hook: 'mission.won',
+    predicate: { distinct: true, set: 'SS' },
     text_fr: 'remporter au moins une fois chacune des 10 missions du set 2',
     text_en: 'win every one of the 10 set 2 missions at least once',
     text_es: 'gana al menos una vez cada una de las 10 misiones del set 2',
@@ -1643,6 +1952,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mission-quatre-manche', level: 4, target: 4, scope: 'match',
+    hook: 'mission.won',
+    predicate: { sameRound: true, set: 'SS' },
     text_fr: 'remporter les 4 missions d\'une même manche',
     text_en: 'win all 4 missions of the same round',
     text_es: 'gana las 4 misiones de una misma ronda',
@@ -1653,6 +1964,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-points-30', level: 4, target: 30, scope: 'match',
+    hook: 'mission_points.scored.match',
+    predicate: { threshold: true },
     text_fr: 'marquer 30 points de mission dans une seule partie',
     text_en: 'score 30 Mission points in a single match',
     text_es: 'consigue 30 puntos de misión en una sola partida',
@@ -1663,6 +1976,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-puissance-20', level: 4, target: 20, scope: 'cumulative',
+    hook: 'character.power.threshold',
+    predicate: { power: 20, set: 'SS' },
     text_fr: 'amener un personnage du set 2 à 20 de Puissance',
     text_en: 'bring a set 2 character to 20 Power',
     text_es: 'lleva a un personaje del set 2 hasta 20 de Poder',
@@ -1673,6 +1988,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-jetons-15', level: 4, target: 15, scope: 'cumulative',
+    hook: 'character.power_tokens.threshold',
+    predicate: { set: 'SS', tokens: 15 },
     text_fr: 'accumuler 15 jetons de puissance sur un même personnage',
     text_en: 'stack 15 Power tokens on a single character',
     text_es: 'acumula 15 fichas de Poder sobre un mismo personaje',
@@ -1683,6 +2000,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-pile-6', level: 4, target: 6, scope: 'cumulative',
+    hook: 'upgrade.stack.depth',
+    predicate: { depth: 6, set: 'SS' },
     text_fr: 'construire une pile d\'améliorations de 6 cartes',
     text_en: 'build a 6 card upgrade stack',
     text_es: 'construye una pila de mejoras de 6 cartas',
@@ -1693,6 +2012,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-groupe-sound-village-100', level: 4, target: 100, scope: 'cumulative',
+    hook: 'character.played.group',
+    predicate: { group: 'Sound Village', set: 'SS' },
     text_fr: 'jouer 100 ninjas du Village du Son',
     text_en: 'play 100 Sound Village characters',
     text_es: 'juega 100 personajes de la Aldea del Sonido',
@@ -1703,6 +2024,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-groupe-sand-village-100', level: 4, target: 100, scope: 'cumulative',
+    hook: 'character.played.group',
+    predicate: { group: 'Sand Village', set: 'SS' },
     text_fr: 'jouer 100 ninjas du Village du Sable',
     text_en: 'play 100 Sand Village characters',
     text_es: 'juega 100 personajes de la Aldea de la Arena',
@@ -1713,6 +2036,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-groupe-akatsuki-50', level: 4, target: 50, scope: 'cumulative',
+    hook: 'character.played.group',
+    predicate: { group: 'Akatsuki', set: 'SS' },
     text_fr: 'jouer 50 membres de l\'Akatsuki',
     text_en: 'play 50 Akatsuki characters',
     text_es: 'juega 50 miembros de Akatsuki',
@@ -1723,6 +2048,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-groupe-leaf-village-150', level: 4, target: 150, scope: 'cumulative',
+    hook: 'character.played.group',
+    predicate: { group: 'Leaf Village', set: 'SS' },
     text_fr: 'jouer 150 ninjas du Village de la Feuille',
     text_en: 'play 150 Leaf Village characters',
     text_es: 'juega 150 personajes de la Aldea de la Hoja',
@@ -1733,6 +2060,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mot-jutsu-120', level: 4, target: 120, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Jutsu', set: 'SS' },
     text_fr: 'jouer 120 personnages Jutsu',
     text_en: 'play 120 Jutsu characters',
     text_es: 'juega 120 personajes Jutsu',
@@ -1743,6 +2072,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mot-sound-four-60', level: 4, target: 60, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Sound Four', set: 'SS' },
     text_fr: 'jouer 60 personnages Sound Four',
     text_en: 'play 60 Sound Four characters',
     text_es: 'juega 60 personajes Cuatro del Sonido',
@@ -1753,6 +2084,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mot-rogue-ninja-60', level: 4, target: 60, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Rogue Ninja', set: 'SS' },
     text_fr: 'jouer 60 personnages Rogue Ninja',
     text_en: 'play 60 Rogue Ninja characters',
     text_es: 'juega 60 personajes Ninja Renegado',
@@ -1763,6 +2096,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-mot-team-guy-60', level: 4, target: 60, scope: 'cumulative',
+    hook: 'character.played.keyword',
+    predicate: { keyword: 'Team Guy', set: 'SS' },
     text_fr: 'jouer 60 personnages Team Guy',
     text_en: 'play 60 Team Guy characters',
     text_es: 'juega 60 personajes Equipo Guy',
@@ -1773,6 +2108,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-legende-1', level: 4, target: 30, scope: 'cumulative',
+    hook: 'ranked.win.deck',
+    predicate: { deckSet: 'SS' },
     text_fr: 'gagner 30 parties classées avec un deck du set 2',
     text_en: 'win 30 ranked matches with a set 2 deck',
     text_es: 'gana 30 partidas clasificatorias con un mazo del set 2',
@@ -1783,6 +2120,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-legende-2', level: 4, target: 10, scope: 'cumulative',
+    hook: 'ranked.win.streak',
+    predicate: { deckSet: 'SS' },
     text_fr: 'gagner 10 parties classées d\'affilée avec le même deck du set 2',
     text_en: 'win 10 ranked matches in a row with the same set 2 deck',
     text_es: 'gana 10 partidas clasificatorias seguidas con el mismo mazo del set 2',
@@ -1793,6 +2132,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-legende-3', level: 4, target: 3, scope: 'cumulative',
+    hook: 'tournament.won.single',
+    predicate: { deckSet: 'SS' },
     text_fr: 'remporter 3 tournois avec un deck du set 2',
     text_en: 'win 3 tournaments with a set 2 deck',
     text_es: 'gana 3 torneos con un mazo del set 2',
@@ -1803,6 +2144,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-legende-4', level: 4, target: 3, scope: 'cumulative',
+    hook: 'tournament.won.swiss',
+    predicate: { deckSet: 'SS' },
     text_fr: 'remporter 3 tournois suisses avec un deck du set 2',
     text_en: 'win 3 Swiss tournaments with a set 2 deck',
     text_es: 'gana 3 torneos suizos con un mazo del set 2',
@@ -1813,6 +2156,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-legende-5', level: 4, target: 2, scope: 'cumulative',
+    hook: 'tournament.won.mono_village',
+    predicate: { set: 'SS' },
     text_fr: 'remporter 2 tournois avec un deck mono village',
     text_en: 'win 2 tournaments with a mono village deck',
     text_es: 'gana 2 torneos con un mazo de una sola aldea',
@@ -1823,6 +2168,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-legende-6', level: 4, target: 1, scope: 'cumulative',
+    hook: 'tournament.won.single',
+    predicate: { deckSet: 'SS', tournamentUndefeated: true },
     text_fr: 'remporter un tournoi sans perdre une seule partie avec un deck du set 2',
     text_en: 'win a tournament without losing a single match with a set 2 deck',
     text_es: 'gana un torneo sin perder una sola partida con un mazo del set 2',
@@ -1833,6 +2180,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-legende-7', level: 4, target: 1, scope: 'cumulative',
+    hook: 'tournament.won.single',
+    predicate: { deckHasAttachment: false },
     text_fr: 'remporter un tournoi avec un deck sans aucun équipement',
     text_en: 'win a tournament with a deck holding no attachment',
     text_es: 'gana un torneo con un mazo sin ningún equipo',
@@ -1843,6 +2192,8 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
   {
     id: 'ss-legende-8', level: 4, target: 1, scope: 'cumulative',
+    hook: 'tournament.won.single',
+    predicate: { deckNumbers: [147, 148], deckSet: 'SS' },
     text_fr: 'remporter un tournoi avec un deck contenant les deux camps de la Vallée de la Fin, Naruto 147 et Sasuke 148',
     text_en: 'win a tournament with a deck holding both sides of the Valley of the End, Naruto 147 and Sasuke 148',
     text_es: 'gana un torneo con un mazo que lleve los dos bandos del Valle del Fin, Naruto 147 y Sasuke 148',
@@ -1853,7 +2204,7 @@ export const QUETES_SHINOBI_SHIREN: QueteAnnoncee[] = [
   },
 ];
 
-export function texteDeQuete(quete: QueteAnnoncee, locale: string): string {
+export function texteDeQuete(quete: Quest, locale: string): string {
   const valeur = (quete as unknown as Record<string, unknown>)[`text_${locale}`];
   if (typeof valeur === 'string' && valeur) return valeur;
   return quete.text_en;

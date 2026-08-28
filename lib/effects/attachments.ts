@@ -1,4 +1,4 @@
-import type { GameState, PlayerID, CardData, AttachedCard, CharacterInPlay } from '@/lib/engine/types';
+import type { GameState, PlayerID, CardData, AttachedCard, CharacterInPlay, EffectType } from '@/lib/engine/types';
 import { generateInstanceId } from '@/lib/engine/utils/id';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectHandler } from '@/lib/effects/EffectRegistry';
@@ -10,6 +10,8 @@ import { estSeimei } from './handlers/SS/seimei065';
 import { actionTypeForSelectionType } from './selectionActionType';
 import { bonusArmeSurTenten, TENTEN_022 } from './handlers/SS/tenten022';
 import { amplifiedPowerup } from '@/lib/effects/ContinuousEffects';
+import { annoncerEquipementPose } from '@/lib/quests/equipementPose';
+import { resoudreEffetAvecQuete } from './resolutionEffet';
 
 export function artisanVillageReward(
   state: GameState,
@@ -74,7 +76,7 @@ function resolveAttachmentTrigger(
   const source = host ?? ({ instanceId: '', card } as unknown as CharacterInPlay);
   let newState = state;
   try {
-    const result = handler({
+    const result = resoudreEffetAvecQuete(handler, {
       state: newState,
       sourcePlayer: player,
       sourceCard: source,
@@ -82,7 +84,7 @@ function resolveAttachmentTrigger(
       triggerType: type,
       isUpgrade: false,
       wasRevealed: true,
-    } as EffectContext);
+    } as EffectContext, type as EffectType, { cardId: card.id, name: card.name_fr ?? card.name_en });
     newState = result.state;
 
     if (result.requiresTargetSelection && result.targetSelectionType && result.validTargets && result.validTargets.length > 0) {
@@ -147,7 +149,7 @@ function resolveAttachmentFirstStrike(
   const source = host ?? ({ instanceId: '', card } as unknown as CharacterInPlay);
 
   try {
-    const result = handler({
+    const result = resoudreEffetAvecQuete(handler, {
       state: newState,
       sourcePlayer: player,
       sourceCard: source,
@@ -155,7 +157,7 @@ function resolveAttachmentFirstStrike(
       triggerType: 'FIRST_STRIKE',
       isUpgrade: false,
       wasFirstCard: true,
-    } as EffectContext);
+    } as EffectContext, 'FIRST_STRIKE' as EffectType, { cardId: card.id, name: card.name_fr ?? card.name_en });
     newState = result.state;
 
     if (result.requiresTargetSelection && result.targetSelectionType && result.validTargets && result.validTargets.length > 0) {
@@ -220,14 +222,14 @@ function resolveAttachmentMain(
 
   let newState = state;
   try {
-    const result = handler({
+    const result = resoudreEffetAvecQuete(handler, {
       state: newState,
       sourcePlayer: player,
       sourceCard: host ?? ({ instanceId: '', card } as unknown as CharacterInPlay),
       sourceMissionIndex: missionIndex,
       triggerType: 'MAIN',
       isUpgrade: false,
-    } as EffectContext);
+    } as EffectContext, 'MAIN' as EffectType, { cardId: card.id, name: card.name_fr ?? card.name_en });
     newState = result.state;
 
     if (result.requiresTargetSelection && result.targetSelectionType && result.validTargets && result.validTargets.length > 0) {
@@ -574,6 +576,9 @@ export function attachCardToMission(state: GameState, player: PlayerID, card: Ca
       ),
     };
   }
+  annoncerEquipementPose(newState, player, card, {
+    missionIndex, attachTo: 'mission', stolen: provenance !== undefined,
+  });
   newState = resolveAttachmentMain(newState, player, card, null, missionIndex);
   newState = resolveAttachmentTrigger(newState, player, card, null, missionIndex, 'AMBUSH', revealed);
   return resolveAttachmentFirstStrike(newState, player, card, null, missionIndex);
@@ -637,6 +642,9 @@ export function attachCardToCharacter(state: GameState, player: PlayerID, card: 
       { card: 'TENTEN', id: TENTEN_022, amount: String(bonusArme) });
   }
 
+  annoncerEquipementPose(newState, player, card, {
+    missionIndex: hostMissionIndex, attachTo: 'character', stolen: provenance !== undefined,
+  });
   newState = resolveAttachmentMain(newState, player, card, host, hostMissionIndex);
 
   newState = artisanVillageReward(newState, player, card, host, hostMissionIndex);

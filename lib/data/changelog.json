@@ -3,41 +3,49 @@
     {
       "date": "2026-08-28",
       "categories": [
+        "feature",
         "fix",
         "fix"
       ],
       "title_fr": "Mise à jour",
       "changes_fr": [
+        "Les 183 quêtes de la saison Shinobi Shiren comptent pour de vrai, l'ancienne saison reste consultable",
         "Le Renard à Neuf Queues 134 compte les puissances négatives, une cible à moins 4 lui rend de la marge",
         "Un personnage vaincu qui portait un équipement part à la défausse tel quel, le personnage au-dessus"
       ],
       "title_en": "Update",
       "changes_en": [
+        "The 183 Shinobi Shiren season quests now track for real, the old season stays viewable",
         "The Nine-Tailed Fox 134 counts negative Power, a minus 4 target gives it back some room",
         "A defeated character carrying an attachment goes to the discard as it stands, the character on top"
       ],
       "title_es": "Actualización",
       "changes_es": [
+        "Las 183 misiones de la temporada Shinobi Shiren ya cuentan de verdad, la anterior sigue consultable",
         "El Zorro de Nueve Colas 134 cuenta el Poder negativo, un objetivo a menos 4 le devuelve margen",
         "Un personaje derrotado con un objeto equipado va al descarte tal cual, el personaje encima"
       ],
       "title_pt": "Atualização",
       "changes_pt": [
+        "As 183 missões da temporada Shinobi Shiren já contam a sério, a anterior continua consultável",
         "A Raposa de Nove Caudas 134 conta o Poder negativo, um alvo a menos 4 devolve-lhe margem",
         "Um personagem derrotado com um equipamento vai para o descarte tal como está, o personagem por cima"
       ],
       "title_it": "Aggiornamento",
       "changes_it": [
+        "Le 183 missioni della stagione Shinobi Shiren contano davvero, la precedente resta consultabile",
         "La Volpe a Nove Code 134 conta la Potenza negativa, un bersaglio a meno 4 le restituisce margine",
         "Un personaggio sconfitto con un equipaggiamento va negli scarti così com'è, il personaggio sopra"
       ],
       "title_pl": "Aktualizacja",
       "changes_pl": [
+        "183 zadania sezonu Shinobi Shiren naprawdę się liczą, poprzedni sezon pozostaje do wglądu",
         "Dziewięcioogoniasty Lis 134 liczy ujemną Moc, cel na minus 4 zwraca mu zapas",
         "Pokonana postać z przedmiotem trafia na stos kart odrzuconych bez zmian, postać na wierzchu"
       ],
       "title_ja": "アップデート",
       "changes_ja": [
+        "忍びの試練シーズンの183のクエストが実際に進むようになり、前シーズンも引き続き見られる",
         "九尾 134 はマイナスのパワーも数える。マイナス4の相手を隠すと余力が戻る",
         "装備を着けたキャラクターが倒れると、そのままの重なりで捨て札に行き、キャラクターが上になる"
       ]

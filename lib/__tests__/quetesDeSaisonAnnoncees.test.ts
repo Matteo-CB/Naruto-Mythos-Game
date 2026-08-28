@@ -73,7 +73,7 @@ describe('quetes annoncees de la saison Shinobi Shiren', () => {
   it('ne reutilise jamais un identifiant, ni entre saisons', () => {
     const ids = QUETES_SHINOBI_SHIREN.map((q) => q.id);
     expect(new Set(ids).size).toBe(ids.length);
-    const anciens = new Set(QUESTS.map((q) => q.id));
+    const anciens = new Set(QUESTS.filter((q) => q.season === SAISON_ARCHIVEE).map((q) => q.id));
     for (const id of ids) expect(anciens.has(id), id).toBe(false);
   });
 
@@ -123,26 +123,25 @@ describe('quetes annoncees de la saison Shinobi Shiren', () => {
     }
   });
 
-  it('reste annoncee et non suivie: aucun declencheur n est declare', () => {
-    const source = readFileSync(join(RACINE, 'lib/quests/saisonShinobiShiren.ts'), 'utf8');
-    expect(source).not.toMatch(/\bhook\s*:/);
+  it('est suivie: chaque quete declare son declencheur', () => {
     for (const quete of QUETES_SHINOBI_SHIREN) {
-      expect('hook' in quete, quete.id).toBe(false);
+      expect(quete.hook, `${quete.id} sans declencheur`).toBeTruthy();
     }
   });
 
-  it('sort de l API marquee comme non suivie, a cote des quetes archivees', () => {
+  it('sort de l API a cote des quetes archivees', () => {
     const source = readFileSync(join(RACINE, 'app/api/quests/route.ts'), 'utf8');
-    expect(source).toContain('seasonQuests');
-    expect(source).toContain('tracked: false');
     expect(source).toContain('archivedSeasonSetId');
   });
 
-  it('est affichee sur la page recompenses, sans barre de progression ni bouton', () => {
+  it('est affichee sur la page recompenses, suivie et reclamable', () => {
     const page = readFileSync(join(RACINE, 'app/[locale]/battlepass/page.tsx'), 'utf8');
-    expect(page).toContain('seasonQuests');
+    expect(page).toContain('quetesDeLaSaison');
+    expect(page).toContain('quetesArchivees');
     expect(page).toContain("tQuests('seasonHeader')");
     expect(page).toContain("tQuests('archiveShow')");
+    const bloc = page.slice(page.indexOf('quetesDeSaisonDuNiveau.map'));
+    expect(bloc.slice(0, 2200), 'la saison en cours propose de reclamer').toContain('handleClaimQuest');
   });
 
   it('a ses libelles dans les sept fichiers de langue', () => {

@@ -3,6 +3,7 @@ import { logAction } from '../engine/utils/gameLog';
 import { EffectEngine } from './EffectEngine';
 import { triggerOnDefeatEffects } from './onDefeatTriggers';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
+import { champsDeLaSource } from '@/lib/quests/sourceCourante';
 
 
 
@@ -127,6 +128,11 @@ export function defeatCharacterInPlay(
   });
   emitEngineQuestEvent(state, sourcePlayer, 'character.defeated.by.name', {
     name: targetChar.card.name_fr,
+  });
+  emitEngineQuestEvent(state, sourcePlayer, 'character.defeated.by.card', {
+    ...champsDeLaSource(),
+    targetName: targetChar.card.name_fr,
+    isHidden: targetChar.isHidden,
   });
 
   newState = {

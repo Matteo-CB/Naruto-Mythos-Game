@@ -30,7 +30,6 @@ function plateau(): GameState {
     p2: [simChar(ENNEMI_COSTAUD, { owner: 'player2', instanceId: 'costaud' })],
     missions: 1,
     chakra1: 40,
-    chakra2: 40,
     edgeHolder: 'player1',
   });
   s.player1.hand = [getCardById(KYUBI) as never];

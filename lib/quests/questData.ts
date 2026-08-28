@@ -1,25 +1,10 @@
-export type QuestLevel = 1 | 2 | 3 | 4;
+import type { Quest, QuestLevel, QuestScope, QuestSeason } from './types';
+import { QUETES_SHINOBI_SHIREN, SAISON_ARCHIVEE, SAISON_COURANTE } from './saisonShinobiShiren';
 
-export type QuestScope = 'match' | 'session' | 'cumulative';
+export type { Quest, QuestLevel, QuestScope, QuestSeason };
+export { SAISON_ARCHIVEE, SAISON_COURANTE };
 
-export interface Quest {
-  id: string;
-  level: QuestLevel;
-  target: number;
-  hook: string;
-  predicate?: Record<string, unknown>;
-  scope: QuestScope;
-  text_fr: string;
-  text_en: string;
-  text_es?: string;
-  text_ja?: string;
-  text_pt?: string;
-  text_it?: string;
-  text_pl?: string;
-  allowSoloVSelf?: boolean;
-}
-
-export const QUESTS: Quest[] = [
+const QUETES_KONOHA_SHIDO: Quest[] = [
   { id: 'social-friend-request-sent', level: 1, target: 1, hook: 'social.friend.request.sent', scope: 'cumulative',
     text_fr: "envoyer une demande d'ami à un joueur",
     text_en: "send a friend request to another player",
@@ -1537,6 +1522,19 @@ export const QUESTS: Quest[] = [
     text_ja: "カードを合計10枚トレードする",
     text_es: "intercambia 10 cartas en total" },
 ];
+
+function estampiller(liste: Quest[], season: QuestSeason): Quest[] {
+  return liste.map((q) => ({ ...q, season }));
+}
+
+export const QUESTS: Quest[] = [
+  ...estampiller(QUETES_KONOHA_SHIDO, SAISON_ARCHIVEE),
+  ...estampiller(QUETES_SHINOBI_SHIREN, SAISON_COURANTE),
+];
+
+export function questsOfSeason(season: QuestSeason): Quest[] {
+  return QUESTS.filter((q) => q.season === season);
+}
 
 export const QUESTS_BY_ID: Record<string, Quest> = Object.fromEntries(QUESTS.map((q) => [q.id, q]));
 

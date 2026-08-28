@@ -1,10 +1,12 @@
 import { prisma } from '@/lib/db/prisma';
-import { matchQuestsForEvent } from './trackProgress';
+import { matchQuestsForEvent, estQueteDistincte } from './trackProgress';
 import type { QuestEventPayload, GameMode } from './hooks';
 import type { Quest } from './questData';
 import { formatDateUTC } from './dailySelector';
 import { ensureDailyQuestForDate } from './dailyAssignment';
 import { withUserLock } from './userLock';
+import { enrichirDesAgregats, reinitialiserAgregats } from './agregatsDePartie';
+import { noterLeFait, reinitialiserFaitsDePartie } from './faitsDePartie';
 
 function isUniqueViolation(err: unknown): boolean {
   if (typeof err !== 'object' || err === null) return false;
@@ -17,6 +19,7 @@ interface ScopedAccumulator {
 }
 
 const scopedProgress = new Map<string, ScopedAccumulator>();
+const distinctScopedProgress = new Map<string, { scopeKey: string; vues: Set<string> }>();
 
 function scopeMapKey(userId: string, questId: string): string {
   return `${userId}:${questId}`;
@@ -39,6 +42,9 @@ function scopeKeyForQuest(quest: Quest, payload: QuestEventPayload | undefined):
 
 export function __resetScopedProgressForTests(): void {
   scopedProgress.clear();
+  distinctScopedProgress.clear();
+  reinitialiserAgregats();
+  reinitialiserFaitsDePartie();
 }
 
 export interface PersistedProgress {
@@ -74,14 +80,16 @@ export async function persistQuestProgress(
   if (!userId) return [];
   if (!shouldPersist(hook, payload)) return [];
 
+  payload = enrichirDesAgregats(hook, userId, payload);
+  noterLeFait(hook, userId, payload);
   const matches = matchQuestsForEvent(hook, payload);
   if (matches.length === 0) return [];
 
   return withUserLock(userId, async () => {
     const persisted: PersistedProgress[] = [];
 
-    for (const { quest, delta } of matches) {
-      const updated = await upsertQuestProgress(userId, quest, delta, payload);
+    for (const { quest, delta, distinctKey } of matches) {
+      const updated = await upsertQuestProgress(userId, quest, delta, payload, distinctKey);
       if (updated) persisted.push(updated);
     }
 
@@ -102,6 +110,7 @@ async function upsertQuestProgress(
   quest: Quest,
   delta: number,
   payload: QuestEventPayload | undefined,
+  distinctKey?: string,
 ): Promise<PersistedProgress | null> {
   const existing = await prisma.questProgress.findUnique({
     where: { userId_questId: { userId, questId: quest.id } },
@@ -110,6 +119,10 @@ async function upsertQuestProgress(
   if (existing?.claimed) return null;
   if (existing?.completed) {
     return { questId: quest.id, newProgress: existing.progress, completedNow: false };
+  }
+
+  if (estQueteDistincte(quest)) {
+    return upsertQueteDistincte(userId, quest, distinctKey, payload, existing);
   }
 
   const isScoped = quest.scope === 'match' || quest.scope === 'session';
@@ -162,6 +175,88 @@ async function upsertQuestProgress(
       progress: newProgress,
       completed: completed ? true : existing.completed,
       completedAt: completedNow ? new Date() : existing.completedAt,
+    },
+  });
+  return { questId: quest.id, newProgress, completedNow };
+}
+
+// Une quete distincte se mesure en sources differentes: on retient les sources vues et la
+// progression vaut la taille de l ensemble. Rejouer la meme source ne fait pas avancer.
+async function upsertQueteDistincte(
+  userId: string,
+  quest: Quest,
+  distinctKey: string | undefined,
+  payload: QuestEventPayload | undefined,
+  existing: { progress: number; seenKeys: string[]; completed: boolean; completedAt: Date | null } | null,
+): Promise<PersistedProgress | null> {
+  if (!distinctKey) return null;
+
+  const isScoped = quest.scope === 'match' || quest.scope === 'session';
+  if (isScoped) {
+    const sKey = scopeKeyForQuest(quest, payload);
+    if (!sKey) return null;
+    const mapKey = scopeMapKey(userId, quest.id);
+    const acc = distinctScopedProgress.get(mapKey);
+    let vues: Set<string>;
+    if (!acc || acc.scopeKey !== sKey) {
+      vues = new Set([distinctKey]);
+      distinctScopedProgress.set(mapKey, { scopeKey: sKey, vues });
+    } else {
+      acc.vues.add(distinctKey);
+      vues = acc.vues;
+    }
+    if (vues.size < quest.target) {
+      return { questId: quest.id, newProgress: vues.size, completedNow: false };
+    }
+    return ecrireProgression(userId, quest, quest.target, existing, null);
+  }
+
+  const dejaVues = new Set(existing?.seenKeys ?? []);
+  if (dejaVues.has(distinctKey)) {
+    return { questId: quest.id, newProgress: dejaVues.size, completedNow: false };
+  }
+  dejaVues.add(distinctKey);
+  return ecrireProgression(userId, quest, dejaVues.size, existing, [...dejaVues]);
+}
+
+async function ecrireProgression(
+  userId: string,
+  quest: Quest,
+  progressionVoulue: number,
+  existing: { progress: number; completed: boolean; completedAt: Date | null } | null,
+  seenKeys: string[] | null,
+): Promise<PersistedProgress> {
+  const newProgress = Math.min(progressionVoulue, quest.target);
+  const completed = newProgress >= quest.target;
+  const donneesCles = seenKeys ? { seenKeys } : {};
+
+  if (!existing) {
+    try {
+      await prisma.questProgress.create({
+        data: {
+          userId,
+          questId: quest.id,
+          progress: newProgress,
+          target: quest.target,
+          completed,
+          completedAt: completed ? new Date() : null,
+          ...donneesCles,
+        },
+      });
+      return { questId: quest.id, newProgress, completedNow: completed };
+    } catch (err) {
+      if (!isUniqueViolation(err)) throw err;
+    }
+  }
+
+  const completedNow = completed && !(existing?.completed ?? false);
+  await prisma.questProgress.update({
+    where: { userId_questId: { userId, questId: quest.id } },
+    data: {
+      progress: newProgress,
+      completed: completed ? true : (existing?.completed ?? false),
+      completedAt: completedNow ? new Date() : (existing?.completedAt ?? null),
+      ...donneesCles,
     },
   });
   return { questId: quest.id, newProgress, completedNow };

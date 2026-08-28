@@ -1216,7 +1216,7 @@
     },
     "seasonHeader": "Missioni della stagione Shinobi Shiren",
     "seasonSoon": "Presto",
-    "seasonIntro": "Ecco le {count} missioni della stagione. Non registrano ancora progressi.",
+    "seasonIntro": "Le {count} missioni della stagione in corso.",
     "archiveHeader": "Stagione precedente",
     "archiveShow": "Consulta",
     "archiveHide": "Nascondi"

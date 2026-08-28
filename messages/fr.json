@@ -3511,7 +3511,7 @@
     },
     "seasonHeader": "Quêtes de la saison Shinobi Shiren",
     "seasonSoon": "Bientôt",
-    "seasonIntro": "Voici les {count} quêtes de la saison. Elles ne comptent pas encore de progression.",
+    "seasonIntro": "Les {count} quêtes de la saison en cours.",
     "archiveHeader": "Saison précédente",
     "archiveShow": "Consulter",
     "archiveHide": "Masquer"

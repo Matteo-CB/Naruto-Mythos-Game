@@ -55,20 +55,41 @@ describe('dailySelector', () => {
 });
 
 describe('quest data integrity', () => {
-  const coreQuests = QUESTS.filter((q) => !q.hook.startsWith('trade.'));
-  const tradeQuests = QUESTS.filter((q) => q.hook.startsWith('trade.'));
+  const konohaShido = QUESTS.filter((q) => q.season === 'KS');
+  const shinobiShiren = QUESTS.filter((q) => q.season === 'SS');
+  const coreQuests = konohaShido.filter((q) => !q.hook.startsWith('trade.'));
+  const tradeQuests = konohaShido.filter((q) => q.hook.startsWith('trade.'));
 
-  it('has exactly 180 core quests plus the trade quests', () => {
+  it('carries both seasons, each with its own 183 quests', () => {
+    expect(konohaShido.length).toBe(183);
+    expect(shinobiShiren.length).toBe(183);
+    expect(QUESTS.length).toBe(366);
+  });
+
+  it('every quest names its season', () => {
+    for (const q of QUESTS) expect(q.season, q.id).toBeTruthy();
+  });
+
+  it('has exactly 180 core Konoha Shido quests plus the trade quests', () => {
     expect(coreQuests.length).toBe(180);
     expect(tradeQuests.length).toBe(3);
   });
 
-  it('has 45 core quests at each difficulty level', () => {
+  it('has 45 core Konoha Shido quests at each difficulty level', () => {
     const byLevel = { 1: 0, 2: 0, 3: 0, 4: 0 };
     for (const q of coreQuests) byLevel[q.level]++;
     expect(byLevel[1]).toBe(45);
     expect(byLevel[2]).toBe(45);
     expect(byLevel[3]).toBe(45);
+    expect(byLevel[4]).toBe(45);
+  });
+
+  it('has the Shinobi Shiren spread of 46 / 46 / 46 / 45', () => {
+    const byLevel = { 1: 0, 2: 0, 3: 0, 4: 0 };
+    for (const q of shinobiShiren) byLevel[q.level]++;
+    expect(byLevel[1]).toBe(46);
+    expect(byLevel[2]).toBe(46);
+    expect(byLevel[3]).toBe(46);
     expect(byLevel[4]).toBe(45);
   });
 

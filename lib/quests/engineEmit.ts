@@ -1,6 +1,8 @@
 import type { GameState, PlayerID } from '@/lib/engine/types';
 import { CARDS_DRAWN_PER_TURN } from '@/lib/engine/types';
 import { emitQuestEvent, type QuestEventPayload, type GameMode } from './hooks';
+import { calculateCharacterPower } from '@/lib/engine/phases/PowerCalculation';
+import { QUESTS } from './questData';
 
 function resolveUserId(state: GameState, player: PlayerID): string | undefined {
   return player === 'player1' ? state.player1UserId : state.player2UserId;
@@ -14,6 +16,32 @@ function inferMode(state: GameState): GameMode | undefined {
   return undefined;
 }
 
+export function numeroImprimeDe(cardId: string | undefined | null): number | null {
+  if (!cardId) return null;
+  const m = /^[A-Z]{2,3}-(\d+)/.exec(cardId);
+  return m ? Number(m[1]) : null;
+}
+
+export function setDe(cardId: string | undefined | null): string | null {
+  if (!cardId) return null;
+  const m = /^([A-Z]{2,3})-/.exec(cardId);
+  return m ? m[1] : null;
+}
+
+// Un signal qui nomme sa carte source porte toujours son set et son numero imprime, sans
+// que chaque site d appel ait a les recalculer.
+function enrichirDeLaSource(payload: QuestEventPayload): QuestEventPayload {
+  const cardId = typeof payload.sourceCardId === 'string' ? payload.sourceCardId : null;
+  if (!cardId) return payload;
+  const set = setDe(cardId);
+  const sourceNumber = numeroImprimeDe(cardId);
+  return {
+    ...payload,
+    ...(payload.set === undefined && set !== null ? { set } : {}),
+    ...(payload.sourceNumber === undefined && sourceNumber !== null ? { sourceNumber } : {}),
+  };
+}
+
 export function emitEngineQuestEvent(
   state: GameState,
   player: PlayerID,
@@ -24,8 +52,26 @@ export function emitEngineQuestEvent(
   if (!userId) return;
   const mode = inferMode(state);
   const matchKey = state.gameId;
-  emitQuestEvent(hook, userId, { gameMode: mode, matchKey, ...(payload ?? {}) });
+  emitQuestEvent(hook, userId, enrichirDeLaSource({ gameMode: mode, matchKey, ...(payload ?? {}) }));
 }
+
+// Les seuils que les quetes citent reellement, lus une fois dans le catalogue. Emettre a
+// chaque valeur serait du bruit, et coder un seuil en dur rendrait toute nouvelle quete
+// muette.
+function seuilsDuCatalogue(hook: string, cles: string[]): number[] {
+  const valeurs = new Set<number>();
+  for (const q of QUESTS) {
+    if (q.hook !== hook) continue;
+    for (const cle of cles) {
+      const v = q.predicate?.[cle];
+      if (typeof v === 'number') valeurs.add(v);
+    }
+  }
+  return [...valeurs].sort((a, b) => a - b);
+}
+
+const SEUILS_PUISSANCE = seuilsDuCatalogue('character.power.threshold', ['power', 'threshold']);
+const SEUILS_JETONS = seuilsDuCatalogue('character.power_tokens.threshold', ['tokens', 'threshold']);
 
 export function emitDrawDiffEvents(oldState: GameState, newState: GameState): void {
   if (!oldState || !newState) return;
@@ -77,17 +123,18 @@ export function emitTokenDiffEvents(oldState: GameState, newState: GameState): v
     for (const mission of newState.activeMissions) {
       for (const ch of mission[sideKey] ?? []) {
         const top = ch.stack?.length > 0 ? ch.stack[ch.stack.length - 1] : ch.card;
-        if (ch.powerTokens >= 10) {
+        const jetons = ch.powerTokens ?? 0;
+        for (const seuil of SEUILS_JETONS) {
+          if (jetons < seuil) break;
           emitEngineQuestEvent(newState, p, 'character.power_tokens.threshold', {
-            name: top.name_fr,
-            threshold: 10,
+            name: top.name_fr, sourceCardId: top.id, threshold: seuil, tokens: jetons,
           });
         }
-        const totalPower = (top.power ?? 0) + (ch.powerTokens ?? 0);
-        if (totalPower >= 10) {
+        const puissance = calculateCharacterPower(newState, ch, p);
+        for (const seuil of SEUILS_PUISSANCE) {
+          if (puissance < seuil) break;
           emitEngineQuestEvent(newState, p, 'character.power.threshold', {
-            name: top.name_fr,
-            threshold: 10,
+            name: top.name_fr, sourceCardId: top.id, threshold: seuil, power: puissance,
           });
         }
       }

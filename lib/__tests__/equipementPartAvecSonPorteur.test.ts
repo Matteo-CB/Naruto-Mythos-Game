@@ -21,7 +21,6 @@ function plateau(): GameState {
     p1: [simChar(PORTEUR, { owner: 'player1', instanceId: 'hote' })],
     missions: 1,
     chakra1: 30,
-    chakra2: 30,
     edgeHolder: 'player1',
   });
 }

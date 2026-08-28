@@ -1216,7 +1216,7 @@
     },
     "seasonHeader": "Zadania sezonu Shinobi Shiren",
     "seasonSoon": "Wkrótce",
-    "seasonIntro": "Oto {count} zadań sezonu. Nie zliczają jeszcze postępu.",
+    "seasonIntro": "{count} zadań bieżącego sezonu.",
     "archiveHeader": "Poprzedni sezon",
     "archiveShow": "Zobacz",
     "archiveHide": "Ukryj"

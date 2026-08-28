@@ -3505,7 +3505,7 @@
     },
     "seasonHeader": "Shinobi Shiren season quests",
     "seasonSoon": "Coming soon",
-    "seasonIntro": "Here are the {count} season quests. They do not track progress yet.",
+    "seasonIntro": "The {count} quests of the current season.",
     "archiveHeader": "Previous season",
     "archiveShow": "View",
     "archiveHide": "Hide"

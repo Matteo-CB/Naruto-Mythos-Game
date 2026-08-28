@@ -3509,7 +3509,7 @@
     },
     "seasonHeader": "忍びの試練シーズンのクエスト",
     "seasonSoon": "近日公開",
-    "seasonIntro": "シーズンのクエスト{count}件です。進捗はまだ記録されません。",
+    "seasonIntro": "現在のシーズンのクエスト{count}件。",
     "archiveHeader": "前シーズン",
     "archiveShow": "見る",
     "archiveHide": "隠す"

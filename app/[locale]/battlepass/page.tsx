@@ -74,18 +74,7 @@ interface QuestRow {
   completed: boolean;
   claimed: boolean;
   claimedVia?: 'main' | 'daily' | null;
-}
-
-interface SeasonQuestRow {
-  id: string;
-  level: 1 | 2 | 3 | 4;
-  target: number;
-  text_fr: string;
-  text_en: string;
-  text_es?: string;
-  text_ja?: string;
-  xpReward: number;
-  tracked: boolean;
+  season?: 'KS' | 'SS';
 }
 
 function questText(q: { text_fr: string; text_en: string; text_es?: string; text_ja?: string }, locale: string): string {
@@ -110,6 +99,7 @@ interface DailyRow {
   completed: boolean;
   claimed: boolean;
   claimedVia?: 'main' | 'daily' | null;
+  season?: 'KS' | 'SS';
 }
 
 interface OpenedBooster {
@@ -147,7 +137,7 @@ export default function RewardsHubPage() {
 
   const [bpState, setBpState] = useState<BattlepassState | null>(null);
   const [quests, setQuests] = useState<QuestRow[]>([]);
-  const [seasonQuests, setSeasonQuests] = useState<SeasonQuestRow[]>([]);
+
   const [voirArchive, setVoirArchive] = useState(false);
   const [niveauDeSaison, setNiveauDeSaison] = useState<number>(1);
   const [daily, setDaily] = useState<DailyRow | null>(null);
@@ -185,7 +175,6 @@ export default function RewardsHubPage() {
     const qData = await qRes.json();
     const dData = dRes.ok ? await dRes.json() : null;
     setQuests(Array.isArray(qData.quests) ? qData.quests : []);
-    setSeasonQuests(Array.isArray(qData.seasonQuests) ? qData.seasonQuests : []);
     setDaily(dData);
   }, []);
 
@@ -446,15 +435,18 @@ export default function RewardsHubPage() {
     return [1, 2, 3, 4].map((l) => byLevel[l]).filter((q): q is QuestRow => q !== null);
   })();
 
+  const quetesDeLaSaison = mainQuests.filter((q) => (q.season ?? 'KS') === 'SS');
+  const quetesArchivees = mainQuests.filter((q) => (q.season ?? 'KS') !== 'SS');
+
   const levelCounts = [1, 2, 3, 4].map((level) => ({
     level,
-    total: mainQuests.filter((q) => q.level === level).length,
-    completed: mainQuests.filter((q) => q.level === level && q.completed).length,
-    claimable: mainQuests.filter((q) => q.level === level && q.completed && !q.claimed).length,
+    total: quetesArchivees.filter((q) => q.level === level).length,
+    completed: quetesArchivees.filter((q) => q.level === level && q.completed).length,
+    claimable: quetesArchivees.filter((q) => q.level === level && q.completed && !q.claimed).length,
   }));
 
-  const filteredQuests = mainQuests.filter((q) => q.level === activeLevel);
-  const quetesDeSaisonDuNiveau = seasonQuests.filter((q) => q.level === niveauDeSaison);
+  const filteredQuests = quetesArchivees.filter((q) => q.level === activeLevel);
+  const quetesDeSaisonDuNiveau = quetesDeLaSaison.filter((q) => q.level === niveauDeSaison);
 
   return (
     <main className="relative min-h-screen flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--t-bg)', color: 'var(--t-text)' }}>
@@ -852,7 +844,7 @@ export default function RewardsHubPage() {
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {seasonQuests.length > 0 && (
+                  {quetesDeLaSaison.length > 0 && (
                     <section
                       className="mb-5 px-5 py-4"
                       style={{ backgroundColor: PANEL_BG, clipPath: PANEL_CLIP, boxShadow: '0 12px 32px var(--t-shadow)' }}
@@ -861,12 +853,12 @@ export default function RewardsHubPage() {
                         <h3 className="text-xs uppercase tracking-[0.24em] font-display" style={{ color: ACCENT }}>
                           {tQuests('seasonHeader')}
                         </h3>
-                        <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>
-                          {tQuests('seasonSoon')}
+                        <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--t-dim)', fontVariantNumeric: 'tabular-nums' }}>
+                          {quetesDeLaSaison.filter((q) => q.completed).length} / {quetesDeLaSaison.length}
                         </span>
                       </div>
                       <p className="text-[11px] mb-3" style={{ color: 'var(--t-dim)' }}>
-                        {tQuests('seasonIntro', { count: seasonQuests.length })}
+                        {tQuests('seasonIntro', { count: quetesDeLaSaison.length })}
                       </p>
                       <div className="flex flex-wrap gap-2 mb-3">
                         {[1, 2, 3, 4].map((level) => (
@@ -883,7 +875,7 @@ export default function RewardsHubPage() {
                           >
                             {tQuests('levelLabel', { level })}
                             <span style={{ color: 'var(--t-dim)', fontVariantNumeric: 'tabular-nums' }}>
-                              {seasonQuests.filter((q) => q.level === level).length}
+                              {quetesDeLaSaison.filter((q) => q.level === level && q.completed).length}/{quetesDeLaSaison.filter((q) => q.level === level).length}
                             </span>
                           </button>
                         ))}
@@ -893,10 +885,13 @@ export default function RewardsHubPage() {
                           <div
                             key={q.id}
                             className="flex items-center justify-between gap-3 px-3 py-2"
-                            style={{ backgroundColor: 'var(--t-surface-2)', opacity: 0.85 }}
+                            style={{ backgroundColor: 'var(--t-surface-2)' }}
                           >
                             <span className="text-[12px] flex-1" style={{ color: 'var(--t-text)' }}>
                               {questText(q, locale)}
+                            </span>
+                            <span className="text-[10px] shrink-0" style={{ color: 'var(--t-muted)', fontVariantNumeric: 'tabular-nums' }}>
+                              {q.progress}/{q.target}
                             </span>
                             <span
                               className="text-[10px] shrink-0"
@@ -904,6 +899,27 @@ export default function RewardsHubPage() {
                             >
                               +{q.xpReward} XP
                             </span>
+                            <div style={{ width: 96, textAlign: 'right' }}>
+                              {q.claimed ? (
+                                <span className="text-[10px] uppercase tracking-widest font-display" style={{ color: 'var(--t-dim)', whiteSpace: 'nowrap' }}>
+                                  {tQuests('claimed')}
+                                </span>
+                              ) : q.completed ? (
+                                <button
+                                  type="button"
+                                  onClick={() => handleClaimQuest(q.id)}
+                                  disabled={claimingQuestId !== null}
+                                  className="px-2 py-1 text-[10px] tracking-widest font-display uppercase"
+                                  style={{
+                                    backgroundColor: claimingQuestId === q.id ? 'var(--t-surface-2)' : ACCENT,
+                                    color: claimingQuestId === q.id ? 'var(--t-muted)' : 'var(--t-bg)',
+                                    cursor: claimingQuestId !== null ? 'wait' : 'pointer',
+                                  }}
+                                >
+                                  {tQuests('claim')}
+                                </button>
+                              ) : null}
+                            </div>
                           </div>
                         ))}
                       </div>

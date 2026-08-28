@@ -6,6 +6,8 @@ import { generateInstanceId } from '../utils/id';
 import { EffectEngine } from '../../effects/EffectEngine';
 import { isMovementBlockedByKurenai, applyRempartTokenRemoval } from '../../effects/ContinuousEffects';
 import { missionPointBonus, textIsBlanked } from '../../effects/handlers/SS/attachmentStatics';
+import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
+import { annoncerMissionRemportee } from '@/lib/quests/missionRemportee';
 
 const RANK_ORDER = ['D', 'C', 'B', 'A'] as const;
 
@@ -269,6 +271,8 @@ function scoreMission(state: GameState, missionIndex: number, rankIndex: number)
     );
 
     newState = { ...newState, [winner]: ps, log };
+
+    annoncerMissionRemportee(newState, winner, missionIndex, points);
 
     
     
