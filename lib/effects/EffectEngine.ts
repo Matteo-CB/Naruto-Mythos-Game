@@ -15556,7 +15556,7 @@ export class EffectEngine {
             for (const char of mission[side]) {
               if (char.isHidden) continue;
               if (char.instanceId === pendingEffect.sourceInstanceId) continue;
-              const power = Math.max(0, getEffectivePower(newState, char, sidePlayer));
+              const power = getEffectivePower(newState, char, sidePlayer);
               k134PowerSnapshot[char.instanceId] = power;
               if (power <= 6) {
                 k134ValidTargets.push(char.instanceId);
@@ -21383,14 +21383,14 @@ export class EffectEngine {
 
     const charResult = EffectEngine.findCharByInstanceId(state, targetId);
     if (!charResult || charResult.character.isHidden) return state;
-    const targetPower = powerSnapshot[targetId] ?? Math.max(0, getEffectivePower(state, charResult.character, charResult.player));
+    const targetPower = powerSnapshot[targetId] ?? getEffectivePower(state, charResult.character, charResult.player);
 
 
     let newState = EffectEngine.hideCharacterWithLog(state, targetId, pending.sourcePlayer);
     remainingPower -= targetPower;
     hiddenIds.push(targetId);
 
-    if (remainingPower <= 0) return newState;
+    if (remainingPower < 0) return newState;
 
 
     const validNext: string[] = [];
