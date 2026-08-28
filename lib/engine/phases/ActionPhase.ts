@@ -14,6 +14,8 @@ import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 import { avecJoueCeTour } from '../rules/discountedPlay';
 import { expireFirstStrike, isFirstCardPlayedThisRound } from '../rules/firstStrike';
 import { offerKimimaro077Sacrifice } from '@/lib/effects/handlers/SS/kimimaro077Pass';
+import { annoncerDuelContinu } from '@/lib/quests/effetResolu';
+import { isDuelConditionMet } from '@/lib/effects/duelUtils';
 
 
 export function executeAction(state: GameState, player: PlayerID, action: GameAction): GameState {
@@ -230,6 +232,9 @@ function handlePlayCharacter(
         sourceCardId: sommetJoue.id,
       });
     }
+    annoncerDuelContinu(newState, player, sommetJoue as never, missionIndex,
+      (texte) => isDuelConditionMet(newState, missionIndex, texte));
+
     const rarity = playedChar.card.rarity;
     if (rarity === 'RA' || rarity === 'MV' || rarity === 'SV' || rarity === 'L') {
       emitEngineQuestEvent(newState, player, 'variant.card.played', { rarity });

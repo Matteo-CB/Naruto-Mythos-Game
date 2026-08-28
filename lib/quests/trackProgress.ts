@@ -65,9 +65,39 @@ function predicateMatches(
       if (actual > expected) return false;
       continue;
     }
+    if (CLES_DE_NOM.has(key)) {
+      if (!memeNom(actual, expected)) return false;
+      continue;
+    }
     if (String(actual) !== String(expected)) return false;
   }
   return true;
+}
+
+const CLES_DE_NOM: ReadonlySet<string> = new Set(['sourceName', 'name', 'targetName']);
+
+// Un nom de carte s ecrit avec ou sans accent, en majuscules ou non, et le moteur annonce
+// tantot la version francaise tantot l anglaise. La comparaison ne doit pas dependre de ce
+// detail, sinon une quete reste muette sans que rien ne le signale.
+function normaliserLeNom(valeur: unknown): string {
+  return String(valeur ?? '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toUpperCase()
+    .trim();
+}
+
+function memeNom(actual: unknown, expected: unknown): boolean {
+  const attendu = normaliserLeNom(expected);
+  if (!attendu) return false;
+  if (normaliserLeNom(actual) === attendu) return true;
+  const variantes = ['UCHIWA', 'UCHIHA'];
+  if (variantes.some((v) => attendu.includes(v))) {
+    const sansClan = attendu.replace(/UCHIWA|UCHIHA/g, '').trim();
+    const reel = normaliserLeNom(actual).replace(/UCHIWA|UCHIHA/g, '').trim();
+    return sansClan.length > 0 && sansClan === reel;
+  }
+  return false;
 }
 
 const SOLO_V_SELF_MODE: GameMode = 'solo_v_self';

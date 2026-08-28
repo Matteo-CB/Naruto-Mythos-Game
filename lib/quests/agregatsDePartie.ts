@@ -52,5 +52,9 @@ export function enrichirDesAgregats(
     ...payload,
     sameRound: deLaManche.size,
     everyRound: Math.min(manchesServies, MANCHES_PAR_PARTIE),
+    // Les sources deja vues dans la partie, pour les quetes qui demandent d en reunir
+    // plusieurs. Le signal garde la sienne quand il en porte deja une, comme la mission qui
+    // annonce les equipements presents au decompte.
+    pairNumbers: payload.pairNumbers ?? [...suivi.vusDansLaPartie],
   };
 }

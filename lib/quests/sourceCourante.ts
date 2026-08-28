@@ -9,6 +9,9 @@
 export interface SourceDEffet {
   cardId: string;
   name?: string;
+  // Le camp qui a joue la carte. Une carte qui force l adversaire a abattre un des siens
+  // agit toujours au benefice de celui qui l a posee.
+  player?: 'player1' | 'player2';
 }
 
 const pile: SourceDEffet[] = [];

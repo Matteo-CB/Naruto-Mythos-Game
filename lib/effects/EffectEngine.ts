@@ -92,6 +92,8 @@ import { resoudreEffetAvecQuete } from './resolutionEffet';
 import { avecSource } from '@/lib/quests/sourceCourante';
 import { getCardById } from '@/lib/data/cardIndex';
 import { champsDeLaSource } from '@/lib/quests/sourceCourante';
+import { annoncerJetonsRetires } from '@/lib/quests/jetonsRetires';
+import { annoncerDefaite } from '@/lib/quests/defaiteAnnoncee';
 import { annoncerEquipementDefausse, annoncerDefaiteParEquipement } from '@/lib/quests/equipementPose';
 import { hasFlexibleUpgradeRestriction, isRestrictedUpgradeTarget } from '@/lib/engine/rules/flexibleUpgradeRestriction';
 import { forestOfDeathActive, textIsBlanked } from './handlers/SS/attachmentStatics';
@@ -1536,9 +1538,17 @@ export class EffectEngine {
     const carteSource = getCardById(pendingEffect.sourceCardId);
     const resolved = avecSource(
       pendingEffect.sourceCardId
-        ? { cardId: pendingEffect.sourceCardId, name: carteSource?.name_fr ?? carteSource?.name_en }
+        ? {
+          cardId: pendingEffect.sourceCardId,
+          name: carteSource?.name_fr ?? carteSource?.name_en,
+          player: pendingEffect.sourcePlayer,
+        }
         : null,
-      () => EffectEngine.dispatchTargetedEffect(state, pendingEffect, selectedTargets),
+      () => {
+        const apres = EffectEngine.dispatchTargetedEffect(state, pendingEffect, selectedTargets);
+        annoncerJetonsRetires(state, apres, pendingEffect.sourcePlayer);
+        return apres;
+      },
     );
     return inheritPlayContext(resolved, knownPendingIds, pendingEffect);
   }
@@ -20915,6 +20925,7 @@ export class EffectEngine {
     };
     
     
+    annoncerDefaite(newState, effectSource, charResult.character);
     newState = triggerOnDefeatEffects(newState, charResult.character, charResult.player, simultaneousDefeatIds, sourcePlayer);
     return newState;
   }
@@ -20937,6 +20948,8 @@ export class EffectEngine {
     if (idx === -1) return state;
 
     const defeated = mission[key].splice(idx, 1)[0];
+
+    annoncerDefaite(newState, charResult2.player === 'player1' ? 'player2' : 'player1', defeated);
 
     
     const owner = defeated.originalOwner;
@@ -24228,6 +24241,17 @@ export class EffectEngine {
     state = EffectEngine.checkKankuro117MoveTrigger(state, effectInitiator ?? charOwner, charResult.player);
 
     state = applyRempartTokenRemoval(state);
+
+    const auteurDuDeplacement = effectInitiator ?? charOwner;
+    emitEngineQuestEvent(state, auteurDuDeplacement, 'character.moved', {
+      targetName: movedCharName,
+      friendly: charResult.player === auteurDuDeplacement,
+    });
+    emitEngineQuestEvent(state, auteurDuDeplacement, 'character.moved.by.card', {
+      sourceCardId: effectCardId,
+      sourceName: effectCardName,
+      targetName: movedCharName,
+    });
 
     return state;
   }

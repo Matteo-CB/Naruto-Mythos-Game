@@ -77,7 +77,7 @@ describe('la saison Shinobi Shiren est reellement branchee', () => {
   it('chaque crochet utilise est emis quelque part dans le code', () => {
     const sources = [
       'lib/quests/effetResolu.ts', 'lib/quests/engineEmit.ts', 'lib/quests/etatDeJeu.ts',
-      'lib/quests/equipementPose.ts', 'lib/quests/jetonsRetires.ts',
+      'lib/quests/equipementPose.ts', 'lib/quests/jetonsRetires.ts', 'lib/quests/defaiteAnnoncee.ts',
       'lib/quests/missionRemportee.ts', 'lib/quests/resumeDeDeck.ts',
       'lib/effects/EffectEngine.ts', 'lib/effects/attachments.ts', 'lib/effects/defeatUtils.ts',
       'lib/engine/GameEngine.ts', 'lib/engine/phases/MissionPhase.ts', 'lib/socket/server.ts',

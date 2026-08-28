@@ -41,6 +41,34 @@ export function equipementsDeLaMission(state: GameState, missionIndex: number | 
   return numeros;
 }
 
+// Un DUEL continu ne se resout jamais comme un effet instantane, il est simplement actif
+// des que son partenaire est la. Pour le joueur c est bien « declencher le DUEL », donc il
+// est annonce a la pose de la carte quand la condition est remplie.
+export function annoncerDuelContinu(
+  state: GameState,
+  player: PlayerID,
+  carte: { id?: string; name_fr?: string; name_en?: string; effects?: Array<{ type?: string; description?: string }> },
+  missionIndex: number | undefined,
+  conditionRemplie: (description: string) => boolean,
+): void {
+  const set = setDeLaCarte(carte.id);
+  const sourceNumber = numeroImprime(carte.id);
+  if (set === null || sourceNumber === null || missionIndex === undefined) return;
+  for (const effet of carte.effects ?? []) {
+    if (effet.type !== 'DUEL') continue;
+    const texte = effet.description ?? '';
+    if (!texte.includes('[⧗]')) continue;
+    if (!conditionRemplie(texte)) continue;
+    emitEngineQuestEvent(state, player, CROCHET_PAR_EFFET.DUEL, {
+      set,
+      sourceNumber,
+      sourceName: carte.name_fr ?? carte.name_en,
+      round: state.turn,
+      missionAttachments: equipementsDeLaMission(state, missionIndex),
+    });
+  }
+}
+
 export function annoncerEffetResolu(
   state: GameState,
   player: PlayerID,

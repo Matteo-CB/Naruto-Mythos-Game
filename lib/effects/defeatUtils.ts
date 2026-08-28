@@ -3,7 +3,7 @@ import { logAction } from '../engine/utils/gameLog';
 import { EffectEngine } from './EffectEngine';
 import { triggerOnDefeatEffects } from './onDefeatTriggers';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
-import { champsDeLaSource } from '@/lib/quests/sourceCourante';
+import { annoncerDefaite } from '@/lib/quests/defaiteAnnoncee';
 
 
 
@@ -121,19 +121,7 @@ export function defeatCharacterInPlay(
 
   let newState = removeCharacterFromPlay(state, missionIndex, charInstanceId, side);
 
-  emitEngineQuestEvent(state, sourcePlayer, 'character.defeated', {
-    targetName: targetChar.card.name_fr,
-    targetKeywords: targetChar.card.keywords ?? [],
-    isHidden: targetChar.isHidden,
-  });
-  emitEngineQuestEvent(state, sourcePlayer, 'character.defeated.by.name', {
-    name: targetChar.card.name_fr,
-  });
-  emitEngineQuestEvent(state, sourcePlayer, 'character.defeated.by.card', {
-    ...champsDeLaSource(),
-    targetName: targetChar.card.name_fr,
-    isHidden: targetChar.isHidden,
-  });
+  annoncerDefaite(state, sourcePlayer, targetChar);
 
   newState = {
     ...newState,

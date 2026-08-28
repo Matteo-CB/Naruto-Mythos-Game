@@ -59,7 +59,7 @@ export function artisanVillageReward(
   return newState;
 }
 
-function resolveAttachmentTrigger(
+export function resolveAttachmentTrigger(
   state: GameState,
   player: PlayerID,
   card: CardData,

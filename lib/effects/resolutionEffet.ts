@@ -27,7 +27,7 @@ export function resoudreEffetAvecQuete(
     : duHote;
 
   const resultat = avecSource(
-    sommet?.id ? { cardId: sommet.id, name: sommet.name_fr ?? sommet.name_en } : null,
+    sommet?.id ? { cardId: sommet.id, name: sommet.name_fr ?? sommet.name_en, player: ctx.sourcePlayer } : null,
     () => envelopperResultat(handler(ctx), ctx, effectType),
   );
 
