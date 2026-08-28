@@ -1127,7 +1127,7 @@
   },
   "battlepass": {
     "title": "Ricompense",
-    "subtitle": "Stagione Konoha Shido",
+    "subtitle": "Stagione {season}",
     "tabRewards": "Livelli",
     "tabBoosters": "Booster",
     "tabQuests": "Missioni",

@@ -1127,7 +1127,7 @@
   },
   "battlepass": {
     "title": "Nagrody",
-    "subtitle": "Sezon Konoha Shido",
+    "subtitle": "Sezon {season}",
     "tabRewards": "Poziomy",
     "tabBoosters": "Boostery",
     "tabQuests": "Zadania",

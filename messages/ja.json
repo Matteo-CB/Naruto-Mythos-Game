@@ -3516,7 +3516,7 @@
   },
   "battlepass": {
     "title": "報酬",
-    "subtitle": "木ノ葉指導シーズン",
+    "subtitle": "{season}シーズン",
     "tabRewards": "ティア",
     "tabBoosters": "ブースター",
     "tabQuests": "クエスト",

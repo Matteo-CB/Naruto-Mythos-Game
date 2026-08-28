@@ -3518,7 +3518,7 @@
   },
   "battlepass": {
     "title": "Récompenses",
-    "subtitle": "Saison Konoha Shido",
+    "subtitle": "Saison {season}",
     "tabRewards": "Paliers",
     "tabBoosters": "Boosters",
     "tabQuests": "Quêtes",

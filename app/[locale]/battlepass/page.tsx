@@ -13,6 +13,7 @@ import { InfiniteSegment } from '@/components/battlepass/InfiniteSegment';
 import { BoosterSetTile } from '@/components/boosters/BoosterSetTile';
 import { BoosterCarousel } from '@/components/boosters/BoosterCarousel';
 import { getSetName } from '@/lib/data/sets/registry';
+import { SAISON_COURANTE } from '@/lib/quests/questData';
 import { BoosterRatesPanel } from '@/components/boosters/BoosterRatesPanel';
 import { BoosterOpenAnimation } from '@/components/boosters/BoosterOpenAnimation';
 import { BoosterOpenFailureScreen } from '@/components/boosters/BoosterOpenFailureScreen';
@@ -475,7 +476,7 @@ export default function RewardsHubPage() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
         >
-          {t('subtitle')}
+          {t('subtitle', { season: getSetName(SAISON_COURANTE, locale) })}
         </motion.p>
         <motion.p
           className="text-[11px] mb-1 italic"

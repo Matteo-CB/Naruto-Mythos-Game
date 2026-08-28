@@ -1,4 +1,4 @@
-import { QUESTS, type Quest } from './questData';
+import { QUESTS, SAISON_COURANTE, type Quest } from './questData';
 import { hashStringToSeed, mulberry32 } from '@/lib/variants/rng';
 
 export function formatDateUTC(date: Date): string {
@@ -38,9 +38,20 @@ const DAILY_EXCLUDED_IDS = new Set([
   'trade-cards-10',
 ]);
 
+// La quete du jour appartient a la saison en cours. Une quete de la saison archivee ne se
+// tirerait plus jamais, et surtout elle ne se reclamerait pas: sa progression appartient a
+// une saison close.
+const CIBLE_MAXIMALE_DU_JOUR = 25;
+
 function isDailyEligible(q: Quest): boolean {
   if (DAILY_EXCLUDED_HOOKS.has(q.hook)) return false;
   if (DAILY_EXCLUDED_IDS.has(q.id)) return false;
+  if ((q.season ?? SAISON_COURANTE) !== SAISON_COURANTE) return false;
+  // Une quete du jour se finit dans la journee: les compteurs au long cours et les
+  // tournois n y ont pas leur place.
+  if (q.target > CIBLE_MAXIMALE_DU_JOUR) return false;
+  if (q.hook.startsWith('tournament.')) return false;
+  if (q.hook.startsWith('ranked.win.streak')) return false;
   return true;
 }
 
