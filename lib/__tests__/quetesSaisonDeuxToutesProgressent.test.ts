@@ -10,7 +10,8 @@ import { matchQuestsForEvent } from '@/lib/quests/trackProgress';
 import { enrichirDesAgregats, reinitialiserAgregats } from '@/lib/quests/agregatsDePartie';
 import { noterLeFait, reinitialiserFaitsDePartie } from '@/lib/quests/faitsDePartie';
 import { emitAttachmentStateEvents } from '@/lib/quests/etatDeJeu';
-import { resolveAttachmentTrigger } from '@/lib/effects/attachments';
+import { attachCardToCharacter } from '@/lib/effects/attachments';
+import { executeMissionPhase, resumeMissionScoring } from '@/lib/engine/phases/MissionPhase';
 import { emitTokenDiffEvents, emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 import { questsOfSeason, SAISON_COURANTE } from '@/lib/quests/questData';
 import { resumerLeDeck, compteParSet } from '@/lib/quests/resumeDeDeck';
@@ -55,15 +56,6 @@ const ROSTER_ENNEMI = ['SS-014-C', 'SS-009-C', 'SS-041-UC', 'SS-032-C'];
 const MISSIONS_SS = duSet.filter((c) => c.card_type === 'mission')
   .filter((c, i, l) => l.findIndex((x) => numero(x.id) === numero(c.id)) === i)
   .map((c) => c.id);
-
-// Ce que ce banc ne sait pas mettre en scene, avec la raison. Toute autre quete qui cesse
-// de progresser fait echouer le banc.
-const HORS_DU_BANC: Readonly<Record<string, string>> = {
-  'ss-kakashi-copies': "aucune carte du set 2 ne copie d effet: la quete est irrealisable telle qu ecrite",
-  'ss-equip-vol': "voler un equipement demande une prise de controle adverse, hors de portee d un banc a un seul joueur",
-  'ss-equip-aiguilles-jetons': "l AMBUSH des aiguilles se declenche a la revelation, que ce banc ne sait pas mettre en scene",
-  'ss-mission-quatre-manche': "remporter les quatre missions d une meme manche demande une partie complete, pas un plateau monte",
-};
 
 const touchees = new Set<string>();
 const captures: Array<{ hook: string; payload?: QuestEventPayload }> = [];
@@ -533,18 +525,30 @@ describe('chaque quete de Shinobi Shiren progresse pour de vrai', () => {
       jouerLaPremiereCarte(etat, 0);
     }
 
-    // LES AIGUILLES EMPOISONNEES posees sur un ennemi charge de jetons, puis revelees.
+    // LES AIGUILLES EMPOISONNEES jouees face cachee puis revelees vident leur porteur.
+    {
+      let etat = plateau({ p1: ['SS-003-C'], p2: ['SS-005-C'], missions: 2, main: ['SS-084-C'] });
+      etat.activeMissions[0].player2Characters[0].powerTokens = 6;
+      try {
+        etat = GameEngine.applyAction(etat, 'player1', { type: 'PLAY_HIDDEN', cardIndex: 0, missionIndex: 0 } as never);
+        etat = GameEngine.applyAction(etat, 'player2', { type: 'PASS' } as never);
+        const cache = etat.activeMissions[0].player1Characters.find((c) => c.isHidden);
+        if (cache) {
+          etat = repondreTout(GameEngine.applyAction(etat, 'player1', {
+            type: 'REVEAL_CHARACTER', missionIndex: 0, characterInstanceId: cache.instanceId,
+          } as never));
+        }
+      } catch { /* une revelation refusee ne doit pas arreter le banc */ }
+    }
+
+    // UN EQUIPEMENT VOLE, repose du cote du voleur.
     {
       const etat = plateau({ p1: ['SS-003-C'], p2: ['SS-005-C'], missions: 2 });
       const cible = etat.activeMissions[0].player2Characters[0];
-      cible.powerTokens = 6;
-      cible.attachments = [{
-        instanceId: 'aiguilles',
-        card: getCardById('SS-084-C') as never,
-        owner: 'player1',
-      } as never];
-      const apres = resolveAttachmentTrigger(etat, 'player1', getCardById('SS-084-C') as never, cible, 0, 'AMBUSH', true);
-      emitAttachmentStateEvents(apres);
+      attachCardToCharacter(
+        etat, 'player2', getCardById('SS-080-C') as never, cible.instanceId, false, undefined,
+        { owner: 'player1', controllerInstanceId: 'a0' },
+      );
     }
 
     // ITACHI 137 face a KURENAI, l adversaire ayant de quoi choisir une victime.
@@ -556,48 +560,42 @@ describe('chaque quete de Shinobi Shiren progresse pour de vrai', () => {
       jouerLaPremiereCarte(etat, 0, dernier);
     }
 
-    // QUATRE MISSIONS remportees dans la meme manche, toutes deja en jeu.
+    // QUATRE MISSIONS remportees dans la meme manche, par la vraie phase de decompte.
     {
       const etat = plateau({ p1: ['SS-116-R'], missions: 4, missionIds: MISSIONS_SS });
+      // Les quatre rangs de la derniere manche: le decompte suit D, C, B puis A.
+      const rangs = ['D', 'C', 'B', 'A'] as const;
       for (let i = 0; i < 4; i += 1) {
         etat.activeMissions[i] = {
           ...etat.activeMissions[i],
-          rank: 'A',
+          rank: rangs[i],
           player1Characters: [simChar('SS-116-R', { owner: 'player1', instanceId: `garde_${i}` })],
           player2Characters: [],
           wonBy: null,
         };
         etat.activeMissions[i].player1Characters[0].missionIndex = i;
       }
-      let courant: GameState = { ...etat, phase: 'mission' as GameState['phase'] };
-      for (let i = 0; i < 30 && courant.phase === 'mission'; i += 1) {
+      let courant = executeMissionPhase({ ...etat, phase: 'mission' as GameState['phase'] });
+      for (let i = 0; i < 20 && courant.pendingActions.length > 0; i += 1) {
         courant = repondreTout(courant);
-        if (courant.pendingActions.length > 0) break;
-        try {
-          courant = GameEngine.applyAction(courant, courant.activePlayer ?? 'player1',
-            { type: 'ADVANCE_PHASE' } as never);
-        } catch { break; }
+        courant = resumeMissionScoring(courant);
       }
+
     }
+
     expect(true).toBe(true);
   });
 
-  it('toutes les quetes du set 2 progressent, hors exceptions nommees', () => {
+  it('les 183 quetes du set 2 progressent, sans une seule exception', () => {
     const jamais = quetes.filter((q) => !touchees.has(q.id));
-    const inattendues = jamais.filter((q) => !(q.id in HORS_DU_BANC));
-    if (inattendues.length > 0) {
+    if (jamais.length > 0) {
       const parCrochet = new Map<string, string[]>();
-      for (const q of inattendues) parCrochet.set(q.hook, [...(parCrochet.get(q.hook) ?? []), q.id]);
+      for (const q of jamais) parCrochet.set(q.hook, [...(parCrochet.get(q.hook) ?? []), q.id]);
       for (const [h, ids] of parCrochet) console.log(`  ${h}: ${ids.join(', ')}`);
     }
-    expect(inattendues.map((q) => q.id), 'ces quetes ne progressent jamais').toEqual([]);
-    expect(quetes.length - jamais.length, 'quetes prouvees en jeu reel').toBeGreaterThanOrEqual(179);
-  });
-
-  it('les exceptions nommees existent encore et restent des exceptions', () => {
-    for (const id of Object.keys(HORS_DU_BANC)) {
-      expect(quetes.some((q) => q.id === id), `${id} n existe plus`).toBe(true);
-    }
-    expect(Object.keys(HORS_DU_BANC).length, 'la liste des exceptions ne doit pas grossir').toBeLessThanOrEqual(4);
+    expect(jamais.map((q) => q.id), 'ces quetes ne progressent jamais').toEqual([]);
+    const prouvees = quetes.filter((q) => touchees.has(q.id)).length;
+    expect(prouvees, 'toutes les quetes prouvees en jeu reel').toBe(quetes.length);
+    expect(quetes.length).toBe(183);
   });
 });
