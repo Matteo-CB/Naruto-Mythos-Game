@@ -3,6 +3,8 @@
     {
       "date": "2026-08-28",
       "categories": [
+        "fix",
+        "fix",
         "feature",
         "fix",
         "feature",
@@ -11,6 +13,8 @@
       ],
       "title_fr": "Mise à jour",
       "changes_fr": [
+        "Tournoi: un joueur qui revient en cours de préparation n'est plus bloqué avant le mulligan",
+        "Tournoi: un joueur qui a déjà joué son mulligan ne peut plus perdre le match pour absence",
         "La saison Shinobi Shiren commence: tout le monde repart au palier 0, avec 10 boosters Konoha Shido et 15 Shinobi Shiren offerts",
         "Les cartes qui déplacent, vainquent ou retirent des jetons font enfin avancer les quêtes",
         "Les 183 quêtes de la saison Shinobi Shiren comptent pour de vrai, l'ancienne saison reste consultable",
@@ -19,6 +23,8 @@
       ],
       "title_en": "Update",
       "changes_en": [
+        "Tournament: a player who reconnects during setup is no longer stuck before the mulligan",
+        "Tournament: a player who already took their mulligan can no longer lose the match for absence",
         "The Shinobi Shiren season begins: everyone restarts at tier 0, with 10 Konoha Shido and 15 Shinobi Shiren boosters given",
         "Cards that move, defeat or remove tokens finally advance quests",
         "The 183 Shinobi Shiren season quests now track for real, the old season stays viewable",
@@ -27,6 +33,8 @@
       ],
       "title_es": "Actualización",
       "changes_es": [
+        "Torneo: un jugador que se reconecta durante la preparación ya no se queda bloqueado antes del mulligan",
+        "Torneo: un jugador que ya hizo su mulligan ya no puede perder la partida por ausencia",
         "Empieza la temporada Shinobi Shiren: todos vuelven al nivel 0, con 10 sobres Konoha Shido y 15 Shinobi Shiren de regalo",
         "Las cartas que mueven, derrotan o retiran fichas por fin hacen avanzar las misiones",
         "Las 183 misiones de la temporada Shinobi Shiren ya cuentan de verdad, la anterior sigue consultable",
@@ -35,6 +43,8 @@
       ],
       "title_pt": "Atualização",
       "changes_pt": [
+        "Torneio: um jogador que se religa durante a preparação já não fica bloqueado antes do mulligan",
+        "Torneio: um jogador que já fez o seu mulligan já não pode perder a partida por ausência",
         "Começa a temporada Shinobi Shiren: todos recomeçam no nível 0, com 10 boosters Konoha Shido e 15 Shinobi Shiren oferecidos",
         "As cartas que movem, derrotam ou removem fichas finalmente fazem avançar as missões",
         "As 183 missões da temporada Shinobi Shiren já contam a sério, a anterior continua consultável",
@@ -43,6 +53,8 @@
       ],
       "title_it": "Aggiornamento",
       "changes_it": [
+        "Torneo: un giocatore che si riconnette durante la preparazione non resta più bloccato prima del mulligan",
+        "Torneo: un giocatore che ha già fatto il suo mulligan non può più perdere la partita per assenza",
         "Inizia la stagione Shinobi Shiren: tutti ripartono dal livello 0, con 10 bustine Konoha Shido e 15 Shinobi Shiren in regalo",
         "Le carte che spostano, sconfiggono o rimuovono segnalini fanno finalmente avanzare le missioni",
         "Le 183 missioni della stagione Shinobi Shiren contano davvero, la precedente resta consultabile",
@@ -51,6 +63,8 @@
       ],
       "title_pl": "Aktualizacja",
       "changes_pl": [
+        "Turniej: gracz, który wraca w trakcie przygotowań, nie utyka już przed mulliganem",
+        "Turniej: gracz, który już wykonał mulligan, nie może przegrać meczu za nieobecność",
         "Zaczyna się sezon Shinobi Shiren: wszyscy wracają na poziom 0, z 10 boosterami Konoha Shido i 15 Shinobi Shiren w prezencie",
         "Karty, które przesuwają, pokonują lub zdejmują żetony, wreszcie posuwają zadania",
         "183 zadania sezonu Shinobi Shiren naprawdę się liczą, poprzedni sezon pozostaje do wglądu",
@@ -59,6 +73,8 @@
       ],
       "title_ja": "アップデート",
       "changes_ja": [
+        "大会：準備中に再接続したプレイヤーが、マリガンの手前で止まらなくなった",
+        "大会：すでにマリガンを行ったプレイヤーが、不在扱いで敗北することはなくなった",
         "忍びの試練シーズン開幕。全員が階層0からの再出発となり、木ノ葉指導のブースター10個と忍びの試練のブースター15個が配られる",
         "移動・撃破・トークン除去を行うカードが、ようやくクエストを進めるようになった",
         "忍びの試練シーズンの183のクエストが実際に進むようになり、前シーズンも引き続き見られる",

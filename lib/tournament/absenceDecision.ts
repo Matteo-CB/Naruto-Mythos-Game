@@ -10,6 +10,11 @@ export interface AbsenceEvidence {
   onlineP1: boolean;
   onlineP2: boolean;
   gameLive: boolean;
+  // Un joueur qui a deja agi dans la partie de ce match est prouve present. Il ne peut plus
+  // etre declare absent, meme si la partie a ete annulee depuis et que toute autre trace de
+  // sa presence a disparu.
+  aAgiP1: boolean;
+  aAgiP2: boolean;
   cycles: number;
   maxCycles: number;
 }
@@ -73,6 +78,8 @@ export function decideAbsenceOutcome(ev: AbsenceEvidence): AbsenceOutcome {
   if (ev.seatBoundP2) absent2 = false;
   if (ev.readyP1) absent1 = false;
   if (ev.readyP2) absent2 = false;
+  if (ev.aAgiP1) absent1 = false;
+  if (ev.aAgiP2) absent2 = false;
 
   const offlineAbsent1 = absent1 && !ev.onlineP1;
   const offlineAbsent2 = absent2 && !ev.onlineP2;

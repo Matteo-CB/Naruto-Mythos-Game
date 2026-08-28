@@ -32,6 +32,7 @@ import { getCharacterById, getMissionById, getCardById } from '@/lib/data/cardIn
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
 import { computeDeckEvolvingPoints } from '@/lib/evolving/computePoints';
 import { resumerLeDeck } from '@/lib/quests/resumeDeDeck';
+import { aAgiAuPlateau, oublierLeMatch } from '@/lib/tournament/presenceAuPlateau';
 import {
   grantWinnerPrize,
   grantParticipantReward,
@@ -486,6 +487,8 @@ export async function fireAbsenceTimerCallback(
     onlineP1: reachableP1,
     onlineP2: reachableP2,
     gameLive: isMatchGameLive(matchId, currentRoomCode),
+    aAgiP1: aAgiAuPlateau(matchId, p1),
+    aAgiP2: aAgiAuPlateau(matchId, p2 || null),
     cycles,
     maxCycles: MAX_GRACE_CYCLES,
   });

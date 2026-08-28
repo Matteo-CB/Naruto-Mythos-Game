@@ -54,6 +54,7 @@ import { initChatAutoScan, enqueueChatScan, holdScanMessage, type HoldVerdict } 
 import { setChatLockRefresher } from '@/lib/socket/chatLockBridge';
 import { sendDm, getUnreadDmCount, markThreadRead } from '@/lib/dm/dmService';
 import { sealedOuvertPour } from '@/lib/sealed/sealedGate';
+import { noterUneActionAuPlateau } from '@/lib/tournament/presenceAuPlateau';
 
 ensureQuestPersistenceListener();
 
@@ -4133,6 +4134,16 @@ export function setupSocketHandlers(io: SocketIOServer) {
       if (!resolved) return;
       const { code, room, seat } = resolved;
       const player = seat;
+
+      // Le tirage n a lieu qu une fois. Un joueur qui se reconnecte pendant l avant-partie
+      // renvoie sa confirmation et attend la synchronisation: sans cette reponse immediate il
+      // reste bloque sur l ecran du tirage et n atteint jamais le mulligan.
+      if (room.coinFlipResolved) {
+        console.log(`[Socket] coin-flip-done from ${player} in room ${code} after resolution, replaying the sync for them`);
+        socket.emit('coin-flip-sync');
+        return;
+      }
+
       room.coinFlipDone[player] = true;
       console.log(`[Socket] coin-flip-done from ${player} in room ${code}`, room.coinFlipDone);
       if (room.coinFlipDone.player1 && room.coinFlipDone.player2) {
@@ -4297,6 +4308,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
         }
 
         console.log(`[Socket] Action applied, new phase: ${room.gameState.phase}, activePlayer: ${room.gameState.activePlayer}`);
+
+        // Ce joueur vient d agir au plateau. Meme si la partie est annulee ensuite et que
+        // toute trace de sa presence disparait, il ne pourra plus etre declare absent.
+        noterUneActionAuPlateau(room.tournamentMatchId, player === 'player1' ? room.hostId : room.guestId);
 
         
 

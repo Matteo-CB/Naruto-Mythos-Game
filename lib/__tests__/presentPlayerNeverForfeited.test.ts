@@ -19,6 +19,8 @@ function evidence(overrides: Partial<AbsenceEvidence> = {}): AbsenceEvidence {
     onlineP1: false,
     onlineP2: false,
     gameLive: false,
+    aAgiP1: false,
+    aAgiP2: false,
     cycles: 0,
     maxCycles: 8,
     ...overrides,

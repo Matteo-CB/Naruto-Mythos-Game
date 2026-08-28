@@ -22,6 +22,7 @@ function everyCombination(): AbsenceEvidence[] {
                         p1: P1, p2: P2, knownAbsentPlayerId, readySetPresent,
                         readyP1, readyP2, seatBoundP1, seatBoundP2,
                         onlineP1, onlineP2, gameLive, cycles, maxCycles: MAX,
+                        aAgiP1: false, aAgiP2: false,
                       });
                     }
                   }
@@ -92,7 +93,8 @@ describe('a tournament never forfeits a player the server can still see', () => 
     const out = decideAbsenceOutcome({
       p1: P1, p2: P2, knownAbsentPlayerId: null, readySetPresent: true,
       readyP1: false, readyP2: false, seatBoundP1: false, seatBoundP2: false,
-      onlineP1: true, onlineP2: true, gameLive: false, cycles: MAX, maxCycles: MAX,
+      onlineP1: true, onlineP2: true, gameLive: false, aAgiP1: false, aAgiP2: false,
+      cycles: MAX, maxCycles: MAX,
     });
     expect(out.kind).toBe('no-contest');
   });
@@ -101,7 +103,8 @@ describe('a tournament never forfeits a player the server can still see', () => 
     const preuve = (cycles: number) => ({
       p1: P1, p2: P2, knownAbsentPlayerId: P2, readySetPresent: true,
       readyP1: true, readyP2: false, seatBoundP1: true, seatBoundP2: false,
-      onlineP1: true, onlineP2: false, gameLive: false, cycles, maxCycles: MAX,
+      onlineP1: true, onlineP2: false, gameLive: false, aAgiP1: false, aAgiP2: false,
+      cycles, maxCycles: MAX,
     });
 
     expect(
