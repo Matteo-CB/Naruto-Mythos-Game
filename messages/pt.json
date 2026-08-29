@@ -604,7 +604,8 @@
     "modalSubtitle": "Notas da atualização",
     "close": "Fechar",
     "empty": "Ainda não há atualizações.",
-    "latestBadge": "Recente"
+    "latestBadge": "Recente",
+    "setMarker": "Set {number}: {name}"
   },
   "badges": {
     "admin": "ADMIN",

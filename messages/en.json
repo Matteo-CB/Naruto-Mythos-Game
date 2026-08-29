@@ -3367,7 +3367,8 @@
     "modalSubtitle": "Patch notes",
     "close": "Close",
     "empty": "No updates yet.",
-    "latestBadge": "Latest"
+    "latestBadge": "Latest",
+    "setMarker": "Set {number}: {name}"
   },
   "spectate": {
     "errorAuth": "Authentication mismatch.",

@@ -3371,7 +3371,8 @@
     "modalSubtitle": "パッチノート",
     "close": "閉じる",
     "empty": "まだ更新はありません。",
-    "latestBadge": "最新"
+    "latestBadge": "最新",
+    "setMarker": "セット{number}：{name}"
   },
   "spectate": {
     "errorAuth": "認証が一致しません。",

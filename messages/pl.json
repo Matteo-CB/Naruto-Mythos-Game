@@ -604,7 +604,8 @@
     "modalSubtitle": "Lista zmian",
     "close": "Zamknij",
     "empty": "Brak jeszcze aktualizacji.",
-    "latestBadge": "Najnowsze"
+    "latestBadge": "Najnowsze",
+    "setMarker": "Zestaw {number}: {name}"
   },
   "badges": {
     "admin": "ADMIN",

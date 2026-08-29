@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { AnimatePresence, motion } from 'framer-motion';
 import changelog from '@/lib/data/changelog.json';
 import { Z_APP_MODAL } from '@/lib/ui/zIndex';
+import { marqueurALaDate, libelleDuMarqueur } from '@/lib/data/marqueursDeSet';
 
 type Category = 'fix' | 'feature';
 
@@ -221,8 +222,29 @@ export function ChangelogButton() {
                     {visibleEntries.map(({ entry, items }) => {
                       const title = localizedTitle(entry, locale);
                       const isLatest = entry.date === latestDate;
+                      const marqueur = marqueurALaDate(entry.date);
                       return (
                         <li key={entry.date}>
+                          {marqueur && (
+                            <motion.div
+                              initial={{ opacity: 0, scaleX: 0.9 }}
+                              animate={{ opacity: 1, scaleX: 1 }}
+                              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                              className="mb-5 flex items-center justify-center px-4 py-3 text-center"
+                              style={{
+                                backgroundColor: 'color-mix(in srgb, var(--t-danger) 16%, transparent)',
+                                boxShadow: '0 0 26px color-mix(in srgb, var(--t-danger) 28%, transparent)',
+                                borderRadius: 3,
+                              }}
+                            >
+                              <span
+                                className="font-display text-sm uppercase"
+                                style={{ color: 'var(--t-danger)', letterSpacing: '0.22em' }}
+                              >
+                                {t('setMarker', libelleDuMarqueur(marqueur.setId, locale))}
+                              </span>
+                            </motion.div>
+                          )}
                           <div className="mb-2 flex items-center gap-3">
                             <span
                               className="text-xs font-bold uppercase tracking-widest"

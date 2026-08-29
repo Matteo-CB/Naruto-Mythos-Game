@@ -3372,7 +3372,8 @@
     "modalSubtitle": "Notas de la actualización",
     "close": "Cerrar",
     "empty": "Aún no hay actualizaciones.",
-    "latestBadge": "Última"
+    "latestBadge": "Última",
+    "setMarker": "Set {number}: {name}"
   },
   "spectate": {
     "errorAuth": "Discrepancia de autenticación.",

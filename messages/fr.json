@@ -3373,7 +3373,8 @@
     "modalSubtitle": "Notes de patch",
     "close": "Fermer",
     "empty": "Aucune mise à jour pour le moment.",
-    "latestBadge": "Nouveau"
+    "latestBadge": "Nouveau",
+    "setMarker": "Set {number} : {name}"
   },
   "spectate": {
     "errorAuth": "Erreur d'authentification.",
