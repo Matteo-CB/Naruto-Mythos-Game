@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { withImageVersion, portraitImagePath } from '@/lib/utils/imagePath';
 import { getCardById } from '@/lib/data/cardIndex';
+import { iconeDuPalier } from '@/lib/battlepass/iconesDePalier';
 
 interface TierReward {
   type: 'booster' | 'card';
@@ -55,6 +56,7 @@ export function TierNode({ tier, xpRequired, reward, reached, isCurrent, fillRat
   const isSpecial = reward.type === 'card';
   const boosters = boostersDuPalier(reward);
   const estDouble = !isSpecial && boosters.length > 1;
+  const icone = iconeDuPalier(tier);
 
   return (
     <motion.div
@@ -142,6 +144,31 @@ export function TierNode({ tier, xpRequired, reward, reached, isCurrent, fillRat
             />
           )}
         </motion.div>
+
+        {icone && (
+          <motion.img
+            src={withImageVersion(icone)}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            draggable={false}
+            className="absolute pointer-events-none"
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: reached ? 1 : 0.45, scale: 1 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              width: '68%',
+              height: '68%',
+              left: '-14%',
+              bottom: '-10%',
+              objectFit: 'contain',
+              filter: reached
+                ? `drop-shadow(0 4px 10px var(--t-shadow)) drop-shadow(0 0 10px ${accentAlpha(45)})`
+                : 'grayscale(0.6) brightness(0.8) drop-shadow(0 3px 8px var(--t-shadow))',
+              zIndex: 3,
+            }}
+          />
+        )}
 
         {isSpecial && isCurrent && (
           <motion.div

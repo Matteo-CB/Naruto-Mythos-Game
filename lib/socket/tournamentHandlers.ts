@@ -1,6 +1,7 @@
 
 import type { Server, Socket } from 'socket.io';
 import { prisma } from '@/lib/db/prisma';
+import { decerneLeBadgeDeTournoi } from '@/lib/badges/recompenses';
 import { emitQuestEvent } from '@/lib/quests/hooks';
 import { ensureQuestPersistenceListener } from '@/lib/quests/listenerSetup';
 
@@ -1668,6 +1669,7 @@ export async function handleSwissMatchEnd(
             where: { id: winner.userId },
             data: { tournamentWins: { increment: 1 } },
           });
+          await decerneLeBadgeDeTournoi(winner.userId, tournamentId);
           logMatchEvent({
             type: 'tournament.completed',
             tournamentId,
@@ -1817,6 +1819,7 @@ export async function handleSwissMatchEnd(
         where: { id: winner.userId },
         data: { tournamentWins: { increment: 1 } },
       });
+      await decerneLeBadgeDeTournoi(winner.userId, tournamentId);
 
       logMatchEvent({
         type: 'tournament.completed',
@@ -2063,6 +2066,7 @@ export async function advanceMatchWinner(
       where: { id: winnerId },
       data: { tournamentWins: { increment: 1 } },
     });
+    await decerneLeBadgeDeTournoi(winnerId, tournamentId);
     logMatchEvent({ type: 'tournament.completed', tournamentId, winnerId, format: 'elimination' });
     io?.to(`tournament:${tournamentId}`).emit('tournament:completed', { winnerId, winnerUsername });
 
@@ -2579,6 +2583,7 @@ async function finalizeDoubleElim(
     where: { id: winnerId },
     data: { tournamentWins: { increment: 1 } },
   });
+  await decerneLeBadgeDeTournoi(winnerId, tournamentId);
   logMatchEvent({ type: 'tournament.completed', tournamentId, winnerId, format: 'double_elimination' });
   io?.to(`tournament:${tournamentId}`).emit('tournament:completed', { winnerId, winnerUsername });
 

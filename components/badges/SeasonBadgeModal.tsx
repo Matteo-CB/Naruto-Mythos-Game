@@ -8,7 +8,7 @@ import { useTexteDeBadge } from '@/components/badges/SeasonBadge';
 import { Z_APP_MODAL } from '@/lib/ui/zIndex';
 
 interface SeasonBadgeModalProps {
-  seasonId: string;
+  seasonId: string | null;
   badge: string;
   rank?: number;
   onClose: () => void;
@@ -37,15 +37,17 @@ export function SeasonBadgeModal({ seasonId, badge, rank, onClose }: SeasonBadge
           className="flex flex-col items-center gap-4 p-7 text-center"
           style={{ backgroundColor: 'var(--t-panel)', boxShadow: '0 24px 60px var(--t-shadow)', maxWidth: 380 }}
         >
-          <Image src={imageDuBadge(seasonId, badge)} alt={titre} width={120} height={120} unoptimized />
+          <Image src={imageDuBadge(seasonId ?? '', badge)} alt={titre} width={120} height={120} unoptimized />
 
           <div className="flex flex-col gap-1">
             <span className="font-display text-lg uppercase tracking-widest" style={{ color: 'var(--t-accent)' }}>
               {palier}
             </span>
-            <span className="font-display text-[11px] uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
-              {nomDeSaison}
-            </span>
+            {nomDeSaison && (
+              <span className="font-display text-[11px] uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
+                {nomDeSaison}
+              </span>
+            )}
           </div>
 
           <p className="text-xs leading-relaxed" style={{ color: 'var(--t-text)' }}>

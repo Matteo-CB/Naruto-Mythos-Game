@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { existsSync } from 'fs';
 import { parseBadgeChoisi, formatBadgeChoisi, estUnChoixValide } from '@/lib/badges/badgeChoisi';
-import { PALIERS_DE_BADGE } from '@/lib/badges/saisonBadges';
+import { PALIERS_DE_BADGE, BADGE_VAINQUEUR_DE_TOURNOI, imageDuBadge } from '@/lib/badges/saisonBadges';
+import { PALIERS_ILLUSTRES, iconeDuPalier, aUneIconeDePalier } from '@/lib/battlepass/iconesDePalier';
 
 const RACINE = process.cwd();
 const LOCALES = ['en', 'fr', 'es', 'pt', 'it', 'pl', 'ja'];
@@ -124,5 +126,87 @@ describe('un badge explique ce qu il est', () => {
       }
       expect(messages.profile.leagueTooltip, `${code} leagueTooltip`).toContain('{name}');
     }
+  });
+});
+
+describe('les badges de recompense vivent a cote des badges de saison', () => {
+  it('un badge de recompense se choisit sans saison', () => {
+    expect(parseBadgeChoisi(BADGE_VAINQUEUR_DE_TOURNOI)).toEqual({ seasonId: null, badge: BADGE_VAINQUEUR_DE_TOURNOI });
+    expect(formatBadgeChoisi(null, BADGE_VAINQUEUR_DE_TOURNOI)).toBe(BADGE_VAINQUEUR_DE_TOURNOI);
+    expect(estUnChoixValide(BADGE_VAINQUEUR_DE_TOURNOI)).toBe(true);
+  });
+
+  it('un badge de saison ne se choisit jamais sans sa saison', () => {
+    for (const palier of PALIERS_DE_BADGE) {
+      expect(parseBadgeChoisi(palier.badge), palier.badge).toBeNull();
+    }
+  });
+
+  it('son visuel vit dans le dossier des recompenses, pas dans une saison', () => {
+    expect(imageDuBadge('KS', BADGE_VAINQUEUR_DE_TOURNOI)).toBe('/images/badges/awards/tournament-winner.webp');
+    expect(imageDuBadge('KS', 'top-200')).toBe('/images/badges/KS/top-200.webp');
+    for (const badge of [...PALIERS_DE_BADGE.map((p) => p.badge), BADGE_VAINQUEUR_DE_TOURNOI]) {
+      const chemin = imageDuBadge('KS', badge).replace(/^\//, '');
+      expect(existsSync(join(RACINE, 'public', chemin)), chemin).toBe(true);
+    }
+  });
+
+  it('le badge est decerne sur les quatre formats de tournoi, jamais ailleurs', () => {
+    const handlers = readFileSync(join(RACINE, 'lib/socket/tournamentHandlers.ts'), 'utf8');
+    const decernes = handlers.split('decerneLeBadgeDeTournoi(').length - 1;
+    const victoires = handlers.split('tournamentWins: { increment: 1 } }').length - 1;
+    expect(decernes, 'une remise par victoire de tournoi').toBe(victoires);
+    const recompenses = readFileSync(join(RACINE, 'lib/badges/recompenses.ts'), 'utf8');
+    expect(recompenses, 'un badge inconnu ne peut pas etre decerne').toContain('estUnBadgeDeRecompense(badge)');
+    expect(recompenses, 'deux fois le meme tournoi ne cree qu une ligne').toContain('upsert');
+  });
+
+  it('la possession est verifiee dans la bonne table selon la famille', () => {
+    const route = readFileSync(join(RACINE, 'app/api/user/preferences/route.ts'), 'utf8');
+    expect(route).toContain('prisma.seasonRanking.findFirst');
+    expect(route).toContain('prisma.playerBadge.findFirst');
+    expect(route).toContain('choix.seasonId');
+  });
+
+  it('les deux nouveaux badges sont expliques dans les sept langues', () => {
+    for (const code of LOCALES) {
+      const messages = JSON.parse(readFileSync(join(RACINE, `messages/${code}.json`), 'utf8'));
+      const bloc = messages.seasonBadges;
+      for (const badge of ['top-200', BADGE_VAINQUEUR_DE_TOURNOI]) {
+        expect(bloc.tier?.[badge], `${code} tier ${badge}`).toBeTruthy();
+        expect(bloc.explication?.[badge], `${code} explication ${badge}`).toBeTruthy();
+        expect(bloc.description?.[badge], `${code} description ${badge}`).toBeTruthy();
+      }
+      expect(bloc.explication['top-200'], `${code}`).toContain('{season}');
+      expect(bloc.explication[BADGE_VAINQUEUR_DE_TOURNOI], `${code}: un tournoi n appartient a aucune saison`).not.toContain('{season}');
+    }
+  });
+});
+
+describe('les paliers illustres du battlepass montrent leur icone avec la recompense', () => {
+  it('chaque palier annonce a son image sur le disque', () => {
+    for (const setId of Object.keys(PALIERS_ILLUSTRES)) {
+      for (const tier of PALIERS_ILLUSTRES[setId]) {
+        const chemin = iconeDuPalier(tier, setId);
+        expect(chemin, `${setId} palier ${tier}`).toBeTruthy();
+        expect(existsSync(join(RACINE, 'public', (chemin as string).replace(/^\//, ''))), chemin as string).toBe(true);
+      }
+    }
+  });
+
+  it('un palier sans icone n en invente pas', () => {
+    expect(iconeDuPalier(1)).toBeNull();
+    expect(iconeDuPalier(58)).toBeNull();
+    expect(aUneIconeDePalier(30)).toBe(true);
+    expect(aUneIconeDePalier(31)).toBe(false);
+  });
+
+  it('l icone se superpose a la recompense sans la remplacer', () => {
+    const noeud = readFileSync(join(RACINE, 'components/battlepass/TierNode.tsx'), 'utf8');
+    expect(noeud).toContain('iconeDuPalier');
+    expect(noeud, 'la recompense reste affichee').toContain('boosterImage(setId)');
+    const apresIcone = noeud.slice(noeud.indexOf('const icone = iconeDuPalier'));
+    expect(apresIcone, 'l icone passe devant').toContain('zIndex: 3');
+    expect(apresIcone).toContain('pointer-events-none');
   });
 });

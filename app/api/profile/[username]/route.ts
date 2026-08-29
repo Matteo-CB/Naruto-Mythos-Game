@@ -266,6 +266,13 @@ export async function GET(
       select: { seasonId: true, badge: true, league: true, rank: true, elo: true },
     }).catch(() => [] as Array<{ seasonId: string; badge: string | null; league: string | null; rank: number; elo: number }>);
 
+    const awardBadges = await prisma.playerBadge.findMany({
+      where: { userId: user.id },
+      orderBy: { awardedAt: 'asc' },
+      distinct: ['badge'],
+      select: { badge: true, awardedAt: true },
+    }).catch(() => [] as Array<{ badge: string; awardedAt: Date }>);
+
     const { decks: _omit, ...userWithoutDecks } = user;
     void _omit;
     const follow = await getFollowState(viewerId, user.id);
@@ -287,6 +294,7 @@ export async function GET(
       consecutiveWinsEvolving,
       modeStats,
       seasonBadges,
+      awardBadges,
       followerCount: follow.followerCount,
       followingCount: follow.followingCount,
       viewerFollowing: follow.following,

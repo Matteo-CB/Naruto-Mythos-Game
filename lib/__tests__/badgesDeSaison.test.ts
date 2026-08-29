@@ -33,6 +33,8 @@ describe('le badge suit le rang, et un seul badge par joueur', () => {
     expect(badgePourLeRang(50)).toBe('top-50');
     expect(badgePourLeRang(51)).toBe('top-100');
     expect(badgePourLeRang(100)).toBe('top-100');
+    expect(badgePourLeRang(101)).toBe('top-200');
+    expect(badgePourLeRang(200)).toBe('top-200');
   });
 
   it('au dela du dernier palier, plus aucun badge', () => {
@@ -78,14 +80,17 @@ describe('le classement archive est deterministe et ne recompense que les joueur
     expect(a).toEqual(b);
   });
 
-  it('seuls les cent premiers portent un badge', () => {
-    const joueurs = Array.from({ length: 130 }, (_, i) => joueur(`j${String(i).padStart(3, '0')}`, 2000 - i));
+  it('seuls les deux cents premiers portent un badge', () => {
+    const total = RANG_MAXIMUM_RECOMPENSE + 30;
+    const joueurs = Array.from({ length: total }, (_, i) => joueur(`j${String(i).padStart(4, '0')}`, 4000 - i));
     const rangs = classementDeSaison(joueurs);
-    expect(rangs).toHaveLength(130);
+    expect(rangs).toHaveLength(total);
     expect(rangs.filter((l) => l.badge !== null)).toHaveLength(RANG_MAXIMUM_RECOMPENSE);
     expect(rangs[0].badge).toBe('top-1');
     expect(rangs[99].badge).toBe('top-100');
-    expect(rangs[100].badge).toBeNull();
+    expect(rangs[100].badge).toBe('top-200');
+    expect(rangs[RANG_MAXIMUM_RECOMPENSE - 1].badge).toBe('top-200');
+    expect(rangs[RANG_MAXIMUM_RECOMPENSE].badge).toBeNull();
     for (const ligne of rangs) {
       expect(ligne.badge === null || estUnBadgeConnu(ligne.badge)).toBe(true);
     }

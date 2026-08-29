@@ -866,3 +866,14 @@ model SeasonRanking {
   @@index([seasonId, rank])
   @@index([userId])
 }
+
+model PlayerBadge {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  badge     String
+  source    String?
+  awardedAt DateTime @default(now())
+
+  @@unique([userId, badge, source])
+  @@index([userId])
+}

@@ -12,7 +12,7 @@ const TAILLES = { xs: 16, sm: 22, md: 34, lg: 56 } as const;
 export type TailleDeBadge = keyof typeof TAILLES;
 
 interface SeasonBadgeProps {
-  seasonId: string;
+  seasonId: string | null;
   badge: string;
   rank?: number;
   size?: TailleDeBadge;
@@ -20,12 +20,12 @@ interface SeasonBadgeProps {
   onClick?: () => void;
 }
 
-export function useTexteDeBadge(seasonId: string, badge: string, rank?: number) {
+export function useTexteDeBadge(seasonId: string | null, badge: string, rank?: number) {
   const t = useTranslations('seasonBadges');
   const locale = useLocale();
-  const nomDeSaison = getSetName(seasonId, locale);
+  const nomDeSaison = seasonId ? getSetName(seasonId, locale) : '';
   const palier = t.has(`tier.${badge}`) ? t(`tier.${badge}`) : badge;
-  const titre = `${nomDeSaison} ${palier}`;
+  const titre = nomDeSaison ? `${nomDeSaison} ${palier}` : palier;
   const resume = t.has(`explication.${badge}`)
     ? t(`explication.${badge}`, { season: nomDeSaison })
     : titre;
@@ -47,15 +47,17 @@ export function SeasonBadge({ seasonId, badge, rank, size = 'md', showLabel = fa
         transition={{ duration: 0.25 }}
         className="inline-flex items-center gap-2"
       >
-        <Image src={imageDuBadge(seasonId, badge)} alt={titre} width={cote} height={cote} unoptimized />
+        <Image src={imageDuBadge(seasonId ?? '', badge)} alt={titre} width={cote} height={cote} unoptimized />
         {showLabel && (
           <span className="flex flex-col leading-tight">
             <span className="font-display text-[11px] uppercase tracking-widest" style={{ color: 'var(--t-accent)' }}>
               {palier}
             </span>
-            <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
-              {nomDeSaison}
-            </span>
+            {nomDeSaison && (
+              <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
+                {nomDeSaison}
+              </span>
+            )}
           </span>
         )}
       </motion.span>

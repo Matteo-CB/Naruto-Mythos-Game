@@ -4108,7 +4108,9 @@
       "top-1": "1.º del ranking",
       "top-10": "Top 10",
       "top-50": "Top 50",
-      "top-100": "Top 100"
+      "top-100": "Top 100",
+      "top-200": "Top 200",
+      "tournament-winner": "Ganador de torneo"
     },
     "pickerLabel": "Insignia mostrada junto a tu bandera",
     "pickerHint": "Esta insignia te acompaña allí donde aparece tu bandera. Solo puedes elegir las que has ganado.",
@@ -4119,13 +4121,17 @@
       "top-1": "Terminó primero en la temporada {season}.",
       "top-10": "Terminó entre los diez primeros de la temporada {season}.",
       "top-50": "Terminó entre los cincuenta primeros de la temporada {season}.",
-      "top-100": "Terminó entre los cien primeros de la temporada {season}."
+      "top-100": "Terminó entre los cien primeros de la temporada {season}.",
+      "top-200": "Terminó entre los doscientos primeros de la temporada {season}.",
+      "tournament-winner": "Ganó un torneo."
     },
     "description": {
       "top-1": "Otorgada al jugador clasificado primero al cerrar la temporada {season}. Solo un jugador la lleva y permanece en la cuenta para siempre.",
       "top-10": "Otorgada a los diez mejores jugadores al cerrar la temporada {season}. La clasificación final queda congelada y la insignia permanece para siempre.",
       "top-50": "Otorgada a los cincuenta mejores jugadores al cerrar la temporada {season}. La clasificación final queda congelada y la insignia permanece para siempre.",
-      "top-100": "Otorgada a los cien mejores jugadores al cerrar la temporada {season}. La clasificación final queda congelada y la insignia permanece para siempre."
+      "top-100": "Otorgada a los cien mejores jugadores al cerrar la temporada {season}. La clasificación final queda congelada y la insignia permanece para siempre.",
+      "top-200": "Otorgada a los doscientos mejores jugadores al cerrar la temporada {season}. La clasificación final queda congelada y la insignia permanece para siempre.",
+      "tournament-winner": "Otorgada al ganador de un torneo. Se consigue con la primera victoria y permanece en la cuenta para siempre."
     }
   }
 }

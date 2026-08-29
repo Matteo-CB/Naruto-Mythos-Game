@@ -6,11 +6,15 @@
         "feature",
         "feature",
         "feature",
+        "feature",
+        "feature",
         "fix",
         "fix"
       ],
       "title_fr": "Mise à jour",
       "changes_fr": [
+        "Un badge Top 200 rejoint les badges de la saison Konoha Shido",
+        "Gagner un tournoi donne désormais un badge de vainqueur, à garder sur son compte",
         "Tu peux choisir un badge gagné qui suivra ton drapeau partout, avec son explication au survol",
         "Nouveau mode Highlander: 40 cartes minimum, une seule copie de chaque carte, avec son propre classement",
         "Les ligues montent désormais en trois niveaux chacune, de Genin I jusqu'à Héritier de la Volonté du Feu III",
@@ -19,6 +23,8 @@
       ],
       "title_en": "Update",
       "changes_en": [
+        "A Top 200 badge joins the Konoha Shido season badges",
+        "Winning a tournament now grants a winner badge, kept on your account",
         "You can pick an earned badge that follows your flag everywhere, with its meaning on hover",
         "New Highlander mode: at least 40 cards, a single copy of each card, with its own ranking",
         "Every league now has three levels, from Genin I all the way up to Inheritor of the Will of Fire III",
@@ -27,6 +33,8 @@
       ],
       "title_es": "Actualización",
       "changes_es": [
+        "Una insignia Top 200 se suma a las de la temporada Konoha Shido",
+        "Ganar un torneo ahora da una insignia de ganador, que se queda en tu cuenta",
         "Puedes elegir una insignia ganada que acompaña tu bandera en todas partes, con su explicación al pasar el ratón",
         "Nuevo modo Highlander: mínimo 40 cartas, una sola copia de cada carta, con su propio ranking",
         "Cada liga tiene ahora tres niveles, desde Genin I hasta Heredero de la Voluntad de Fuego III",
@@ -35,6 +43,8 @@
       ],
       "title_pt": "Atualização",
       "changes_pt": [
+        "Um emblema Top 200 junta-se aos da temporada Konoha Shido",
+        "Vencer um torneio dá agora um emblema de vencedor, que fica na tua conta",
         "Podes escolher um emblema ganho que segue a tua bandeira em todo o lado, com a explicação ao passar o rato",
         "Novo modo Highlander: no mínimo 40 cartas, uma só cópia de cada carta, com a sua classificação",
         "Cada liga tem agora três níveis, de Genin I até Herdeiro da Vontade do Fogo III",
@@ -43,6 +53,8 @@
       ],
       "title_it": "Aggiornamento",
       "changes_it": [
+        "Un distintivo Top 200 si aggiunge a quelli della stagione Konoha Shido",
+        "Vincere un torneo ora dà un distintivo di vincitore, che resta sul profilo",
         "Puoi scegliere un distintivo vinto che segue la tua bandiera ovunque, con la spiegazione al passaggio del mouse",
         "Nuova modalità Highlander: almeno 40 carte, una sola copia di ogni carta, con la sua classifica",
         "Ogni lega ha ora tre livelli, da Genin I fino a Erede della Volontà del Fuoco III",
@@ -51,6 +63,8 @@
       ],
       "title_pl": "Aktualizacja",
       "changes_pl": [
+        "Odznaka Top 200 dołącza do odznak sezonu Konoha Shido",
+        "Wygrana w turnieju daje teraz odznakę zwycięzcy, która zostaje na koncie",
         "Możesz wybrać zdobytą odznakę, która towarzyszy twojej fladze wszędzie, z opisem po najechaniu",
         "Nowy tryb Highlander: minimum 40 kart, tylko jedna kopia każdej karty, z własnym rankingiem",
         "Każda liga ma teraz trzy poziomy, od Genin I aż po Dziedzica Woli Ognia III",
@@ -59,6 +73,8 @@
       ],
       "title_ja": "アップデート",
       "changes_ja": [
+        "コノハ指導シーズンのバッジにトップ 200 が加わりました",
+        "トーナメント優勝で優勝バッジがもらえるようになりました。アカウントに残ります",
         "獲得したバッジを1つ選ぶと国旗の横にいつも表示され、カーソルを合わせると説明が出ます",
         "新モード ハイランダー: 40枚以上、同じカードは1枚まで、専用のランキング付き",
         "各リーグが3段階になりました。下忍 I から火の意志を継ぐ者 III まで",

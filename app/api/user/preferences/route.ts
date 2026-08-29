@@ -119,10 +119,15 @@ export async function PATCH(request: NextRequest) {
     } else if (typeof body.selectedSeasonBadge === 'string') {
       const choix = parseBadgeChoisi(body.selectedSeasonBadge);
       if (choix) {
-        const possede = await prisma.seasonRanking.findFirst({
-          where: { userId: session.user.id, seasonId: choix.seasonId, badge: choix.badge },
-          select: { id: true },
-        });
+        const possede = choix.seasonId
+          ? await prisma.seasonRanking.findFirst({
+              where: { userId: session.user.id, seasonId: choix.seasonId, badge: choix.badge },
+              select: { id: true },
+            })
+          : await prisma.playerBadge.findFirst({
+              where: { userId: session.user.id, badge: choix.badge },
+              select: { id: true },
+            });
         if (!possede) {
           return NextResponse.json({ error: 'Badge not earned' }, { status: 403 });
         }
