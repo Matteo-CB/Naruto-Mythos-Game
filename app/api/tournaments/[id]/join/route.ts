@@ -108,7 +108,7 @@ export async function POST(
       }
     }
 
-    const refusPalier = await refuserSiPalierNwlInterdit(tournament.partner, user?.discordId);
+    const refusPalier = await refuserSiPalierNwlInterdit(tournament.partner, user?.discordId, tournament.partnerRoleWaived);
     if (refusPalier) {
       const { status, ...corps } = refusPalier;
       return NextResponse.json(corps, { status });

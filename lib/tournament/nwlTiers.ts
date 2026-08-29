@@ -26,6 +26,7 @@ import {
   nwlEditMessage,
   nwlSendDirectMessage,
   checkNwlAnyRole,
+  checkNwlMembership,
   grantNwlRole,
   revokeNwlRole,
   NWL_NARUTO_MYTHOS_ROLE_ID,
@@ -778,10 +779,31 @@ export interface RefusPalierNwl {
 export async function refuserSiPalierNwlInterdit(
   partner: string | null | undefined,
   discordId: string | null | undefined,
+  roleLeve: boolean = false,
 ): Promise<RefusPalierNwl | null> {
   if (!estPalierNwl(partner)) return null;
   if (!discordId) {
     return { errorKey: 'tournament.error.linkDiscord', error: 'Link your Discord account first', status: 403 };
+  }
+
+  if (roleLeve) {
+    const presence = await checkNwlMembership(discordId);
+    if (presence === 'not_member') {
+      return {
+        errorKey: 'tournament.error.nwlNotMember',
+        error: 'Join the New World Loot Discord server first',
+        status: 403,
+        inviteUrl: NWL_INVITE_URL,
+      };
+    }
+    if (presence === 'unavailable') {
+      return {
+        errorKey: 'tournament.error.nwlCheckUnavailable',
+        error: 'Membership check temporarily unavailable, please try again in a moment',
+        status: 503,
+      };
+    }
+    return null;
   }
 
   if (partner === NWL_KAGE_PARTNER_KEY) {
