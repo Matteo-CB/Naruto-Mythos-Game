@@ -10,14 +10,15 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const q = url.searchParams.get('user') ?? '';
   if (!q) return NextResponse.json({ error: 'Missing user query param' }, { status: 400 });
-  const eloType = url.searchParams.get('type') === 'evolving' ? 'evolving' : 'ranked';
+  const demande = url.searchParams.get('type');
+  const eloType = demande === 'evolving' ? 'evolving' : demande === 'highlander' ? 'highlander' : 'ranked';
 
   const looksLikeId = /^[0-9a-f]{24}$/i.test(q);
   const user = await prisma.user.findFirst({
     where: looksLikeId
       ? { id: q }
       : { username: { equals: q, mode: 'insensitive' } },
-    select: { id: true, username: true, elo: true, evolvingElo: true, wins: true, losses: true, draws: true, createdAt: true },
+    select: { id: true, username: true, elo: true, evolvingElo: true, highlanderElo: true, wins: true, losses: true, draws: true, createdAt: true },
   });
 
   if (!user) {
@@ -70,7 +71,7 @@ export async function GET(request: Request) {
     user: {
       id: user.id,
       username: user.username,
-      elo: eloType === 'evolving' ? (user.evolvingElo ?? 500) : user.elo,
+      elo: eloType === 'evolving' ? (user.evolvingElo ?? 500) : eloType === 'highlander' ? (user.highlanderElo ?? 500) : user.elo,
       wins: user.wins,
       losses: user.losses,
       draws: user.draws,

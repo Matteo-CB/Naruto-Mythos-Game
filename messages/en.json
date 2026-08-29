@@ -2196,7 +2196,8 @@
     "mode": {
       "casual": "Casual",
       "ranked": "Ranked",
-      "sealed": "Sealed"
+      "sealed": "Sealed",
+      "highlander": "Highlander"
     },
     "modeDesc": {
       "casual": "Unranked match, play for fun, no ELO changes",
@@ -2226,7 +2227,8 @@
     },
     "badge": {
       "evolving": "EVOLVING",
-      "anonymous": "ANONYMOUS"
+      "anonymous": "ANONYMOUS",
+      "highlander": "Highlander"
     },
     "evolving": {
       "toggleLabel": "Evolving mode",
@@ -2242,6 +2244,15 @@
       "toggleDescription": "Open 5 boosters and build your deck on the spot. Saved decks are not used.",
       "setChoiceLabel": "Set to use",
       "setRandom": "Random"
+    },
+    "highlander": {
+      "toggleLabel": "Highlander mode",
+      "toggleDescription": "At least 40 cards, only one copy of each card",
+      "noDeckTitle": "Highlander deck required",
+      "noDeck": "You need a Highlander deck to join or create this room",
+      "createDeck": "Build a Highlander deck",
+      "needDeckHint": "Build a 40 card deck with no duplicates to unlock this mode",
+      "noDeckInSelector": "No Highlander deck available. You need at least 40 cards and a single copy of each."
     }
   },
   "leaderboard": {
@@ -2249,7 +2260,8 @@
     "subtitle": "Minimum {count} ranked matches to earn a league",
     "toggleType": {
       "ranked": "Ranked",
-      "evolving": "Evolving"
+      "evolving": "Evolving",
+      "highlander": "Highlander"
     },
     "rank": "Rank",
     "player": "Player",
@@ -2322,7 +2334,8 @@
     "deckPrivate": "Private",
     "deckPublicHint": "Visible to everyone",
     "deckPrivateHint": "Visible only to you",
-    "rankDivision": "{name} {level}"
+    "rankDivision": "{name} {level}",
+    "mode_highlander": "Highlander"
   },
   "replay": {
     "title": "Match Recap",
@@ -2365,7 +2378,9 @@
   },
   "room": {
     "error": {
-      "evolvingNoDeck": "You need an Evolving deck for this mode."
+      "evolvingNoDeck": "You need an Evolving deck for this mode.",
+      "highlanderNoDeck": "You need a Highlander deck for this mode.",
+      "highlanderDeckInvalid": "This deck does not follow the Highlander rules."
     }
   },
   "auth": {

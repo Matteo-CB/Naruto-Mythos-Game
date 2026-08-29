@@ -571,7 +571,8 @@
     "subtitle": "Minimo {count} partite classificate per ottenere una lega",
     "toggleType": {
       "ranked": "Classificata",
-      "evolving": "Evolving"
+      "evolving": "Evolving",
+      "highlander": "Highlander"
     },
     "rank": "Posizione",
     "player": "Giocatore",
@@ -655,7 +656,9 @@
   },
   "room": {
     "error": {
-      "evolvingNoDeck": "Ti serve un mazzo Evolving per questa modalità."
+      "evolvingNoDeck": "Ti serve un mazzo Evolving per questa modalità.",
+      "highlanderNoDeck": "Ti serve un mazzo Highlander per questa modalità.",
+      "highlanderDeckInvalid": "Questo mazzo non rispetta le regole Highlander."
     }
   },
   "dm": {
@@ -854,7 +857,8 @@
     "deckPrivate": "Privato",
     "deckPublicHint": "Visibile a tutti",
     "deckPrivateHint": "Visibile solo a te",
-    "rankDivision": "{name} {level}"
+    "rankDivision": "{name} {level}",
+    "mode_highlander": "Highlander"
   },
   "friends": {
     "title": "Amici",
@@ -1035,7 +1039,8 @@
     "mode": {
       "casual": "Amichevole",
       "ranked": "Classificata",
-      "sealed": "Sealed"
+      "sealed": "Sealed",
+      "highlander": "Highlander"
     },
     "modeDesc": {
       "casual": "Partita non classificata, gioca per divertimento, nessuna variazione di ELO",
@@ -1065,7 +1070,8 @@
     },
     "badge": {
       "evolving": "EVOLVING",
-      "anonymous": "ANONIMO"
+      "anonymous": "ANONIMO",
+      "highlander": "Highlander"
     },
     "evolving": {
       "toggleLabel": "Modalità Evolving",
@@ -1081,6 +1087,15 @@
       "toggleDescription": "Apri 5 booster e costruisci il tuo mazzo sul momento. I mazzi salvati non vengono usati.",
       "setChoiceLabel": "Set da usare",
       "setRandom": "Casuale"
+    },
+    "highlander": {
+      "toggleLabel": "Modalità Highlander",
+      "toggleDescription": "Almeno 40 carte, una sola copia di ogni carta",
+      "noDeckTitle": "Serve un mazzo Highlander",
+      "noDeck": "Ti serve un mazzo Highlander per entrare o creare questa stanza",
+      "createDeck": "Creare un mazzo Highlander",
+      "needDeckHint": "Crea un mazzo da 40 carte senza doppioni per attivare questa modalità",
+      "noDeckInSelector": "Nessun mazzo Highlander disponibile. Servono 40 carte e una sola copia di ognuna."
     }
   },
   "boosters": {

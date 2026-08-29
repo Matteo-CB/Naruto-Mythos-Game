@@ -144,6 +144,7 @@ export function buildMatchContextReset() {
     chessClock: null,
     currentRoomGameMode: null,
     currentRoomIsEvolving: false,
+    currentRoomIsHighlander: false,
     currentRoomHoloHue: null,
     tournamentMatchRoom: false,
     currentTournamentId: null,
@@ -183,6 +184,7 @@ interface PublicRoom {
   gameMode: string;
   createdAt: number;
   isEvolving: boolean;
+  isHighlander?: boolean;
   holoHue: number | null;
   isRanked: boolean;
   isAnonymous: boolean;
@@ -197,8 +199,9 @@ interface SocketStore {
   userId: string | null;
   userName: string | null;
   roomCode: string | null;
-  currentRoomGameMode: 'casual' | 'ranked' | 'sealed' | 'evolving' | null;
+  currentRoomGameMode: 'casual' | 'ranked' | 'sealed' | 'evolving' | 'highlander' | null;
   currentRoomIsEvolving: boolean;
+  currentRoomIsHighlander: boolean;
   currentRoomHoloHue: number | null;
   playerRole: 'player1' | 'player2' | null;
   visibleState: VisibleGameState | null;
@@ -266,7 +269,7 @@ interface SocketStore {
   connect: (userId?: string, username?: string) => Promise<void>;
   disconnect: () => void;
   rejoinMatch: () => void;
-  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isSealed?: boolean, gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, isAnonymous?: boolean, isEvolving?: boolean) => void;
+  createRoom: (userId: string, isPrivate?: boolean, isRanked?: boolean, isSealed?: boolean, gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving' | 'highlander', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, isAnonymous?: boolean, isEvolving?: boolean, isHighlander?: boolean) => void;
   joinRoom: (code: string, userId: string) => void;
   selectDeck: (characters: unknown[], missions: unknown[], deckId?: string) => void;
   changeDeck: () => void;
@@ -344,6 +347,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   roomCode: null,
   currentRoomGameMode: null,
   currentRoomIsEvolving: false,
+  currentRoomIsHighlander: false,
   currentRoomHoloHue: null,
   playerRole: null,
   visibleState: null,
@@ -537,18 +541,19 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       
 
-      socket.on('room:created', (data: { code: string; gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving'; isEvolving?: boolean; holoHue?: number | null }) => {
+      socket.on('room:created', (data: { code: string; gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving' | 'highlander'; isEvolving?: boolean; isHighlander?: boolean; holoHue?: number | null }) => {
         console.log('[Socket] Room created:', data.code, 'evolving:', data.isEvolving === true);
         set({
           roomCode: data.code,
           playerRole: 'player1',
           currentRoomGameMode: data.gameMode ?? null,
           currentRoomIsEvolving: data.isEvolving === true,
+          currentRoomIsHighlander: data.isHighlander === true,
           currentRoomHoloHue: typeof data.holoHue === 'number' ? data.holoHue : null,
         });
       });
 
-      socket.on('room:joined', (data: { code: string; playerRole: 'player1' | 'player2'; tournamentId?: string | null; gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving'; isEvolving?: boolean; holoHue?: number | null }) => {
+      socket.on('room:joined', (data: { code: string; playerRole: 'player1' | 'player2'; tournamentId?: string | null; gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving' | 'highlander'; isEvolving?: boolean; isHighlander?: boolean; holoHue?: number | null }) => {
         console.log('[Socket] Joined room:', data.code, 'tournament:', data.tournamentId ?? 'none', 'mode:', data.gameMode ?? 'unknown', 'evolving:', data.isEvolving === true);
         set({
           roomCode: data.code,
@@ -558,6 +563,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           currentTournamentId: data.tournamentId ?? null,
           currentRoomGameMode: data.gameMode ?? null,
           currentRoomIsEvolving: data.isEvolving === true,
+          currentRoomIsHighlander: data.isHighlander === true,
           currentRoomHoloHue: typeof data.holoHue === 'number' ? data.holoHue : null,
         });
         markSeatBound();
@@ -600,13 +606,14 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         syncConnectionPhase();
       });
 
-      socket.on('room:player-joined', (data?: { gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving'; isEvolving?: boolean; holoHue?: number | null }) => {
+      socket.on('room:player-joined', (data?: { gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving' | 'highlander'; isEvolving?: boolean; isHighlander?: boolean; holoHue?: number | null }) => {
         console.log('[Socket] Player joined, mode:', data?.gameMode ?? 'unchanged');
         const wasAlone = !get().opponentJoined;
         set((s) => ({
           opponentJoined: true,
           currentRoomGameMode: data?.gameMode ?? s.currentRoomGameMode,
           currentRoomIsEvolving: typeof data?.isEvolving === 'boolean' ? data.isEvolving : s.currentRoomIsEvolving,
+          currentRoomIsHighlander: typeof data?.isHighlander === 'boolean' ? data.isHighlander : s.currentRoomIsHighlander,
           currentRoomHoloHue: typeof data?.holoHue === 'number' ? data.holoHue : s.currentRoomHoloHue,
         }));
 
@@ -1068,6 +1075,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         roomCode?: string;
         chessClock?: ChessClockBroadcast;
         isEvolving?: boolean;
+        isHighlander?: boolean;
         holoHue?: number | null;
       }) => {
         const current = get();
@@ -1082,6 +1090,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           isSpectating: true,
           gameStarted: true,
           currentRoomIsEvolving: data.isEvolving === true,
+          currentRoomIsHighlander: data.isHighlander === true,
           currentRoomHoloHue: typeof data.holoHue === 'number' ? data.holoHue : null,
         };
         if (data.chessClock) {
@@ -1237,12 +1246,12 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     }
   },
 
-  createRoom: (userId: string, isPrivate = true, isRanked = false, isSealed = false, gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, isAnonymous?: boolean, isEvolving?: boolean) => {
+  createRoom: (userId: string, isPrivate = true, isRanked = false, isSealed = false, gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving' | 'highlander', hostName?: string, sealedBoosterCount?: 4 | 5 | 6, sealedSetChoice?: string, isAnonymous?: boolean, isEvolving?: boolean, isHighlander?: boolean) => {
     const { socket, connected } = get();
     if (socket && connected) {
-      console.log(`[Socket] Emitting room:create${isSealed ? ' (sealed)' : ''} mode: ${gameMode ?? 'auto'}${sealedBoosterCount ? ` boosters: ${sealedBoosterCount}` : ''}${sealedSetChoice ? ` set: ${sealedSetChoice}` : ''}${isAnonymous ? ' (anonymous)' : ''}${isEvolving ? ' (evolving)' : ''}`);
+      console.log(`[Socket] Emitting room:create${isSealed ? ' (sealed)' : ''} mode: ${gameMode ?? 'auto'}${sealedBoosterCount ? ` boosters: ${sealedBoosterCount}` : ''}${sealedSetChoice ? ` set: ${sealedSetChoice}` : ''}${isAnonymous ? ' (anonymous)' : ''}${isEvolving ? ' (evolving)' : ''}${isHighlander ? ' (highlander)' : ''}`);
       set({ isSealedRoom: isSealed, rematchState: 'none', chatMessages: [], unreadChatCount: 0, chatLockState: null, chatOpponent: null, chatFriendStatus: null, chatFriendshipId: null });
-      socket.emit('room:create', { userId, isPrivate, isRanked, isSealed, gameMode, hostName, sealedBoosterCount, sealedSetChoice, isAnonymous, isEvolving });
+      socket.emit('room:create', { userId, isPrivate, isRanked, isSealed, gameMode, hostName, sealedBoosterCount, sealedSetChoice, isAnonymous, isEvolving, isHighlander });
     } else {
       console.error('[Socket] Cannot create room: not connected');
       set({ error: 'Not connected to server.', errorKey: 'game.error.notConnected' });
@@ -1429,7 +1438,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       isSpectating: false, spectatingRoomCode: null, spectatorCount: 0,
       visibleState: null, playerNames: null, gameStarted: false,
       chessClock: null,
-      currentRoomIsEvolving: false, currentRoomHoloHue: null,
+      currentRoomIsEvolving: false, currentRoomIsHighlander: false, currentRoomHoloHue: null,
       chatMessages: [], unreadChatCount: 0, chatLockState: null, chatOpponent: null, chatFriendStatus: null, chatFriendshipId: null,
     });
   },

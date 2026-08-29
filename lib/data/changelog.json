@@ -4,47 +4,55 @@
       "date": "2026-08-29",
       "categories": [
         "feature",
+        "feature",
         "fix",
         "fix"
       ],
       "title_fr": "Mise à jour",
       "changes_fr": [
+        "Nouveau mode Highlander: 40 cartes minimum, une seule copie de chaque carte, avec son propre classement",
         "Les ligues montent désormais en trois niveaux chacune, de Genin I jusqu'à Héritier de la Volonté du Feu III",
         "Tournoi: la partie s'ouvre même si le signal de départ se perd, fini l'écran qui recharge en boucle",
         "Tournoi: un joueur qui a deux onglets ouverts ne se retrouve plus devant un écran figé"
       ],
       "title_en": "Update",
       "changes_en": [
+        "New Highlander mode: at least 40 cards, a single copy of each card, with its own ranking",
         "Every league now has three levels, from Genin I all the way up to Inheritor of the Will of Fire III",
         "Tournament: the game opens even if the start signal is lost, no more screen looping back to the home page",
         "Tournament: a player with two tabs open no longer ends up facing a frozen screen"
       ],
       "title_es": "Actualización",
       "changes_es": [
+        "Nuevo modo Highlander: mínimo 40 cartas, una sola copia de cada carta, con su propio ranking",
         "Cada liga tiene ahora tres niveles, desde Genin I hasta Heredero de la Voluntad de Fuego III",
         "Torneo: la partida se abre aunque se pierda la señal de inicio, se acabó la pantalla que vuelve al inicio",
         "Torneo: un jugador con dos pestañas abiertas ya no se queda ante una pantalla congelada"
       ],
       "title_pt": "Atualização",
       "changes_pt": [
+        "Novo modo Highlander: no mínimo 40 cartas, uma só cópia de cada carta, com a sua classificação",
         "Cada liga tem agora três níveis, de Genin I até Herdeiro da Vontade do Fogo III",
         "Torneio: a partida abre mesmo que o sinal de início se perca, acabou o ecrã que volta sempre ao início",
         "Torneio: um jogador com dois separadores abertos já não fica perante um ecrã congelado"
       ],
       "title_it": "Aggiornamento",
       "changes_it": [
+        "Nuova modalità Highlander: almeno 40 carte, una sola copia di ogni carta, con la sua classifica",
         "Ogni lega ha ora tre livelli, da Genin I fino a Erede della Volontà del Fuoco III",
         "Torneo: la partita si apre anche se il segnale di inizio va perso, basta schermate che tornano alla home",
         "Torneo: un giocatore con due schede aperte non resta più davanti a uno schermo bloccato"
       ],
       "title_pl": "Aktualizacja",
       "changes_pl": [
+        "Nowy tryb Highlander: minimum 40 kart, tylko jedna kopia każdej karty, z własnym rankingiem",
         "Każda liga ma teraz trzy poziomy, od Genin I aż po Dziedzica Woli Ognia III",
         "Turniej: partia otwiera się nawet gdy sygnał startu zaginie, koniec z ekranem wracającym na stronę główną",
         "Turniej: gracz z dwiema otwartymi kartami nie zostaje już przed zamrożonym ekranem"
       ],
       "title_ja": "アップデート",
       "changes_ja": [
+        "新モード ハイランダー: 40枚以上、同じカードは1枚まで、専用のランキング付き",
         "各リーグが3段階になりました。下忍 I から火の意志を継ぐ者 III まで",
         "トーナメント: 開始の合図が届かなくても対戦が始まり、ホームに戻され続ける画面がなくなりました",
         "大会：タブを二つ開いているプレイヤーが、固まった画面に取り残されなくなった"

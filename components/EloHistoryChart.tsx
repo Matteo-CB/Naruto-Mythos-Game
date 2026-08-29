@@ -50,7 +50,7 @@ interface Props {
   username: string;
 
   compact?: boolean;
-  eloType?: 'ranked' | 'evolving';
+  eloType?: 'ranked' | 'evolving' | 'highlander';
 }
 
 export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props) {
@@ -66,7 +66,7 @@ export function EloHistoryChart({ username, compact, eloType = 'ranked' }: Props
     let cancelled = false;
     setLoading(true);
     setError(null);
-    const typeParam = eloType === 'evolving' ? '&type=evolving' : '';
+    const typeParam = eloType === 'ranked' ? '' : `&type=${eloType}`;
     fetch(`/api/elo-history?user=${encodeURIComponent(username)}${typeParam}`)
       .then(async (res) => {
         if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? `HTTP ${res.status}`);

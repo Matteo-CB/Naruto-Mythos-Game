@@ -32,11 +32,12 @@ interface DeckSelectorProps {
   allCharacters: CharacterCard[];
   allMissions: MissionCard[];
   evolvingOnly?: boolean;
+  highlanderOnly?: boolean;
 }
 
 const LOAD_MORE_STEP = 30;
 
-export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnly = false }: DeckSelectorProps) {
+export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnly = false, highlanderOnly = false }: DeckSelectorProps) {
   const t = useTranslations();
   const { unlockedIds } = useUnlockedVariants();
   const deckListLimit = useSettingsStore((s) => s.deckListLimit);
@@ -63,7 +64,7 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
   const hiddenCount = Math.max(0, otherDecks.length - visibleCount);
 
   useEffect(() => {
-    const url = evolvingOnly ? '/api/decks?evolving=true' : '/api/decks';
+    const url = highlanderOnly ? '/api/decks?highlander=true' : evolvingOnly ? '/api/decks?evolving=true' : '/api/decks';
     fetch(url)
       .then((res) => (res.ok ? res.json() : []))
       .then((data: SavedDeck[]) => {
@@ -74,7 +75,7 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
         setSavedDecks([]);
         setLoading(false);
       });
-  }, [evolvingOnly]);
+  }, [evolvingOnly, highlanderOnly]);
 
   const resolveAndSelect = async (deckId: string | null) => {
     if (!deckId) {
@@ -186,7 +187,7 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
         {t('playAI.selectDeck')}
       </p>
 
-      {!evolvingOnly && (
+      {!evolvingOnly && !highlanderOnly && (
         <button
           onClick={() => {
             setSelectedDeckId(null);
@@ -212,7 +213,22 @@ export function DeckSelector({ onSelect, allCharacters, allMissions, evolvingOnl
         <p className="text-xs italic" style={{ color: 'var(--t-faint)' }}>{t('common.loading')}</p>
       )}
 
-      {!loading && savedDecks.length === 0 && (
+      {!loading && savedDecks.length === 0 && highlanderOnly && (
+        <div className="flex flex-col gap-3 items-center text-center p-5" style={{ backgroundColor: 'color-mix(in srgb, var(--t-surface) 85%, transparent)' }}>
+          <p className="text-xs italic" style={{ color: 'var(--t-muted)' }}>
+            {t('online.highlander.noDeckInSelector')}
+          </p>
+          <Link
+            href={'/deck-builder' as '/deck-builder'}
+            className="px-4 py-2 text-[11px] font-bold uppercase no-select"
+            style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-on-accent)', letterSpacing: '0.18em' }}
+          >
+            {t('online.highlander.createDeck')}
+          </Link>
+        </div>
+      )}
+
+      {!loading && savedDecks.length === 0 && !highlanderOnly && (
         evolvingOnly ? (
           <div className="flex flex-col gap-3 items-center text-center p-5" style={{ backgroundColor: 'color-mix(in srgb, var(--t-surface) 85%, transparent)' }}>
             <p className="text-xs italic" style={{ color: 'var(--t-muted)' }}>

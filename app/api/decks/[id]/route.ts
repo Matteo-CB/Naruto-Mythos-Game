@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { computeDeckEvolvingPoints, deckUsesOnlyAllowedSets } from '@/lib/evolving/computePoints';
 import { EVOLVING_MAX_POINTS } from '@/lib/evolving/constants';
+import { estDeckHighlander } from '@/lib/highlander/deckRules';
 import { validateDeckVariantUnlocks } from '@/lib/variants/serverValidation';
 
 export async function GET(
@@ -145,6 +146,7 @@ export async function PUT(
       missionIds?: string[];
       evolvingPoints?: number;
       evolvingCompatible?: boolean;
+      highlanderCompatible?: boolean;
     } = {};
     if (name) updateData.name = name;
     if (cardIds) updateData.cardIds = cardIds;
@@ -155,6 +157,7 @@ export async function PUT(
       const finalMissions = missionIds ?? existing.missionIds;
       updateData.evolvingPoints = computeDeckEvolvingPoints(finalCards);
       updateData.evolvingCompatible = deckUsesOnlyAllowedSets(finalCards, finalMissions) && updateData.evolvingPoints <= EVOLVING_MAX_POINTS;
+      updateData.highlanderCompatible = estDeckHighlander(finalCards, finalMissions);
     }
 
     const deck = await prisma.deck.update({

@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { computeDeckEvolvingPoints, deckUsesOnlyAllowedSets } from '@/lib/evolving/computePoints';
 import { EVOLVING_MAX_POINTS } from '@/lib/evolving/constants';
+import { estDeckHighlander } from '@/lib/highlander/deckRules';
 import { validateDeckVariantUnlocks } from '@/lib/variants/serverValidation';
 
 export async function GET(request: NextRequest) {
@@ -15,6 +16,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const evolvingOnly = searchParams.get('evolving') === 'true';
+    const highlanderOnly = searchParams.get('highlander') === 'true';
 
     const decks = await prisma.deck.findMany({
       where: { userId: session.user.id },
@@ -23,14 +25,21 @@ export async function GET(request: NextRequest) {
     });
 
     const backfillIds: string[] = [];
+    const highlanderVrai: string[] = [];
+    const highlanderFaux: string[] = [];
     const enriched = decks.map((d) => {
-      if (d.evolvingCompatible || d.evolvingPoints > EVOLVING_MAX_POINTS) return d;
-      const compatible = deckUsesOnlyAllowedSets(d.cardIds, d.missionIds) && d.evolvingPoints <= EVOLVING_MAX_POINTS;
-      if (compatible) {
-        backfillIds.push(d.id);
-        return { ...d, evolvingCompatible: true };
+      const highlander = estDeckHighlander(d.cardIds, d.missionIds);
+      const base = d.highlanderCompatible === highlander ? d : { ...d, highlanderCompatible: highlander };
+      if (d.highlanderCompatible !== highlander) {
+        (highlander ? highlanderVrai : highlanderFaux).push(d.id);
       }
-      return d;
+      if (base.evolvingCompatible || base.evolvingPoints > EVOLVING_MAX_POINTS) return base;
+      const compatible = deckUsesOnlyAllowedSets(base.cardIds, base.missionIds) && base.evolvingPoints <= EVOLVING_MAX_POINTS;
+      if (compatible) {
+        backfillIds.push(base.id);
+        return { ...base, evolvingCompatible: true };
+      }
+      return base;
     });
 
     if (backfillIds.length > 0) {
@@ -40,7 +49,23 @@ export async function GET(request: NextRequest) {
       }).catch(() => {});
     }
 
-    const filtered = evolvingOnly ? enriched.filter((d) => d.evolvingCompatible) : enriched;
+    if (highlanderVrai.length > 0) {
+      prisma.deck.updateMany({
+        where: { id: { in: highlanderVrai } },
+        data: { highlanderCompatible: true },
+      }).catch(() => {});
+    }
+
+    if (highlanderFaux.length > 0) {
+      prisma.deck.updateMany({
+        where: { id: { in: highlanderFaux } },
+        data: { highlanderCompatible: false },
+      }).catch(() => {});
+    }
+
+    const filtered = enriched
+      .filter((d) => (evolvingOnly ? d.evolvingCompatible : true))
+      .filter((d) => (highlanderOnly ? d.highlanderCompatible : true));
     return NextResponse.json(filtered);
   } catch {
     return NextResponse.json(
@@ -135,6 +160,7 @@ export async function POST(request: NextRequest) {
 
     const evolvingPoints = computeDeckEvolvingPoints(cardIds);
     const evolvingCompatible = deckUsesOnlyAllowedSets(cardIds, missionIds) && evolvingPoints <= EVOLVING_MAX_POINTS;
+    const highlanderCompatible = estDeckHighlander(cardIds, missionIds);
 
     const deck = await prisma.deck.create({
       data: {
@@ -144,6 +170,7 @@ export async function POST(request: NextRequest) {
         missionIds,
         evolvingPoints,
         evolvingCompatible,
+        highlanderCompatible,
       },
     });
 

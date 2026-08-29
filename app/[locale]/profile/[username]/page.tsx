@@ -30,9 +30,9 @@ import dynamic from 'next/dynamic';
 
 const DeckViewerModal = dynamic(() => import('@/components/profile/DeckViewerModal'), { ssr: false });
 
-type ProfileStatsMode = 'ranked' | 'evolving' | 'casual' | 'sealed' | 'all';
+type ProfileStatsMode = 'ranked' | 'evolving' | 'highlander' | 'casual' | 'sealed' | 'all';
 
-const PROFILE_MODES: ProfileStatsMode[] = ['ranked', 'evolving', 'casual', 'sealed', 'all'];
+const PROFILE_MODES: ProfileStatsMode[] = ['ranked', 'evolving', 'highlander', 'casual', 'sealed', 'all'];
 
 function ProfileModeSwitch({ value, onChange }: { value: ProfileStatsMode; onChange: (m: ProfileStatsMode) => void }) {
   const t = useTranslations('profile');
@@ -87,6 +87,9 @@ interface ProfileData {
   evolvingElo?: number;
   evolvingWins?: number;
   evolvingLosses?: number;
+  highlanderElo?: number;
+  highlanderWins?: number;
+  highlanderLosses?: number;
   wins: number;
   losses: number;
   role?: string;
@@ -344,23 +347,28 @@ export default function ProfilePage({
     (acc, [, v]) => ({ games: acc.games + v.games, wins: acc.wins + v.wins, losses: acc.losses + v.losses }),
     { games: 0, wins: 0, losses: 0 },
   );
-  const allWins = (profile?.wins ?? 0) + (profile?.evolvingWins ?? 0) + casualStats.wins + sealedTotals.wins;
-  const allLosses = (profile?.losses ?? 0) + (profile?.evolvingLosses ?? 0) + casualStats.losses + sealedTotals.losses;
+  const allWins = (profile?.wins ?? 0) + (profile?.evolvingWins ?? 0) + (profile?.highlanderWins ?? 0) + casualStats.wins + sealedTotals.wins;
+  const allLosses = (profile?.losses ?? 0) + (profile?.evolvingLosses ?? 0) + (profile?.highlanderLosses ?? 0) + casualStats.losses + sealedTotals.losses;
 
   const displayedWins =
     profileMode === 'evolving' ? (profile?.evolvingWins ?? 0)
+    : profileMode === 'highlander' ? (profile?.highlanderWins ?? 0)
     : profileMode === 'casual' ? casualStats.wins
     : profileMode === 'sealed' ? sealedTotals.wins
     : profileMode === 'all' ? allWins
     : (profile?.wins ?? 0);
   const displayedLosses =
     profileMode === 'evolving' ? (profile?.evolvingLosses ?? 0)
+    : profileMode === 'highlander' ? (profile?.highlanderLosses ?? 0)
     : profileMode === 'casual' ? casualStats.losses
     : profileMode === 'sealed' ? sealedTotals.losses
     : profileMode === 'all' ? allLosses
     : (profile?.losses ?? 0);
-  const eloMode: 'ranked' | 'evolving' = profileMode === 'evolving' ? 'evolving' : 'ranked';
-  const displayedElo = eloMode === 'evolving' ? (profile?.evolvingElo ?? 500) : (profile?.elo ?? 0);
+  const eloMode: 'ranked' | 'evolving' | 'highlander' =
+    profileMode === 'evolving' ? 'evolving' : profileMode === 'highlander' ? 'highlander' : 'ranked';
+  const displayedElo = eloMode === 'evolving'
+    ? (profile?.evolvingElo ?? 500)
+    : eloMode === 'highlander' ? (profile?.highlanderElo ?? 500) : (profile?.elo ?? 0);
   const displayedTotal = displayedWins + displayedLosses;
 
   const placed = rankedTotal >= PLACEMENT_MATCHES_REQUIRED;
@@ -368,8 +376,10 @@ export default function ProfilePage({
   const winRate = displayedTotal > 0 ? Math.round((displayedWins / displayedTotal) * 100) : 0;
   const tier = profile ? getRankTier(profile.elo) : null;
   const evoTier = profile ? getRankTier(profile.evolvingElo ?? 500) : null;
-  const displayedTier = eloMode === 'evolving' ? evoTier : tier;
-  const displayedPlaced = eloMode === 'evolving' ? evoPlaced : placed;
+  const highlanderTier = profile ? getRankTier(profile.highlanderElo ?? 500) : null;
+  const highlanderPlaced = ((profile?.highlanderWins ?? 0) + (profile?.highlanderLosses ?? 0)) >= PLACEMENT_MATCHES_REQUIRED;
+  const displayedTier = eloMode === 'evolving' ? evoTier : eloMode === 'highlander' ? highlanderTier : tier;
+  const displayedPlaced = eloMode === 'evolving' ? evoPlaced : eloMode === 'highlander' ? highlanderPlaced : placed;
   const eloCount = useCountUp(displayedElo, 900);
   const accentColor = leaguesEnabled && displayedPlaced && displayedTier ? displayedTier.color : 'var(--t-accent)';
 
@@ -805,7 +815,7 @@ export default function ProfilePage({
           <SeasonBadgesPanel badges={profile.seasonBadges!} />
         )}
 
-        {(profileMode === 'ranked' || profileMode === 'evolving') && (
+        {(profileMode === 'ranked' || profileMode === 'evolving' || profileMode === 'highlander') && (
           <section className="mb-7">
             <EloHistoryChart key={profileMode} username={profile.username} eloType={profileMode} />
           </section>

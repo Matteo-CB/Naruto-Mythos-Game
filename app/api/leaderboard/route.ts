@@ -12,11 +12,14 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0', 10);
     const search = searchParams.get('search')?.trim() || '';
     const league = searchParams.get('league')?.trim() || '';
-    const type = searchParams.get('type')?.trim() === 'evolving' ? 'evolving' : 'ranked';
+    const demande = searchParams.get('type')?.trim();
+    const type = demande === 'evolving' ? 'evolving' : demande === 'highlander' ? 'highlander' : 'ranked';
     const countryParam = searchParams.get('country')?.trim() || '';
     const country = countryParam === 'none' || COUNTRY_CODES.has(countryParam) ? countryParam : '';
     const isEvolving = type === 'evolving';
-    const eloField = isEvolving ? 'evolvingElo' : 'elo';
+    const isHighlander = type === 'highlander';
+    const surClassementAnnexe = isEvolving || isHighlander;
+    const eloField = isEvolving ? 'evolvingElo' : isHighlander ? 'highlanderElo' : 'elo';
 
     const conditions: Record<string, unknown>[] = [];
 
@@ -41,7 +44,18 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    if (!isEvolving && league && league !== 'unranked') {
+    if (isHighlander) {
+      conditions.push({
+        OR: [
+          { highlanderGamesPlayed: { gt: 0 } },
+          { highlanderWins: { gt: 0 } },
+          { highlanderLosses: { gt: 0 } },
+          { highlanderDraws: { gt: 0 } },
+        ],
+      });
+    }
+
+    if (!surClassementAnnexe && league && league !== 'unranked') {
       const tierIdx = LEAGUE_TIERS.findIndex((t) => t.key === league);
       if (tierIdx >= 0) {
         const tier = LEAGUE_TIERS[tierIdx];
@@ -56,7 +70,7 @@ export async function GET(request: NextRequest) {
       ? conditions.length === 1 ? conditions[0] : { AND: conditions }
       : {};
 
-    const needsPostFilter = !isEvolving && !!league && league !== 'unranked';
+    const needsPostFilter = !surClassementAnnexe && !!league && league !== 'unranked';
     const fetchLimit = needsPostFilter ? Math.min(limit * 3, 150) : limit;
     const fetchSkip = needsPostFilter ? 0 : offset;
 
@@ -74,6 +88,10 @@ export async function GET(request: NextRequest) {
         evolvingWins: true,
         evolvingLosses: true,
         evolvingDraws: true,
+        highlanderElo: true,
+        highlanderWins: true,
+        highlanderLosses: true,
+        highlanderDraws: true,
         role: true,
         badgePrefs: true,
         consecutiveWins: true,
@@ -85,7 +103,7 @@ export async function GET(request: NextRequest) {
       skip: fetchSkip,
     });
 
-    if (!isEvolving && league === 'unranked') {
+    if (!surClassementAnnexe && league === 'unranked') {
       const unrankedConditions: Record<string, unknown>[] = [
         { wins: { lt: PLACEMENT_MATCHES } },
         { losses: { lt: PLACEMENT_MATCHES } },
@@ -96,20 +114,20 @@ export async function GET(request: NextRequest) {
       else if (country) unrankedConditions.push({ countryCode: country });
       const allUsers = await prisma.user.findMany({
         where: { AND: unrankedConditions },
-        select: { id: true, username: true, countryCode: true, elo: true, evolvingElo: true, wins: true, losses: true, draws: true, evolvingWins: true, evolvingLosses: true, evolvingDraws: true, role: true, badgePrefs: true, consecutiveWins: true, consecutiveLosses: true, tournamentWins: true },
+        select: { id: true, username: true, countryCode: true, elo: true, evolvingElo: true, wins: true, losses: true, draws: true, evolvingWins: true, evolvingLosses: true, evolvingDraws: true, highlanderElo: true, highlanderWins: true, highlanderLosses: true, highlanderDraws: true, role: true, badgePrefs: true, consecutiveWins: true, consecutiveLosses: true, tournamentWins: true },
         orderBy: { createdAt: 'desc' },
         take: 500,
       });
       users = allUsers.filter((u) => u.wins + u.losses + u.draws < PLACEMENT_MATCHES);
-    } else if (!isEvolving && league) {
+    } else if (!surClassementAnnexe && league) {
       users = users.filter((u) => u.wins + u.losses + u.draws >= PLACEMENT_MATCHES);
     }
 
-    const total = (!isEvolving && (league === 'unranked' || needsPostFilter))
+    const total = (!surClassementAnnexe && (league === 'unranked' || needsPostFilter))
       ? users.length
       : await prisma.user.count({ where });
 
-    if (!isEvolving && (league === 'unranked' || needsPostFilter)) {
+    if (!surClassementAnnexe && (league === 'unranked' || needsPostFilter)) {
       users = users.slice(offset, offset + limit);
     }
 

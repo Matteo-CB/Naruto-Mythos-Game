@@ -36,6 +36,10 @@ interface LeaderboardUser {
   evolvingWins?: number;
   evolvingLosses?: number;
   evolvingDraws?: number;
+  highlanderElo?: number;
+  highlanderWins?: number;
+  highlanderLosses?: number;
+  highlanderDraws?: number;
   role?: string;
   badgePrefs?: string[];
   consecutiveWins?: number;
@@ -43,7 +47,7 @@ interface LeaderboardUser {
   tournamentWins?: number;
 }
 
-type LeaderboardType = 'ranked' | 'evolving' | 'season';
+type LeaderboardType = 'ranked' | 'evolving' | 'highlander' | 'season';
 
 interface SeasonRow {
   userId: string;
@@ -101,15 +105,15 @@ function LeaderRow({
   isSelf: boolean;
   type: LeaderboardType;
 }) {
-  const wins = type === 'evolving' ? (user.evolvingWins ?? 0) : user.wins;
-  const losses = type === 'evolving' ? (user.evolvingLosses ?? 0) : user.losses;
+  const wins = type === 'evolving' ? (user.evolvingWins ?? 0) : type === 'highlander' ? (user.highlanderWins ?? 0) : user.wins;
+  const losses = type === 'evolving' ? (user.evolvingLosses ?? 0) : type === 'highlander' ? (user.highlanderLosses ?? 0) : user.losses;
   const total = wins + losses;
   const winRate = total > 0 ? Math.round((wins / total) * 100) : 0;
-  const displayElo = type === 'evolving' ? (user.evolvingElo ?? 500) : user.elo;
+  const displayElo = type === 'evolving' ? (user.evolvingElo ?? 500) : type === 'highlander' ? (user.highlanderElo ?? 500) : user.elo;
   const tier = getRankTier(user.elo);
   const placed = total >= PLACEMENT_MATCHES_REQUIRED;
-  const showLeagueIcon = type !== 'evolving' && leaguesEnabled && placed;
-  const tierColor = type === 'evolving' ? 'var(--t-accent)' : (placed && leaguesEnabled ? tier.color : 'var(--t-dim)');
+  const showLeagueIcon = type === 'ranked' && leaguesEnabled && placed;
+  const tierColor = type !== 'ranked' ? 'var(--t-accent)' : (placed && leaguesEnabled ? tier.color : 'var(--t-dim)');
   const altBg = index % 2 === 0 ? 'var(--t-accent-surface)' : 'var(--t-accent-surface-hover)';
 
   return (
@@ -343,6 +347,7 @@ export default function LeaderboardPage() {
     const url = new URL(window.location.href);
     const demande = url.searchParams.get('type');
     if (demande === 'evolving') return 'evolving';
+    if (demande === 'highlander') return 'highlander';
     if (demande === 'season') return 'season';
     return 'ranked';
   });
@@ -417,8 +422,8 @@ export default function LeaderboardPage() {
         .catch(() => setLoading(false));
       return;
     }
-    const leagueParam = boardType === 'evolving' || !leagueFilter ? '' : `&league=${encodeURIComponent(leagueFilter)}`;
-    const typeParam = boardType === 'evolving' ? `&type=evolving` : '';
+    const leagueParam = boardType !== 'ranked' || !leagueFilter ? '' : `&league=${encodeURIComponent(leagueFilter)}`;
+    const typeParam = boardType === 'ranked' ? '' : `&type=${boardType}`;
     fetch(`/api/leaderboard?limit=${PLAYERS_PER_PAGE}&offset=${offset}${searchParam}${leagueParam}${countryParam}${typeParam}`)
       .then((res) => res.json())
       .then((data) => {
@@ -576,6 +581,20 @@ export default function LeaderboardPage() {
             }}
           >
             {t('toggleType.ranked')}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleBoardTypeChange('highlander')}
+            className="font-display text-[11px] uppercase tracking-widest px-4 py-1.5 transition-colors"
+            style={{
+              color: boardType === 'highlander' ? 'var(--t-bg)' : 'var(--t-accent)',
+              backgroundColor: boardType === 'highlander' ? 'var(--t-accent)' : 'transparent',
+              borderRadius: 9999,
+              cursor: 'pointer',
+              outline: 'none',
+            }}
+          >
+            {t('toggleType.highlander')}
           </button>
           <button
             type="button"

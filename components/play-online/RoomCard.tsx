@@ -13,6 +13,7 @@ interface RoomCardProps {
   gameMode: string;
   createdAt: number;
   isEvolving: boolean;
+  isHighlander?: boolean;
   holoHue: number | null;
   isRanked: boolean;
   isAnonymous: boolean;
@@ -25,6 +26,7 @@ export function RoomCard({
   gameMode,
   createdAt,
   isEvolving,
+  isHighlander,
   holoHue,
   isRanked,
   isAnonymous,
@@ -78,6 +80,7 @@ export function RoomCard({
           )}
           {isAnonymous && <ChipText label={t('online.badge.anonymous')} accent="var(--t-muted)" />}
           {isEvolving && <EvoBadge holoHue={holoHue} />}
+          {isHighlander && <ChipText label={t('online.badge.highlander')} accent="var(--t-accent)" />}
           <span className="text-[9px]" style={{ color: 'var(--t-muted)', marginLeft: 4 }}>
             {formatTimeAgo(createdAt, t)}
           </span>

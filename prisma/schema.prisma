@@ -51,6 +51,11 @@ model User {
   evolvingWins            Int                  @default(0)
   evolvingLosses          Int                  @default(0)
   evolvingDraws           Int                  @default(0)
+  highlanderElo           Int                  @default(500)
+  highlanderGamesPlayed   Int                  @default(0)
+  highlanderWins          Int                  @default(0)
+  highlanderLosses        Int                  @default(0)
+  highlanderDraws         Int                  @default(0)
   unlockedVariantCardIds  String[]             @default([])
   battlepassXp            Int                  @default(0)
   battlepassTier          Int                  @default(0)
@@ -77,6 +82,7 @@ model User {
   @@index([elo])
   @@index([createdAt])
   @@index([evolvingElo])
+  @@index([highlanderElo])
 }
 
 model BoosterInventory {
@@ -180,21 +186,23 @@ model Account {
 }
 
 model Deck {
-  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
-  name               String
-  userId             String   @db.ObjectId
-  user               User     @relation(fields: [userId], references: [id])
-  cardIds            String[]
-  missionIds         String[]
-  sortOrder          Int      @default(0)
-  evolvingPoints     Int      @default(0)
-  evolvingCompatible Boolean  @default(false)
-  isPublic           Boolean  @default(false)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  name                 String
+  userId               String   @db.ObjectId
+  user                 User     @relation(fields: [userId], references: [id])
+  cardIds              String[]
+  missionIds           String[]
+  sortOrder            Int      @default(0)
+  evolvingPoints       Int      @default(0)
+  evolvingCompatible   Boolean  @default(false)
+  highlanderCompatible Boolean  @default(false)
+  isPublic             Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   @@index([userId, evolvingPoints])
   @@index([userId, evolvingCompatible])
+  @@index([userId, highlanderCompatible])
 }
 
 model Follow {
@@ -290,6 +298,7 @@ model Game {
   player2Score Int       @default(0)
   eloChange    Int?
   isEvolving   Boolean   @default(false)
+  isHighlander Boolean   @default(false)
   createdAt    DateTime  @default(now())
   completedAt  DateTime?
 
@@ -297,19 +306,21 @@ model Game {
   @@index([player1Id, completedAt])
   @@index([player2Id, completedAt])
   @@index([isEvolving, completedAt])
+  @@index([isHighlander, completedAt])
 }
 
 model Room {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  code       String   @unique
-  hostId     String   @db.ObjectId
-  guestId    String?  @db.ObjectId
-  gameId     String?  @db.ObjectId
-  status     String
-  isPrivate  Boolean  @default(false)
-  isEvolving Boolean  @default(false)
-  holoHue    Int?
-  createdAt  DateTime @default(now())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  code         String   @unique
+  hostId       String   @db.ObjectId
+  guestId      String?  @db.ObjectId
+  gameId       String?  @db.ObjectId
+  status       String
+  isPrivate    Boolean  @default(false)
+  isEvolving   Boolean  @default(false)
+  isHighlander Boolean  @default(false)
+  holoHue      Int?
+  createdAt    DateTime @default(now())
 }
 
 model Friendship {

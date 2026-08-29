@@ -902,6 +902,7 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
             isAnonymous: false,
             gameMode: isSealedTournament ? 'sealed' : isEvolvingTournament ? 'evolving' : 'casual',
             isEvolving: isEvolvingTournament,
+            isHighlander: false,
             holoHue: isEvolvingTournament ? Math.floor(Math.random() * 360) : null,
             hostEvolvingPoints,
             guestEvolvingPoints,

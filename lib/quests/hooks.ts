@@ -8,6 +8,7 @@ export type GameMode =
   | 'ranked'
   | 'casual'
   | 'evolving'
+  | 'highlander'
   | 'sealed'
   | 'tournament'
   | 'ai'

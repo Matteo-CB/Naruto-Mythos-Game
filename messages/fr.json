@@ -2202,7 +2202,8 @@
     "mode": {
       "casual": "Casual",
       "ranked": "Classé",
-      "sealed": "Scellé"
+      "sealed": "Scellé",
+      "highlander": "Highlander"
     },
     "modeDesc": {
       "casual": "Match non classé, jouez pour le plaisir, pas de changement ELO",
@@ -2232,7 +2233,8 @@
     },
     "badge": {
       "evolving": "EVOLVING",
-      "anonymous": "ANONYME"
+      "anonymous": "ANONYME",
+      "highlander": "Highlander"
     },
     "evolving": {
       "toggleLabel": "Mode evolving",
@@ -2248,6 +2250,15 @@
       "toggleDescription": "Ouvre 5 boosters et construis ton deck sur place. Les decks sauvegardés ne sont pas utilisés.",
       "setChoiceLabel": "Extension à utiliser",
       "setRandom": "Aléatoire"
+    },
+    "highlander": {
+      "toggleLabel": "Mode Highlander",
+      "toggleDescription": "Deck de 40 cartes minimum, une seule copie de chaque carte",
+      "noDeckTitle": "Deck Highlander requis",
+      "noDeck": "Tu dois avoir un deck Highlander pour rejoindre ou créer cette room",
+      "createDeck": "Créer un deck Highlander",
+      "needDeckHint": "Crée un deck de 40 cartes sans doublon pour activer ce mode",
+      "noDeckInSelector": "Aucun deck Highlander disponible. Il faut 40 cartes minimum et une seule copie de chaque."
     }
   },
   "leaderboard": {
@@ -2255,7 +2266,8 @@
     "subtitle": "Minimum {count} matchs classés pour obtenir une ligue",
     "toggleType": {
       "ranked": "Classé",
-      "evolving": "Evolving"
+      "evolving": "Evolving",
+      "highlander": "Highlander"
     },
     "rank": "Rang",
     "player": "Joueur",
@@ -2328,7 +2340,8 @@
     "deckPrivate": "Privé",
     "deckPublicHint": "Visible par tous",
     "deckPrivateHint": "Visible par toi seul",
-    "rankDivision": "{name} {level}"
+    "rankDivision": "{name} {level}",
+    "mode_highlander": "Highlander"
   },
   "replay": {
     "title": "Récapitulatif",
@@ -2371,7 +2384,9 @@
   },
   "room": {
     "error": {
-      "evolvingNoDeck": "Il te faut un deck Evolving pour ce mode."
+      "evolvingNoDeck": "Il te faut un deck Evolving pour ce mode.",
+      "highlanderNoDeck": "Il te faut un deck Highlander pour ce mode.",
+      "highlanderDeckInvalid": "Ce deck ne respecte pas les règles Highlander."
     }
   },
   "auth": {

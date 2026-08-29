@@ -2200,7 +2200,8 @@
     "mode": {
       "casual": "カジュアル",
       "ranked": "ランク",
-      "sealed": "シールド"
+      "sealed": "シールド",
+      "highlander": "ハイランダー"
     },
     "modeDesc": {
       "casual": "ランク外の対戦、気軽にプレイ、ELO変動なし",
@@ -2230,7 +2231,8 @@
     },
     "badge": {
       "evolving": "エボルビング",
-      "anonymous": "匿名"
+      "anonymous": "匿名",
+      "highlander": "ハイランダー"
     },
     "evolving": {
       "toggleLabel": "エボルビングモード",
@@ -2246,6 +2248,15 @@
       "toggleDescription": "5パックを開封してその場でデッキを組みます。保存したデッキは使いません。",
       "setChoiceLabel": "使うセット",
       "setRandom": "ランダム"
+    },
+    "highlander": {
+      "toggleLabel": "ハイランダーモード",
+      "toggleDescription": "40枚以上、同じカードは1枚まで",
+      "noDeckTitle": "ハイランダーデッキが必要です",
+      "noDeck": "この部屋に入る、または作るにはハイランダーデッキが必要です",
+      "createDeck": "ハイランダーデッキを作る",
+      "needDeckHint": "重複なしの40枚デッキを作るとこのモードが使えます",
+      "noDeckInSelector": "ハイランダーデッキがありません。40枚以上、同じカードは1枚までです。"
     }
   },
   "leaderboard": {
@@ -2253,7 +2264,8 @@
     "subtitle": "リーグを得るにはランク対戦が最低 {count} 回必要です",
     "toggleType": {
       "ranked": "ランク",
-      "evolving": "エボルビング"
+      "evolving": "エボルビング",
+      "highlander": "ハイランダー"
     },
     "rank": "順位",
     "player": "プレイヤー",
@@ -2326,7 +2338,8 @@
     "deckPrivate": "非公開",
     "deckPublicHint": "全員に表示",
     "deckPrivateHint": "自分だけに表示",
-    "rankDivision": "{name} {level}"
+    "rankDivision": "{name} {level}",
+    "mode_highlander": "ハイランダー"
   },
   "replay": {
     "title": "対戦の振り返り",
@@ -2369,7 +2382,9 @@
   },
   "room": {
     "error": {
-      "evolvingNoDeck": "このモードにはエボルビングデッキが必要です。"
+      "evolvingNoDeck": "このモードにはエボルビングデッキが必要です。",
+      "highlanderNoDeck": "このモードにはハイランダーデッキが必要です。",
+      "highlanderDeckInvalid": "このデッキはハイランダーのルールを満たしていません。"
     }
   },
   "auth": {

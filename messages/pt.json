@@ -571,7 +571,8 @@
     "subtitle": "Mínimo de {count} partidas ranqueadas para ganhar uma liga",
     "toggleType": {
       "ranked": "Ranqueado",
-      "evolving": "Evolving"
+      "evolving": "Evolving",
+      "highlander": "Highlander"
     },
     "rank": "Posição",
     "player": "Jogador",
@@ -655,7 +656,9 @@
   },
   "room": {
     "error": {
-      "evolvingNoDeck": "Você precisa de um deck Evolving para este modo."
+      "evolvingNoDeck": "Você precisa de um deck Evolving para este modo.",
+      "highlanderNoDeck": "Precisas de um baralho Highlander para este modo.",
+      "highlanderDeckInvalid": "Este baralho não segue as regras Highlander."
     }
   },
   "dm": {
@@ -854,7 +857,8 @@
     "deckPrivate": "Privado",
     "deckPublicHint": "Visível para todos",
     "deckPrivateHint": "Visível só para você",
-    "rankDivision": "{name} {level}"
+    "rankDivision": "{name} {level}",
+    "mode_highlander": "Highlander"
   },
   "friends": {
     "title": "Amigos",
@@ -1035,7 +1039,8 @@
     "mode": {
       "casual": "Casual",
       "ranked": "Ranqueado",
-      "sealed": "Sealed"
+      "sealed": "Sealed",
+      "highlander": "Highlander"
     },
     "modeDesc": {
       "casual": "Partida sem rank, jogue por diversão, sem mudanças de ELO",
@@ -1065,7 +1070,8 @@
     },
     "badge": {
       "evolving": "EVOLVING",
-      "anonymous": "ANÔNIMO"
+      "anonymous": "ANÔNIMO",
+      "highlander": "Highlander"
     },
     "evolving": {
       "toggleLabel": "Modo Evolving",
@@ -1081,6 +1087,15 @@
       "toggleDescription": "Abra 5 boosters e monte seu deck na hora. Decks salvos não são usados.",
       "setChoiceLabel": "Set a usar",
       "setRandom": "Aleatório"
+    },
+    "highlander": {
+      "toggleLabel": "Modo Highlander",
+      "toggleDescription": "No mínimo 40 cartas, apenas uma cópia de cada carta",
+      "noDeckTitle": "É preciso um baralho Highlander",
+      "noDeck": "Precisas de um baralho Highlander para entrar ou criar esta sala",
+      "createDeck": "Criar um baralho Highlander",
+      "needDeckHint": "Cria um baralho de 40 cartas sem repetições para ativar este modo",
+      "noDeckInSelector": "Nenhum baralho Highlander disponível. São precisas 40 cartas e uma só cópia de cada."
     }
   },
   "boosters": {

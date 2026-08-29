@@ -18,6 +18,7 @@ import { PlayStatsButton } from '@/components/play-online/PlayStatsButton';
 import { RoomCard } from '@/components/play-online/RoomCard';
 import { HoloSurface } from '@/components/HoloSurface';
 import { useHasEvolvingDeck } from '@/components/play-online/useHasEvolvingDeck';
+import { useHasHighlanderDeck } from '@/components/play-online/useHasHighlanderDeck';
 import { useMemo } from 'react';
 import { randomHoloHue } from '@/lib/utils/holoColor';
 import { useToastStore } from '@/stores/toastStore';
@@ -35,6 +36,7 @@ interface ResolvedDeck {
 }
 
 const EVOLVING_TOGGLE_STORAGE_KEY = 'naruto-mythos-evolving-toggle';
+const HIGHLANDER_TOGGLE_STORAGE_KEY = 'naruto-mythos-highlander-toggle';
 const SEALED_TOGGLE_STORAGE_KEY = 'naruto-mythos-sealed-toggle';
 const SEALED_DEFAULT_BOOSTER_COUNT: 4 | 5 | 6 = 5;
 const SEALED_DEFAULT_SET_CHOICE = 'KS';
@@ -82,6 +84,11 @@ export default function PlayOnlinePage() {
   const [isPrivateRoom, setIsPrivateRoom] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [isEvolvingToggle, setIsEvolvingToggleRaw] = useState(initialEvolving);
+  const [isHighlanderToggle, setIsHighlanderToggleRaw] = useState(false);
+  const setIsHighlanderToggle = useCallback((v: boolean) => {
+    setIsHighlanderToggleRaw(v);
+    if (v) setIsEvolvingToggleRaw(false);
+  }, []);
   const [isSealedToggle, setIsSealedToggleRaw] = useState<boolean>(initialSealed);
   const setIsEvolvingToggle = useCallback((v: boolean) => {
     setIsEvolvingToggleRaw(v);
@@ -96,6 +103,10 @@ export default function PlayOnlinePage() {
   useEffect(() => {
     try { localStorage.setItem(EVOLVING_TOGGLE_STORAGE_KEY, isEvolvingToggle ? '1' : '0'); } catch { /* ignore */ }
   }, [isEvolvingToggle]);
+
+  useEffect(() => {
+    try { localStorage.setItem(HIGHLANDER_TOGGLE_STORAGE_KEY, isHighlanderToggle ? '1' : '0'); } catch { /* ignore */ }
+  }, [isHighlanderToggle]);
   useEffect(() => {
     try { localStorage.setItem(SEALED_TOGGLE_STORAGE_KEY, isSealedToggle ? '1' : '0'); } catch { /* ignore */ }
   }, [isSealedToggle]);
@@ -114,14 +125,28 @@ export default function PlayOnlinePage() {
   }, [showToast]);
 
   const { hasEvo } = useHasEvolvingDeck();
+  const { hasHighlander } = useHasHighlanderDeck();
   const previewHue = useMemo(() => randomHoloHue(), []);
   const evoToggleBlocked = isEvolvingToggle && hasEvo === false;
+  const highlanderToggleBlocked = isHighlanderToggle && hasHighlander === false;
+  const creationBlocked = evoToggleBlocked || highlanderToggleBlocked;
+  const triggerHighlanderErrorToast = useCallback(() => {
+    showToast({
+      type: 'error',
+      titleKey: 'online.highlander.noDeckTitle',
+      messageKey: 'online.highlander.noDeck',
+      action: { labelKey: 'online.highlander.createDeck', href: '/deck-builder' },
+      dedupeKey: 'highlander-no-deck',
+      durationMs: 6000,
+    });
+  }, [showToast]);
 
   const {
     connected,
     roomCode,
     currentRoomGameMode,
     currentRoomIsEvolving,
+    currentRoomIsHighlander,
     currentRoomHoloHue,
     playerRole,
     opponentJoined,
@@ -344,6 +369,10 @@ export default function PlayOnlinePage() {
       triggerEvoErrorToast();
       return;
     }
+    if (highlanderToggleBlocked) {
+      triggerHighlanderErrorToast();
+      return;
+    }
     try {
       if (!connected) await connect(session.user.id, session.user.name ?? undefined);
       const isRanked = mode === 'ranked';
@@ -366,12 +395,13 @@ export default function PlayOnlinePage() {
           false,
           isRanked,
           false,
-          isEvolvingToggle && isRanked ? 'evolving' : mode,
+          isHighlanderToggle && isRanked ? 'highlander' : isEvolvingToggle && isRanked ? 'evolving' : mode,
           session.user.name ?? undefined,
           undefined,
           undefined,
           isAnonymous,
           isEvolvingToggle,
+          isHighlanderToggle,
         );
       }
       setIsPrivateRoom(false);
@@ -381,6 +411,10 @@ export default function PlayOnlinePage() {
   const handleCreatePrivateRoom = async () => {
     if (evoToggleBlocked) {
       triggerEvoErrorToast();
+      return;
+    }
+    if (highlanderToggleBlocked) {
+      triggerHighlanderErrorToast();
       return;
     }
     try {
@@ -405,12 +439,13 @@ export default function PlayOnlinePage() {
           true,
           isRanked,
           false,
-          isEvolvingToggle && isRanked ? 'evolving' : selectedMode,
+          isHighlanderToggle && isRanked ? 'highlander' : isEvolvingToggle && isRanked ? 'evolving' : selectedMode,
           session.user.name ?? undefined,
           undefined,
           undefined,
           isAnonymous,
           isEvolvingToggle,
+          isHighlanderToggle,
         );
       }
       setIsPrivateRoom(true);
@@ -439,6 +474,7 @@ export default function PlayOnlinePage() {
 
   const showDeckSelector = roomCode && opponentJoined && !deckSelected && cards && !tournamentMatchRoom;
   const isEvoRoomActive = currentRoomIsEvolving || currentRoomGameMode === 'evolving';
+  const isHighlanderRoomActive = currentRoomIsHighlander || currentRoomGameMode === 'highlander';
 
   useEffect(() => {
     if (tournamentMatchRoom && !deckSelected) {
@@ -531,6 +567,7 @@ export default function PlayOnlinePage() {
                     allCharacters={cards.characters}
                     allMissions={cards.missions}
                     evolvingOnly={false}
+                    highlanderOnly={isHighlanderRoomActive}
                   />
                 </div>
               )}
@@ -572,6 +609,11 @@ export default function PlayOnlinePage() {
                           blocked={evoToggleBlocked}
                           previewHue={previewHue}
                         />
+                        <HighlanderToggleBlock
+                          checked={isHighlanderToggle}
+                          onChange={setIsHighlanderToggle}
+                          blocked={highlanderToggleBlocked}
+                        />
                         <SealedToggleBlock
                           checked={isSealedToggle}
                           onChange={setIsSealedToggle}
@@ -589,7 +631,7 @@ export default function PlayOnlinePage() {
                         onJoin={handleJoinRoom}
                         onCreateCasual={() => handleCreatePublicRoom('casual')}
                         onCreateRanked={() => handleCreatePublicRoom('ranked')}
-                        disableCreate={evoToggleBlocked}
+                        disableCreate={creationBlocked}
                       />
                     </Section>
                   </div>
@@ -963,6 +1005,7 @@ function RoomColumn({
                 gameMode={room.gameMode}
                 createdAt={room.createdAt}
                 isEvolving={room.isEvolving}
+                isHighlander={room.isHighlander}
                 holoHue={room.holoHue}
                 isRanked={room.isRanked}
                 isAnonymous={room.isAnonymous}
@@ -999,7 +1042,7 @@ function formatElapsed(ms: number): string {
 }
 
 function getRoomModeLabel(
-  gameMode: 'casual' | 'ranked' | 'sealed' | 'evolving' | null,
+  gameMode: 'casual' | 'ranked' | 'sealed' | 'evolving' | 'highlander' | null,
   isEvolving: boolean,
 ): { labelKey: string; accent: string } {
   if (gameMode === 'evolving') {
@@ -1019,7 +1062,7 @@ function WaitingRoomHeader({
   isEvolving,
   createdAt,
 }: {
-  gameMode: 'casual' | 'ranked' | 'sealed' | 'evolving' | null;
+  gameMode: 'casual' | 'ranked' | 'sealed' | 'evolving' | 'highlander' | null;
   isEvolving: boolean;
   createdAt: number | null;
 }) {
@@ -1198,6 +1241,32 @@ function SealedToggleBlock({
   );
 }
 
+
+function HighlanderToggleBlock({
+  checked, onChange, blocked,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  blocked: boolean;
+}) {
+  const t = useTranslations();
+  return (
+    <div className="flex flex-col gap-1">
+      <ToggleRow
+        label={t('online.highlander.toggleLabel')}
+        description={t('online.highlander.toggleDescription')}
+        checked={checked}
+        onChange={onChange}
+        accent="var(--t-accent)"
+      />
+      {blocked && (
+        <span className="text-[10px] italic px-3" style={{ color: 'var(--t-dim)' }}>
+          {t('online.highlander.needDeckHint')}
+        </span>
+      )}
+    </div>
+  );
+}
 
 function EvolvingToggleBlock({
   checked, onChange, blocked, previewHue,

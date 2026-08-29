@@ -571,7 +571,8 @@
     "subtitle": "Minimum {count} meczów rankingowych, aby zdobyć ligę",
     "toggleType": {
       "ranked": "Rankingowy",
-      "evolving": "Evolving"
+      "evolving": "Evolving",
+      "highlander": "Highlander"
     },
     "rank": "Miejsce",
     "player": "Gracz",
@@ -655,7 +656,9 @@
   },
   "room": {
     "error": {
-      "evolvingNoDeck": "Potrzebujesz talii Evolving do tego trybu."
+      "evolvingNoDeck": "Potrzebujesz talii Evolving do tego trybu.",
+      "highlanderNoDeck": "Do tego trybu potrzebujesz talii Highlander.",
+      "highlanderDeckInvalid": "Ta talia nie spełnia zasad Highlander."
     }
   },
   "dm": {
@@ -854,7 +857,8 @@
     "deckPrivate": "Prywatny",
     "deckPublicHint": "Widoczny dla wszystkich",
     "deckPrivateHint": "Widoczny tylko dla ciebie",
-    "rankDivision": "{name} {level}"
+    "rankDivision": "{name} {level}",
+    "mode_highlander": "Highlander"
   },
   "friends": {
     "title": "Znajomi",
@@ -1035,7 +1039,8 @@
     "mode": {
       "casual": "Towarzyski",
       "ranked": "Rankingowy",
-      "sealed": "Sealed"
+      "sealed": "Sealed",
+      "highlander": "Highlander"
     },
     "modeDesc": {
       "casual": "Mecz bez rankingu, graj dla zabawy, bez zmian ELO",
@@ -1065,7 +1070,8 @@
     },
     "badge": {
       "evolving": "EVOLVING",
-      "anonymous": "ANONIMOWY"
+      "anonymous": "ANONIMOWY",
+      "highlander": "Highlander"
     },
     "evolving": {
       "toggleLabel": "Tryb Evolving",
@@ -1081,6 +1087,15 @@
       "toggleDescription": "Otwórz 5 boosterów i zbuduj talię na miejscu. Zapisane talie nie są używane.",
       "setChoiceLabel": "Set do użycia",
       "setRandom": "Losowy"
+    },
+    "highlander": {
+      "toggleLabel": "Tryb Highlander",
+      "toggleDescription": "Minimum 40 kart, tylko jedna kopia każdej karty",
+      "noDeckTitle": "Wymagana talia Highlander",
+      "noDeck": "Potrzebujesz talii Highlander, aby dołączyć lub stworzyć ten pokój",
+      "createDeck": "Stwórz talię Highlander",
+      "needDeckHint": "Zbuduj talię 40 kart bez powtórek, aby odblokować ten tryb",
+      "noDeckInSelector": "Brak talii Highlander. Potrzeba 40 kart i tylko jednej kopii każdej."
     }
   },
   "boosters": {

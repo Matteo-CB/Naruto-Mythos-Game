@@ -28,6 +28,8 @@ import { isMaintenanceActive, activateMaintenance, setDrainTimeout, setCheckInte
 import { createChessClock, arm as armChessClock, disarm as disarmChessClock, resetIdle as resetChessClockIdle, snapshotForBroadcast as snapshotChessClockForBroadcast, bankEmpty as chessClockBankEmpty, idleMs as chessClockIdleMs, consumeIdleWarning as consumeChessClockIdleWarning, CHESS_CLOCK_IDLE_LIMIT_MS, CHESS_CLOCK_IDLE_TOAST_MS, CHESS_CLOCK_MULLIGAN_IDLE_MS, CHESS_CLOCK_DISCONNECT_FORFEIT_MS, type ChessClockState } from '@/lib/timing/chessClock';
 import { computeEvolvingMpBonus } from '@/lib/evolving/mpBonus';
 import { computeDeckEvolvingPoints, isEvolvingCompatible } from '@/lib/evolving/computePoints';
+import { classementDeLaPartie, eloDuJoueur, partiesDuJoueur } from '@/lib/elo/classements';
+import { estDeckHighlander } from '@/lib/highlander/deckRules';
 import { validateDeckVariantUnlocks } from '@/lib/variants/serverValidation';
 import { getOwnedVariantIds } from '@/lib/variants/inventory';
 import { isAdmin } from '@/lib/auth/admins';
@@ -58,8 +60,9 @@ import { noterUneActionAuPlateau } from '@/lib/tournament/presenceAuPlateau';
 
 ensureQuestPersistenceListener();
 
-function resolveQuestGameMode(room: Pick<RoomData, 'isRanked' | 'isEvolving' | 'gameMode' | 'tournamentId'>): GameMode {
+function resolveQuestGameMode(room: Pick<RoomData, 'isRanked' | 'isEvolving' | 'isHighlander' | 'gameMode' | 'tournamentId'>): GameMode {
   if (room.tournamentId) return 'tournament';
+  if (room.isHighlander) return 'highlander';
   if (room.isEvolving) return 'evolving';
   if (room.isRanked) return 'ranked';
   if (room.gameMode === 'sealed') return 'sealed';
@@ -195,8 +198,9 @@ export interface RoomData {
   isPrivate: boolean;
   isRanked: boolean;
   isAnonymous: boolean;
-  gameMode: 'casual' | 'ranked' | 'sealed' | 'evolving';
+  gameMode: 'casual' | 'ranked' | 'sealed' | 'evolving' | 'highlander';
   isEvolving: boolean;
+  isHighlander: boolean;
   holoHue: number | null;
   hostEvolvingPoints: number;
   guestEvolvingPoints: number;
@@ -628,6 +632,7 @@ export function announceMissedGameEnd(room: RoomData, code: string, io: SocketIO
     player2Score: room.gameState.player2.missionPoints,
     isRanked: room.isRanked,
     isEvolving: room.isEvolving === true,
+    isHighlander: room.isHighlander === true,
     eloDelta: null,
     newElo: undefined,
     totalGames: undefined,
@@ -1113,8 +1118,8 @@ function cleanupPlayerRoom(socket: Socket): void {
   playerRooms.delete(socket.id);
 }
 
-function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: string; createdAt: number; isEvolving: boolean; holoHue: number | null; isRanked: boolean; isAnonymous: boolean; sealedSetChoice: string | null }> {
-  const list: Array<{ code: string; hostName: string; gameMode: string; createdAt: number; isEvolving: boolean; holoHue: number | null; isRanked: boolean; isAnonymous: boolean; sealedSetChoice: string | null }> = [];
+function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: string; createdAt: number; isEvolving: boolean; isHighlander: boolean; holoHue: number | null; isRanked: boolean; isAnonymous: boolean; sealedSetChoice: string | null }> {
+  const list: Array<{ code: string; hostName: string; gameMode: string; createdAt: number; isEvolving: boolean; isHighlander: boolean; holoHue: number | null; isRanked: boolean; isAnonymous: boolean; sealedSetChoice: string | null }> = [];
   const staleRoomCodes: string[] = [];
   for (const [code, room] of rooms) {
     if (room.isPrivate) continue;
@@ -1134,6 +1139,7 @@ function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: 
       gameMode: room.gameMode,
       createdAt: room.createdAt,
       isEvolving: room.isEvolving === true,
+    isHighlander: room.isHighlander === true,
       holoHue: room.holoHue ?? null,
       isRanked: room.isRanked === true,
       isAnonymous: room.isAnonymous === true,
@@ -1201,7 +1207,7 @@ function broadcastActiveGames(io: SocketIOServer): void {
   const activeGames: Array<{
     roomCode: string; player1Name: string; player2Name: string;
     spectatorCount: number; turn: number; isRanked: boolean; isPrivate: boolean;
-    isEvolving: boolean; holoHue: number | null; isAnonymous: boolean; phase: string;
+    isEvolving: boolean; isHighlander: boolean; holoHue: number | null; isAnonymous: boolean; phase: string;
   }> = [];
 
   const seenPlayerIds = new Set<string>();
@@ -1225,6 +1231,7 @@ function broadcastActiveGames(io: SocketIOServer): void {
       isRanked: room.isRanked,
       isPrivate: false,
       isEvolving: room.isEvolving === true,
+    isHighlander: room.isHighlander === true,
       holoHue: room.holoHue ?? null,
       isAnonymous: room.isAnonymous === true,
       phase: room.gameState.phase,
@@ -1720,19 +1727,19 @@ async function finalizeGameEnd(
     .then(({ cleanupOldGames }) => cleanupOldGames())
     .catch(() => {});
 
-  const isEvolving = room.isEvolving === true;
-  const eloField: 'elo' | 'evolvingElo' = isEvolving ? 'evolvingElo' : 'elo';
-  const eloType: 'ranked' | 'evolving' = isEvolving ? 'evolving' : 'ranked';
-  const winsField: 'wins' | 'evolvingWins' = isEvolving ? 'evolvingWins' : 'wins';
-  const lossesField: 'losses' | 'evolvingLosses' = isEvolving ? 'evolvingLosses' : 'losses';
-  const getElo = (u: { elo: number; evolvingElo?: number | null }): number =>
-    isEvolving ? (u.evolvingElo ?? 500) : u.elo;
+  const classement = classementDeLaPartie(room);
+  const isEvolving = classement.id !== 'ranked';
+  const eloField = classement.eloField;
+  const eloType = classement.id;
+  const winsField = classement.winsField;
+  const lossesField = classement.lossesField;
+  const getElo = (u: Record<string, unknown>): number => eloDuJoueur(classement, u);
   const buildWinStats = () => ({ [winsField]: { increment: 1 } });
   const buildLossStats = () => ({ [lossesField]: { increment: 1 } });
-  const getTotalGames = (u: { wins: number; losses: number; draws: number; evolvingWins?: number | null; evolvingLosses?: number | null; evolvingDraws?: number | null }): number =>
-    isEvolving
-      ? ((u.evolvingWins ?? 0) + (u.evolvingLosses ?? 0) + (u.evolvingDraws ?? 0))
-      : (u.wins + u.losses + u.draws);
+  const compteurDeParties = classement.compteurDeParties
+    ? { [classement.compteurDeParties]: { increment: 1 } }
+    : {};
+  const getTotalGames = (u: Record<string, unknown>): number => partiesDuJoueur(classement, u);
 
   if (!room.isRanked && (winner === 'player1' || winner === 'player2')) {
     const modeKey = unrankedModeKey(room);
@@ -1780,7 +1787,7 @@ async function finalizeGameEnd(
             [eloField]: newElo, ...stats,
             consecutiveWins: survivorWon ? (survivor.consecutiveWins ?? 0) + 1 : 0,
             consecutiveLosses: survivorWon ? 0 : (survivor.consecutiveLosses ?? 0) + 1,
-            ...(isEvolving ? { evolvingGamesPlayed: { increment: 1 } } : {}),
+            ...compteurDeParties,
           } as never,
         });
         const updatedElo = getElo(updated);
@@ -1812,7 +1819,7 @@ async function finalizeGameEnd(
         }).catch((err) => {
           console.warn('[Socket] EloHistory write failed (one-side):', err instanceof Error ? err.message : err);
         });
-        if (!isEvolving) {
+        if (classement.id === 'ranked') {
           syncDiscordRole(survivor.id).catch(() => {});
           const oldTotal = survivor.wins + survivor.losses + survivor.draws;
           sendRankUpNotification(survivor.username, survivor.discordId, oldElo, updatedElo, oldTotal, oldTotal + 1).catch(() => {});
@@ -1845,7 +1852,7 @@ async function finalizeGameEnd(
               [eloField]: changes.player1NewElo, ...p1Stats,
               consecutiveWins: changes.player1NewConsecWins,
               consecutiveLosses: changes.player1NewConsecLosses,
-              ...(isEvolving ? { evolvingGamesPlayed: { increment: 1 } } : {}),
+              ...compteurDeParties,
             } as never,
           }),
           prisma.user.update({
@@ -1854,7 +1861,7 @@ async function finalizeGameEnd(
               [eloField]: changes.player2NewElo, ...p2Stats,
               consecutiveWins: changes.player2NewConsecWins,
               consecutiveLosses: changes.player2NewConsecLosses,
-              ...(isEvolving ? { evolvingGamesPlayed: { increment: 1 } } : {}),
+              ...compteurDeParties,
             } as never,
           }),
         ]);
@@ -1869,7 +1876,7 @@ async function finalizeGameEnd(
           performanceBonus: changes.performanceBonus,
         };
 
-        if (!isEvolving && room.hostId && room.guestId) {
+        if (classement.id === 'ranked' && room.hostId && room.guestId) {
           const ELO_TIER_THRESHOLDS: Array<{ tier: string; minElo: number }> = [
             { tier: 'genin', minElo: 450 },
             { tier: 'chunin', minElo: 550 },
@@ -1891,7 +1898,7 @@ async function finalizeGameEnd(
           checkTier(room.guestId, getElo(player2!), changes.player2NewElo);
         }
 
-        if (!isEvolving && room.hostId && room.guestId) {
+        if (classement.id === 'ranked' && room.hostId && room.guestId) {
           const p1Wins = changes.player1NewConsecWins;
           const p2Wins = changes.player2NewConsecWins;
           if (p1Wins >= 2) emitQuestEvent('ranked.win.streak', room.hostId, { gameMode: 'ranked', streak: p1Wins });
@@ -1973,7 +1980,7 @@ async function finalizeGameEnd(
         ]);
         room.pendingEloHistoryIds = [e1?.id, e2?.id].filter((x): x is string => !!x);
 
-        if (!isEvolving) {
+        if (classement.id === 'ranked') {
           syncDiscordRole(room.hostId).catch(() => {});
           syncDiscordRole(room.guestId!).catch(() => {});
 
@@ -2011,8 +2018,8 @@ async function finalizeGameEnd(
           const p1S = winner === 'player1' ? buildWinStats() : buildLossStats();
           const p2S = winner === 'player2' ? buildWinStats() : buildLossStats();
           const [uP1, uP2] = await Promise.all([
-            prisma.user.update({ where: { id: room.hostId! }, data: { [eloField]: retryChanges.player1NewElo, ...p1S, consecutiveWins: retryChanges.player1NewConsecWins, consecutiveLosses: retryChanges.player1NewConsecLosses, ...(isEvolving ? { evolvingGamesPlayed: { increment: 1 } } : {}) } as never }),
-            prisma.user.update({ where: { id: room.guestId! }, data: { [eloField]: retryChanges.player2NewElo, ...p2S, consecutiveWins: retryChanges.player2NewConsecWins, consecutiveLosses: retryChanges.player2NewConsecLosses, ...(isEvolving ? { evolvingGamesPlayed: { increment: 1 } } : {}) } as never }),
+            prisma.user.update({ where: { id: room.hostId! }, data: { [eloField]: retryChanges.player1NewElo, ...p1S, consecutiveWins: retryChanges.player1NewConsecWins, consecutiveLosses: retryChanges.player1NewConsecLosses, ...compteurDeParties } as never }),
+            prisma.user.update({ where: { id: room.guestId! }, data: { [eloField]: retryChanges.player2NewElo, ...p2S, consecutiveWins: retryChanges.player2NewConsecWins, consecutiveLosses: retryChanges.player2NewConsecLosses, ...compteurDeParties } as never }),
           ]);
           eloData = { player1Delta: retryChanges.player1Delta, player2Delta: retryChanges.player2Delta, player1NewElo: getElo(uP1), player2NewElo: getElo(uP2), player1TotalGames: getTotalGames(uP1), player2TotalGames: getTotalGames(uP2), performanceBonus: retryChanges.performanceBonus };
           console.log(`[Socket] ELO retry (${label}) succeeded`);
@@ -2201,6 +2208,7 @@ async function finalizeGameEnd(
       player2Score: p2Score,
       eloChange: eloData?.player1Delta ?? 0,
       isEvolving: room.isEvolving === true,
+    isHighlander: room.isHighlander === true,
       completedAt: new Date(),
     };
 
@@ -2277,7 +2285,7 @@ async function finalizeGameEnd(
 
     console.log(`[Socket] Game saved: ${recordId} | winner=${winner} (${winner === 'player1' ? room.hostId : room.guestId}) | ranked=${room.isRanked} | elo=${eloData ? `p1:${eloData.player1Delta} p2:${eloData.player2Delta}` : 'none'}`);
 
-    if (eloData && room.isEvolving !== true) {
+    if (eloData && room.isEvolving !== true && room.isHighlander !== true) {
       const deckIdsOf = (d: { characters: CharacterCard[]; missions: MissionCard[] } | null) =>
         d ? [...d.characters.map((c) => c.id), ...d.missions.map((m) => m.id)] : null;
       import('@/lib/cards/usageLive')
@@ -2754,6 +2762,7 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
         roomCode: room.code,
         chessClock,
         isEvolving: room.isEvolving === true,
+        isHighlander: room.isHighlander === true,
         holoHue: room.holoHue ?? null,
       });
     }
@@ -3308,7 +3317,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     
-    socket.on('room:create', async (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; isEvolving?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6; sealedSetChoice?: string; isAnonymous?: boolean }) => {
+    socket.on('room:create', async (data: { userId: string; isPrivate?: boolean; isRanked?: boolean; isSealed?: boolean; isEvolving?: boolean; isHighlander?: boolean; gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving' | 'highlander'; hostName?: string; sealedBoosterCount?: 4 | 5 | 6; sealedSetChoice?: string; isAnonymous?: boolean }) => {
       if (isMaintenanceActive()) {
         socket.emit('room:error', { message: 'Maintenance', errorKey: 'game.error.maintenanceNoNewGames' });
         return;
@@ -3359,15 +3368,17 @@ export function setupSocketHandlers(io: SocketIOServer) {
         code = generateRoomCode();
       } while (rooms.has(code));
 
-      const VALID_MODES = ['casual', 'ranked', 'sealed', 'evolving'] as const;
+      const VALID_MODES = ['casual', 'ranked', 'sealed', 'evolving', 'highlander'] as const;
       const requestedMode = data.gameMode ?? (data.isSealed ? 'sealed' : data.isRanked ? 'ranked' : 'casual');
       const baseMode = (VALID_MODES as readonly string[]).includes(requestedMode) ? requestedMode : 'casual';
 
       const evolvingFlag = data.isEvolving === true || baseMode === 'evolving';
-      const isRankedFlag = baseMode === 'ranked' || baseMode === 'evolving' || (data.isRanked === true && baseMode !== 'sealed');
+      const highlanderFlag = data.isHighlander === true || baseMode === 'highlander';
+      const isRankedFlag = baseMode === 'ranked' || baseMode === 'evolving' || baseMode === 'highlander' || (data.isRanked === true && baseMode !== 'sealed');
 
-      const gameMode: 'casual' | 'ranked' | 'sealed' | 'evolving' =
+      const gameMode: 'casual' | 'ranked' | 'sealed' | 'evolving' | 'highlander' =
         baseMode === 'sealed' ? 'sealed' :
+        highlanderFlag && isRankedFlag ? 'highlander' :
         evolvingFlag && isRankedFlag ? 'evolving' :
         isRankedFlag ? 'ranked' :
         'casual';
@@ -3376,6 +3387,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
         const evoDeckCount = await prisma.deck.count({ where: { userId: data.userId, evolvingCompatible: true } });
         if (evoDeckCount === 0) {
           socket.emit('room:error', { message: 'You need an evolving deck to create an evolving room', errorKey: 'room.error.evolvingNoDeck' });
+          return;
+        }
+      }
+
+      if (highlanderFlag) {
+        const highlanderDeckCount = await prisma.deck.count({ where: { userId: data.userId, highlanderCompatible: true } });
+        if (highlanderDeckCount === 0) {
+          socket.emit('room:error', { message: 'You need a highlander deck to create a highlander room', errorKey: 'room.error.highlanderNoDeck' });
           return;
         }
       }
@@ -3398,6 +3417,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         isAnonymous: data.isAnonymous ?? false,
         gameMode,
         isEvolving: evolvingFlag,
+        isHighlander: highlanderFlag,
         holoHue: evolvingFlag ? Math.floor(Math.random() * 360) : null,
         hostEvolvingPoints: 0,
         guestEvolvingPoints: 0,
@@ -3474,6 +3494,14 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
+      if (joinRoomRef?.isHighlander === true) {
+        const nombre = await prisma.deck.count({ where: { userId: data.userId, highlanderCompatible: true } });
+        if (nombre === 0) {
+          socket.emit('room:error', { message: 'You need a highlander deck to join a highlander room', errorKey: 'room.error.highlanderNoDeck' });
+          return;
+        }
+      }
+
       const tournamentBusy = await getActiveTournamentMatchForUser(data.userId, data.code);
       const targetRoomForBusyCheck = rooms.get(data.code);
       const targetIsOwnMatch = !!tournamentBusy
@@ -3511,6 +3539,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             isRanked: room.isRanked,
             tournamentId: room.tournamentId,
             isEvolving: room.isEvolving === true,
+        isHighlander: room.isHighlander === true,
             holoHue: room.holoHue ?? null,
           });
 
@@ -3611,6 +3640,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         isRanked: room.isRanked,
         tournamentId: room.tournamentId ?? null,
         isEvolving: room.isEvolving === true,
+        isHighlander: room.isHighlander === true,
         holoHue: room.holoHue ?? null,
       });
       io.to(data.code).emit('room:player-joined', {
@@ -3619,6 +3649,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         isSealed: room.isSealed,
         gameMode: room.gameMode,
         isEvolving: room.isEvolving === true,
+        isHighlander: room.isHighlander === true,
         holoHue: room.holoHue ?? null,
       });
 
@@ -3919,6 +3950,18 @@ export function setupSocketHandlers(io: SocketIOServer) {
           socket.emit('room:error', {
             message: 'Deck is not compatible with Evolving mode',
             errorKey: 'room.error.evolvingNoDeck',
+          });
+          return;
+        }
+      }
+
+      if (room.isHighlander) {
+        const cardIds = safeDeck.characters.map((c) => c.id);
+        const missionIds = safeDeck.missions.map((m) => m.id);
+        if (!estDeckHighlander(cardIds, missionIds)) {
+          socket.emit('room:error', {
+            message: 'Deck is not compatible with Highlander mode',
+            errorKey: 'room.error.highlanderDeckInvalid',
           });
           return;
         }
@@ -4407,7 +4450,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       room.chessClock = createChessClock();
       room.chessClockLastInputKey = null;
 
-      const rematchReselectPayload = { roomCode: code, isSealed: room.isSealed, isEvolving: room.isEvolving === true };
+      const rematchReselectPayload = { roomCode: code, isSealed: room.isSealed, isEvolving: room.isEvolving === true, isHighlander: room.isHighlander === true };
       if (room.hostSocket) {
         io.to(room.hostSocket).emit('game:rematch-accepted');
         io.to(room.hostSocket).emit('game:rematch-reselect', rematchReselectPayload);
@@ -4485,7 +4528,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
 
     
-    socket.on('matchmaking:join', async (data: { userId: string; isRanked?: boolean; isEvolving?: boolean; hostName?: string }) => {
+    socket.on('matchmaking:join', async (data: { userId: string; isRanked?: boolean; isEvolving?: boolean; isHighlander?: boolean; hostName?: string }) => {
       if (isMaintenanceActive()) {
         socket.emit('game:error', { message: 'Maintenance', errorKey: 'game.error.maintenanceNoNewGames' });
         return;
@@ -4519,12 +4562,21 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       const wantRanked = data.isRanked ?? true;
       const wantEvolving = data.isEvolving === true;
-      console.log(`[Socket] User ${data.userId} joining matchmaking (ranked: ${wantRanked}, evolving: ${wantEvolving})`);
+      const wantHighlander = data.isHighlander === true;
+      console.log(`[Socket] User ${data.userId} joining matchmaking (ranked: ${wantRanked}, evolving: ${wantEvolving}, highlander: ${wantHighlander})`);
 
       if (wantEvolving) {
         const has = await userHasEvolvingDeck(data.userId);
         if (!has) {
           socket.emit('game:error', { message: 'You need an evolving deck to matchmake in evolving', errorKey: 'room.error.evolvingNoDeck' });
+          return;
+        }
+      }
+
+      if (wantHighlander) {
+        const nombre = await prisma.deck.count({ where: { userId: data.userId, highlanderCompatible: true } });
+        if (nombre === 0) {
+          socket.emit('game:error', { message: 'You need a highlander deck to matchmake in highlander', errorKey: 'room.error.highlanderNoDeck' });
           return;
         }
       }
@@ -4550,7 +4602,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       let foundRoom: RoomData | null = null;
       for (const [code, room] of rooms) {
-        if (!room.isPrivate && !room.guestId && room.hostId !== data.userId && room.isRanked === wantRanked && room.isEvolving === wantEvolving) {
+        if (!room.isPrivate && !room.guestId && room.hostId !== data.userId && room.isRanked === wantRanked && room.isEvolving === wantEvolving && room.isHighlander === wantHighlander) {
           
           const hostSocketObj = io.sockets.sockets.get(room.hostSocket);
           if (hostSocketObj && hostSocketObj.connected) {
@@ -4614,8 +4666,9 @@ export function setupSocketHandlers(io: SocketIOServer) {
           isPrivate: false,
           isRanked: wantRanked,
           isAnonymous: false,
-          gameMode: wantEvolving && wantRanked ? 'evolving' : (wantRanked ? 'ranked' : 'casual'),
+          gameMode: wantHighlander && wantRanked ? 'highlander' : (wantEvolving && wantRanked ? 'evolving' : (wantRanked ? 'ranked' : 'casual')),
           isEvolving: wantEvolving,
+          isHighlander: wantHighlander,
           holoHue: wantEvolving ? Math.floor(Math.random() * 360) : null,
           hostEvolvingPoints: 0,
           guestEvolvingPoints: 0,
@@ -4743,6 +4796,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           roomCode: data.roomCode,
           chessClock,
           isEvolving: room.isEvolving === true,
+        isHighlander: room.isHighlander === true,
           holoHue: room.holoHue ?? null,
         });
 
@@ -4796,6 +4850,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           roomCode: data.roomCode,
           chessClock,
           isEvolving: room.isEvolving === true,
+        isHighlander: room.isHighlander === true,
           holoHue: room.holoHue ?? null,
         });
       } catch (err) {

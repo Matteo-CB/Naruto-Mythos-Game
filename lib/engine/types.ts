@@ -160,7 +160,7 @@ export interface MissionScoringProgress {
 
 export interface GameState {
   gameId: string;
-  gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving';
+  gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving' | 'highlander';
   player1UserId?: string;
   player2UserId?: string;
   player1EffectsUsed?: boolean;
@@ -370,7 +370,7 @@ export interface GameConfig {
   player1: PlayerConfig;
   player2: PlayerConfig;
   randomSeed?: number;
-  gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving';
+  gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving' | 'highlander';
   startingMissionPoints?: {
     player1: number;
     player2: number;
@@ -403,7 +403,7 @@ export interface PublicReveal {
 
 export interface VisibleGameState {
   gameId: string;
-  gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving';
+  gameMode?: 'casual' | 'ranked' | 'sealed' | 'evolving' | 'highlander';
   turn: TurnNumber;
   phase: GamePhase;
   activePlayer: PlayerID;

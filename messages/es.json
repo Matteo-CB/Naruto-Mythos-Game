@@ -2201,7 +2201,8 @@
     "mode": {
       "casual": "Casual",
       "ranked": "Clasificatorio",
-      "sealed": "Sellado"
+      "sealed": "Sellado",
+      "highlander": "Highlander"
     },
     "modeDesc": {
       "casual": "Partida no clasificatoria, juega por diversión, sin cambios de ELO",
@@ -2231,7 +2232,8 @@
     },
     "badge": {
       "evolving": "EVOLVING",
-      "anonymous": "ANÓNIMO"
+      "anonymous": "ANÓNIMO",
+      "highlander": "Highlander"
     },
     "evolving": {
       "toggleLabel": "Modo Evolving",
@@ -2247,6 +2249,15 @@
       "toggleDescription": "Abre 5 sobres y construye tu mazo al momento. No se usan los mazos guardados.",
       "setChoiceLabel": "Colección a usar",
       "setRandom": "Aleatoria"
+    },
+    "highlander": {
+      "toggleLabel": "Modo Highlander",
+      "toggleDescription": "Mínimo 40 cartas, solo una copia de cada carta",
+      "noDeckTitle": "Se necesita un mazo Highlander",
+      "noDeck": "Necesitas un mazo Highlander para entrar o crear esta sala",
+      "createDeck": "Crear un mazo Highlander",
+      "needDeckHint": "Crea un mazo de 40 cartas sin repetidas para activar este modo",
+      "noDeckInSelector": "No hay mazo Highlander disponible. Hacen falta 40 cartas y una sola copia de cada una."
     }
   },
   "leaderboard": {
@@ -2254,7 +2265,8 @@
     "subtitle": "Mínimo {count} partidas clasificatorias para conseguir una liga",
     "toggleType": {
       "ranked": "Clasificatorio",
-      "evolving": "Evolving"
+      "evolving": "Evolving",
+      "highlander": "Highlander"
     },
     "rank": "Puesto",
     "player": "Jugador",
@@ -2327,7 +2339,8 @@
     "deckPrivate": "Privado",
     "deckPublicHint": "Visible para todos",
     "deckPrivateHint": "Visible solo para ti",
-    "rankDivision": "{name} {level}"
+    "rankDivision": "{name} {level}",
+    "mode_highlander": "Highlander"
   },
   "replay": {
     "title": "Resumen de la partida",
@@ -2370,7 +2383,9 @@
   },
   "room": {
     "error": {
-      "evolvingNoDeck": "Necesitas un mazo Evolving para este modo."
+      "evolvingNoDeck": "Necesitas un mazo Evolving para este modo.",
+      "highlanderNoDeck": "Necesitas un mazo Highlander para este modo.",
+      "highlanderDeckInvalid": "Este mazo no cumple las reglas Highlander."
     }
   },
   "auth": {
