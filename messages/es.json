@@ -4133,7 +4133,10 @@
       "top-100": "Otorgada a los cien mejores jugadores al cerrar la temporada {season}. La clasificación final queda congelada y la insignia permanece para siempre.",
       "top-200": "Otorgada a los doscientos mejores jugadores al cerrar la temporada {season}. La clasificación final queda congelada y la insignia permanece para siempre.",
       "tournament-winner": "Otorgada al ganador de un torneo. Se consigue con la primera victoria y permanece en la cuenta para siempre."
-    }
+    },
+    "battlepassTier": "Nivel {tier}",
+    "explicationPalier": "Nivel {tier} del battlepass {season}.",
+    "descriptionPalier": "Se consigue al alcanzar el nivel {tier} del battlepass de la temporada {season}. Permanece en la cuenta una vez ganado."
   },
   "seasonIntro": {
     "kicker": "Nueva temporada",

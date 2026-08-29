@@ -4128,7 +4128,10 @@
       "top-100": "Atribuído aos cem melhores jogadores no fecho da temporada {season}. A classificação final fica congelada e o emblema fica para sempre.",
       "top-200": "Atribuído aos duzentos melhores jogadores no fecho da temporada {season}. A classificação final fica congelada e o emblema fica para sempre.",
       "tournament-winner": "Atribuído ao vencedor de um torneio. Ganha-se na primeira vitória e fica na conta para sempre."
-    }
+    },
+    "battlepassTier": "Nível {tier}",
+    "explicationPalier": "Nível {tier} do battlepass {season}.",
+    "descriptionPalier": "Obtido ao alcançar o nível {tier} do battlepass da temporada {season}. Fica na conta depois de ganho."
   },
   "seasonIntro": {
     "kicker": "Nova temporada",

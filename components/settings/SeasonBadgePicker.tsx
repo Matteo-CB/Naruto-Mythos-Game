@@ -18,6 +18,11 @@ interface BadgeDeRecompense {
   badge: string;
 }
 
+interface BadgeDePalier {
+  seasonId: string;
+  badge: string;
+}
+
 export function SeasonBadgePicker({ disabled }: { disabled?: boolean }) {
   const t = useTranslations('seasonBadges');
   const locale = useLocale();
@@ -25,23 +30,25 @@ export function SeasonBadgePicker({ disabled }: { disabled?: boolean }) {
   const setSelectedSeasonBadge = useSettingsStore((s) => s.setSelectedSeasonBadge);
   const [gagnes, setGagnes] = useState<BadgeGagne[]>([]);
   const [recompenses, setRecompenses] = useState<BadgeDeRecompense[]>([]);
+  const [paliers, setPaliers] = useState<BadgeDePalier[]>([]);
   const [charge, setCharge] = useState(false);
 
   useEffect(() => {
     let annule = false;
     fetch('/api/user/badges')
       .then((r) => (r.ok ? r.json() : null))
-      .then((d: { seasonBadges?: BadgeGagne[]; awardBadges?: BadgeDeRecompense[] } | null) => {
+      .then((d: { seasonBadges?: BadgeGagne[]; awardBadges?: BadgeDeRecompense[]; tierBadges?: BadgeDePalier[] } | null) => {
         if (annule) return;
         setGagnes((d?.seasonBadges ?? []).filter((b) => !!b.badge));
         setRecompenses(d?.awardBadges ?? []);
+        setPaliers(d?.tierBadges ?? []);
         setCharge(true);
       })
       .catch(() => { if (!annule) setCharge(true); });
     return () => { annule = true; };
   }, []);
 
-  if (charge && gagnes.length === 0 && recompenses.length === 0) {
+  if (charge && gagnes.length === 0 && recompenses.length === 0 && paliers.length === 0) {
     return (
       <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>
         {t('pickerEmpty')}
@@ -67,6 +74,19 @@ export function SeasonBadgePicker({ disabled }: { disabled?: boolean }) {
             onClick={() => setSelectedSeasonBadge(valeur)}
             libelle={t.has(`tier.${r.badge}`) ? t(`tier.${r.badge}`) : r.badge}
             visuel={<SeasonBadge seasonId={null} badge={r.badge} size="md" />}
+          />
+        );
+      })}
+      {paliers.map((p) => {
+        const valeur = formatBadgeChoisi(p.seasonId, p.badge);
+        return (
+          <BoutonDeBadge
+            key={valeur}
+            actif={selectedSeasonBadge === valeur}
+            disabled={disabled}
+            onClick={() => setSelectedSeasonBadge(valeur)}
+            libelle={getSetName(p.seasonId, locale)}
+            visuel={<SeasonBadge seasonId={p.seasonId} badge={p.badge} size="md" />}
           />
         );
       })}

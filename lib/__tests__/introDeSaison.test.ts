@@ -118,6 +118,29 @@ describe('la fenetre est branchee de bout en bout', () => {
     expect(admin).toContain('<SeasonIntroPreview />');
   });
 
+  it('le nom de la saison est fourni au titre comme au texte', () => {
+    const modale = readFileSync(join(RACINE, 'components/season/SeasonIntroModal.tsx'), 'utf8');
+    expect(modale, 'le titre doit recevoir la saison').toContain('t(`page.${page}.title`, { season: nomDeSaison })');
+    expect(modale, 'le texte aussi').toContain('t(`page.${page}.body`, { season: nomDeSaison })');
+  });
+
+  it('aucun texte de page ne reclame un parametre que la fenetre ne passe pas', () => {
+    const modale = readFileSync(join(RACINE, 'components/season/SeasonIntroModal.tsx'), 'utf8');
+    const fournis = new Set(['season']);
+    for (const code of LOCALES) {
+      const messages = JSON.parse(readFileSync(join(RACINE, `messages/${code}.json`), 'utf8'));
+      for (const page of PAGES_DE_LINTRO) {
+        for (const champ of ['title', 'body'] as const) {
+          const texte = String(messages.seasonIntro.page[page][champ]);
+          for (const trouve of texte.matchAll(/\{(\w+)\}/g)) {
+            expect(fournis.has(trouve[1]), `${code}.${page}.${champ} reclame {${trouve[1]}}`).toBe(true);
+          }
+        }
+      }
+    }
+    expect(modale).toContain('nomDeSaison');
+  });
+
   it('les sept langues ont les quatre pages', () => {
     for (const code of LOCALES) {
       const messages = JSON.parse(readFileSync(join(RACINE, `messages/${code}.json`), 'utf8'));

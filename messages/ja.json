@@ -4132,7 +4132,10 @@
       "top-100": "{season} シーズン終了時の上位100名に贈られます。最終順位は固定され、バッジは永久に残ります。",
       "top-200": "{season} シーズン終了時の上位200名に贈られます。最終順位は固定され、バッジは永久に残ります。",
       "tournament-winner": "トーナメントの優勝者に贈られます。初優勝で獲得し、アカウントに永久に残ります。"
-    }
+    },
+    "battlepassTier": "ティア {tier}",
+    "explicationPalier": "{season} バトルパスのティア {tier}。",
+    "descriptionPalier": "{season} シーズンのバトルパスでティア {tier} に到達すると獲得します。一度取ればアカウントに残ります。"
   },
   "seasonIntro": {
     "kicker": "新シーズン",

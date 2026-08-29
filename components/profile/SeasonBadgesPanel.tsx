@@ -12,9 +12,10 @@ import { getSetName } from '@/lib/data/sets/registry';
 interface SeasonBadgesPanelProps {
   badges: readonly BadgeDeSaison[];
   recompenses?: readonly string[];
+  paliers?: readonly { seasonId: string; badge: string }[];
 }
 
-export function SeasonBadgesPanel({ badges, recompenses = [] }: SeasonBadgesPanelProps) {
+export function SeasonBadgesPanel({ badges, recompenses = [], paliers = [] }: SeasonBadgesPanelProps) {
   const t = useTranslations('seasonBadges');
   const locale = useLocale();
   const ordonnes = trieLesBadges(badges);
@@ -25,12 +26,30 @@ export function SeasonBadgesPanel({ badges, recompenses = [] }: SeasonBadgesPane
       <span className="font-display text-[11px] uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
         {t('title')}
       </span>
-      {ordonnes.length === 0 && recompenses.length === 0 ? (
+      {ordonnes.length === 0 && recompenses.length === 0 && paliers.length === 0 ? (
         <p className="font-display text-xs py-3 uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>
           {t('empty')}
         </p>
       ) : (
         <div className="mt-3 flex flex-wrap gap-3">
+          {paliers.map((p) => (
+            <motion.div
+              key={`${p.seasonId}-${p.badge}`}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="flex items-center gap-4 px-4 py-3"
+              style={{ backgroundColor: 'var(--t-panel)', borderRadius: 4 }}
+            >
+              <SeasonBadge
+                seasonId={p.seasonId}
+                badge={p.badge}
+                size="lg"
+                showLabel
+                onClick={() => setOuvert({ seasonId: p.seasonId, badge: p.badge, rank: 0, elo: 0 })}
+              />
+            </motion.div>
+          ))}
           {recompenses.map((badge) => (
             <motion.div
               key={badge}

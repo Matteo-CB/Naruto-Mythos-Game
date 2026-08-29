@@ -63,7 +63,7 @@ export function SeasonIntroModal({ donnees, onClose }: SeasonIntroModalProps) {
               className="flex flex-col gap-4"
             >
               <h3 className="font-display text-base uppercase tracking-widest" style={{ color: 'var(--t-text)' }}>
-                {t(`page.${page}.title`)}
+                {t(`page.${page}.title`, { season: nomDeSaison })}
               </h3>
               <p className="text-sm leading-relaxed" style={{ color: 'var(--t-muted)' }}>
                 {t(`page.${page}.body`, { season: nomDeSaison })}

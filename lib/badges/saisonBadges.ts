@@ -21,6 +21,21 @@ export const BADGES_DE_RECOMPENSE: readonly string[] = [BADGE_VAINQUEUR_DE_TOURN
 
 export const DOSSIER_DES_RECOMPENSES = 'awards';
 
+const FORME_DUN_BADGE_DE_PALIER = /^tier-(\d+)$/;
+
+export function estUnBadgeDePalier(badge: string): boolean {
+  return FORME_DUN_BADGE_DE_PALIER.test(badge);
+}
+
+export function palierDuBadge(badge: string): number | null {
+  const trouve = FORME_DUN_BADGE_DE_PALIER.exec(badge);
+  return trouve ? Number(trouve[1]) : null;
+}
+
+export function badgeDuPalier(tier: number): string {
+  return `tier-${tier}`;
+}
+
 export function badgePourLeRang(rang: number): string | null {
   if (!Number.isFinite(rang) || rang < 1) return null;
   for (const palier of PALIERS_DE_BADGE) {
@@ -38,10 +53,11 @@ export function estUnBadgeDeRecompense(badge: string): boolean {
 }
 
 export function estUnBadgeConnu(badge: string): boolean {
-  return estUnBadgeDeSaison(badge) || estUnBadgeDeRecompense(badge);
+  return estUnBadgeDeSaison(badge) || estUnBadgeDeRecompense(badge) || estUnBadgeDePalier(badge);
 }
 
 export function imageDuBadge(seasonId: string, badge: string): string {
+  if (estUnBadgeDePalier(badge)) return `/images/battlepass/${seasonId}/${badge}.webp`;
   const dossier = estUnBadgeDeRecompense(badge) ? DOSSIER_DES_RECOMPENSES : seasonId;
   return `/images/badges/${dossier}/${badge}.webp`;
 }

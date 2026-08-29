@@ -4128,7 +4128,10 @@
       "top-100": "Awarded to the hundred best players when the {season} season closed. The final standing is frozen and the badge stays on the account forever.",
       "top-200": "Awarded to the two hundred best players when the {season} season closed. The final standing is frozen and the badge stays on the account forever.",
       "tournament-winner": "Awarded to the winner of a tournament. It is earned on the first win and stays on the account forever."
-    }
+    },
+    "battlepassTier": "Tier {tier}",
+    "explicationPalier": "Tier {tier} of the {season} battlepass.",
+    "descriptionPalier": "Earned by reaching tier {tier} of the {season} battlepass. It stays on the account once earned."
   },
   "seasonIntro": {
     "kicker": "New season",

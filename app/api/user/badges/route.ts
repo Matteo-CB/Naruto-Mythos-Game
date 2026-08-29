@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { isAdmin } from '@/lib/auth/admins';
 import { badgesDeSaisonPourAdmin, badgesDeRecompensePourAdmin, fusionneLesBadges } from '@/lib/badges/badgesAdmin';
+import { badgesDePalierAtteints, badgesDePalierExistants } from '@/lib/badges/familles';
 
 export async function GET() {
   const session = await auth();
@@ -13,7 +14,7 @@ export async function GET() {
   const userId = session.user.id;
   const compte = await prisma.user.findUnique({
     where: { id: userId },
-    select: { username: true, email: true },
+    select: { username: true, email: true, battlepassTier: true },
   });
   if (!compte) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
@@ -44,5 +45,11 @@ export async function GET() {
     ? fusionneLesBadges(recompenses, badgesDeRecompensePourAdmin())
     : recompenses;
 
-  return NextResponse.json({ seasonBadges, awardBadges, admin: administrateur });
+  const paliers = administrateur
+    ? badgesDePalierExistants()
+    : badgesDePalierAtteints(compte.battlepassTier ?? 0);
+
+  const tierBadges = paliers.map((p) => ({ seasonId: p.seasonId, badge: p.badge }));
+
+  return NextResponse.json({ seasonBadges, awardBadges, tierBadges, admin: administrateur });
 }

@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
-import { imageDuBadge } from '@/lib/badges/saisonBadges';
+import { imageDuBadge, estUnBadgeDePalier, palierDuBadge } from '@/lib/badges/saisonBadges';
 import { getSetName } from '@/lib/data/sets/registry';
 import { BadgeTooltip } from '@/components/badges/BadgeTooltip';
 
@@ -24,14 +24,21 @@ export function useTexteDeBadge(seasonId: string | null, badge: string, rank?: n
   const t = useTranslations('seasonBadges');
   const locale = useLocale();
   const nomDeSaison = seasonId ? getSetName(seasonId, locale) : '';
-  const palier = t.has(`tier.${badge}`) ? t(`tier.${badge}`) : badge;
+  const numeroDePalier = palierDuBadge(badge);
+  const palier = estUnBadgeDePalier(badge) && numeroDePalier !== null
+    ? t('battlepassTier', { tier: numeroDePalier })
+    : t.has(`tier.${badge}`) ? t(`tier.${badge}`) : badge;
   const titre = nomDeSaison ? `${nomDeSaison} ${palier}` : palier;
-  const resume = t.has(`explication.${badge}`)
-    ? t(`explication.${badge}`, { season: nomDeSaison })
-    : titre;
-  const description = t.has(`description.${badge}`)
-    ? t(`description.${badge}`, { season: nomDeSaison, rank: rank ?? 0 })
-    : resume;
+  const resume = estUnBadgeDePalier(badge) && numeroDePalier !== null
+    ? t('explicationPalier', { tier: numeroDePalier, season: nomDeSaison })
+    : t.has(`explication.${badge}`)
+      ? t(`explication.${badge}`, { season: nomDeSaison })
+      : titre;
+  const description = estUnBadgeDePalier(badge) && numeroDePalier !== null
+    ? t('descriptionPalier', { tier: numeroDePalier, season: nomDeSaison })
+    : t.has(`description.${badge}`)
+      ? t(`description.${badge}`, { season: nomDeSaison, rank: rank ?? 0 })
+      : resume;
   return { nomDeSaison, palier, titre, resume, description };
 }
 

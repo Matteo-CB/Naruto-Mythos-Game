@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { auth } from '@/lib/auth/authOptions';
 import { isAdmin } from '@/lib/auth/admins';
+import { badgesDePalierAtteints } from '@/lib/badges/familles';
 import { cleanupOldGames } from '@/lib/db/gameCleanup';
 import { deckUsesOnlyAllowedSets } from '@/lib/evolving/computePoints';
 import { getFollowState } from '@/lib/social/followSync';
@@ -44,6 +45,7 @@ export async function GET(
         evolvingWins: true,
         evolvingLosses: true,
         evolvingDraws: true,
+        battlepassTier: true,
         highlanderElo: true,
         highlanderWins: true,
         highlanderLosses: true,
@@ -274,6 +276,9 @@ export async function GET(
       select: { badge: true, awardedAt: true },
     }).catch(() => [] as Array<{ badge: string; awardedAt: Date }>);
 
+    const paliersGagnes = badgesDePalierAtteints(user.battlepassTier ?? 0)
+      .map((p) => ({ seasonId: p.seasonId, badge: p.badge }));
+
     const { decks: _omit, ...userWithoutDecks } = user;
     void _omit;
     const follow = await getFollowState(viewerId, user.id);
@@ -296,6 +301,7 @@ export async function GET(
       modeStats,
       seasonBadges,
       awardBadges,
+      tierBadges: paliersGagnes,
       followerCount: follow.followerCount,
       followingCount: follow.followingCount,
       viewerFollowing: follow.following,

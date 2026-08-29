@@ -4128,7 +4128,10 @@
       "top-100": "Przyznawana stu najlepszym graczom w chwili zamknięcia sezonu {season}. Końcowy ranking jest zamrożony, a odznaka zostaje na zawsze.",
       "top-200": "Przyznawana dwustu najlepszym graczom w chwili zamknięcia sezonu {season}. Końcowy ranking jest zamrożony, a odznaka zostaje na zawsze.",
       "tournament-winner": "Przyznawana zwycięzcy turnieju. Zdobywa się ją przy pierwszej wygranej i zostaje na koncie na zawsze."
-    }
+    },
+    "battlepassTier": "Poziom {tier}",
+    "explicationPalier": "Poziom {tier} battlepassa {season}.",
+    "descriptionPalier": "Zdobywana po osiągnięciu poziomu {tier} battlepassa sezonu {season}. Po zdobyciu zostaje na koncie."
   },
   "seasonIntro": {
     "kicker": "Nowy sezon",

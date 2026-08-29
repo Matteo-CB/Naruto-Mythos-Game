@@ -4134,7 +4134,10 @@
       "top-100": "Décerné aux cent meilleurs joueurs à la fermeture de la saison {season}. Le classement de fin de saison est figé et le badge reste sur le compte pour toujours.",
       "top-200": "Décerné aux deux cents meilleurs joueurs à la fermeture de la saison {season}. Le classement de fin de saison est figé et le badge reste sur le compte pour toujours.",
       "tournament-winner": "Décerné au vainqueur d'un tournoi. Il se gagne dès la première victoire et reste sur le compte pour toujours."
-    }
+    },
+    "battlepassTier": "Palier {tier}",
+    "explicationPalier": "Palier {tier} du battlepass {season}.",
+    "descriptionPalier": "Obtenu en atteignant le palier {tier} du battlepass de la saison {season}. Il reste sur le compte une fois gagne."
   },
   "seasonIntro": {
     "kicker": "Nouvelle saison",

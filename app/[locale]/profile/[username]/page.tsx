@@ -100,6 +100,7 @@ interface ProfileData {
   modeStats?: Record<string, { games: number; wins: number; losses: number }>;
   seasonBadges?: Array<{ seasonId: string; badge: string | null; league: string | null; rank: number; elo: number }>;
   awardBadges?: Array<{ badge: string }>;
+  tierBadges?: Array<{ seasonId: string; badge: string }>;
   decks: Array<{ id: string; name: string; createdAt: string; evolvingPoints?: number; evolvingCompatible?: boolean; isPublic?: boolean; cardIds?: string[]; missionIds?: string[] }>;
   canViewDeckContents?: boolean;
   followerCount?: number;
@@ -813,10 +814,13 @@ export default function ProfilePage({
           </section>
         )}
 
-        {((profile.seasonBadges?.length ?? 0) > 0 || (profile.awardBadges?.length ?? 0) > 0) && (
+        {((profile.seasonBadges?.length ?? 0) > 0
+          || (profile.awardBadges?.length ?? 0) > 0
+          || (profile.tierBadges?.length ?? 0) > 0) && (
           <SeasonBadgesPanel
             badges={profile.seasonBadges ?? []}
             recompenses={(profile.awardBadges ?? []).map((a) => a.badge)}
+            paliers={profile.tierBadges ?? []}
           />
         )}
 

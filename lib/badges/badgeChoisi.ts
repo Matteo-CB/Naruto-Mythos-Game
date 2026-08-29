@@ -1,4 +1,4 @@
-import { estUnBadgeDeRecompense, estUnBadgeDeSaison } from './saisonBadges';
+import { estUnBadgeDePalier, estUnBadgeDeRecompense, estUnBadgeDeSaison } from './saisonBadges';
 
 export interface BadgeChoisi {
   seasonId: string | null;
@@ -20,7 +20,7 @@ export function parseBadgeChoisi(valeur: string | null | undefined): BadgeChoisi
   if (parties.length !== 2) return null;
   const [seasonId, badge] = parties;
   if (!/^[A-Z]{2,4}$/.test(seasonId)) return null;
-  if (!estUnBadgeDeSaison(badge)) return null;
+  if (!estUnBadgeDeSaison(badge) && !estUnBadgeDePalier(badge)) return null;
   return { seasonId, badge };
 }
 

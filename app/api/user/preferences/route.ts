@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { COUNTRY_CODES } from '@/lib/data/countries';
 import { parseBadgeChoisi } from '@/lib/badges/badgeChoisi';
+import { palierDuBadge } from '@/lib/badges/saisonBadges';
 import { isAdmin } from '@/lib/auth/admins';
 import { refreshChatLock } from '@/lib/socket/chatLockBridge';
 import { normalizeChatVisibility } from '@/lib/chat/chatRules';
@@ -125,15 +126,25 @@ export async function PATCH(request: NextRequest) {
           select: { username: true, email: true },
         });
         const estAdministrateur = !!compte && isAdmin({ username: compte.username, email: compte.email ?? '' });
-        const possede = estAdministrateur ? { id: 'admin' } : choix.seasonId
-          ? await prisma.seasonRanking.findFirst({
-              where: { userId: session.user.id, seasonId: choix.seasonId, badge: choix.badge },
-              select: { id: true },
-            })
-          : await prisma.playerBadge.findFirst({
-              where: { userId: session.user.id, badge: choix.badge },
-              select: { id: true },
-            });
+        const palierRequis = palierDuBadge(choix.badge);
+        let possede: { id: string } | null = estAdministrateur ? { id: 'admin' } : null;
+        if (!possede && palierRequis !== null) {
+          const progression = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { battlepassTier: true },
+          });
+          possede = (progression?.battlepassTier ?? 0) >= palierRequis ? { id: 'palier' } : null;
+        } else if (!possede && choix.seasonId) {
+          possede = await prisma.seasonRanking.findFirst({
+            where: { userId: session.user.id, seasonId: choix.seasonId, badge: choix.badge },
+            select: { id: true },
+          });
+        } else if (!possede) {
+          possede = await prisma.playerBadge.findFirst({
+            where: { userId: session.user.id, badge: choix.badge },
+            select: { id: true },
+          });
+        }
         if (!possede) {
           return NextResponse.json({ error: 'Badge not earned' }, { status: 403 });
         }

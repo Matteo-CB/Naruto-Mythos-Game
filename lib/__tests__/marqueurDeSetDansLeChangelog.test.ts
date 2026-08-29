@@ -41,6 +41,27 @@ describe('chaque nouveau set marque le changelog', () => {
     expect(libelleDuMarqueur('SS', 'ja').name).toBe(getSetName('SS', 'ja'));
   });
 
+  it('la banniere reste accrochee a sa date, elle ne remonte pas avec le temps', () => {
+    const entrees = (changelog as { entries: Array<{ date: string }> }).entries;
+    const plusRecente = entrees[0].date;
+    const marquee = marqueurALaDate('2026-08-29');
+    expect(marquee, 'le 29 aout porte bien le marqueur').toBeTruthy();
+    for (const entree of entrees) {
+      const attendu = entree.date === '2026-08-29' ? 'SS' : null;
+      expect(marqueurALaDate(entree.date)?.setId ?? null, `${entree.date}`).toBe(attendu);
+    }
+    expect(
+      marqueurALaDate(plusRecente)?.setId ?? null,
+      'le jour le plus recent ne herite pas du marqueur, sauf si c est le sien',
+    ).toBe(plusRecente === '2026-08-29' ? 'SS' : null);
+  });
+
+  it('la banniere lit la date de son entree, jamais la plus recente', () => {
+    const source = readFileSync(join(RACINE, 'components/ChangelogButton.tsx'), 'utf8');
+    expect(source).toContain('marqueurALaDate(entry.date)');
+    expect(source, 'jamais accrochee a la derniere entree').not.toContain('marqueurALaDate(latestDate)');
+  });
+
   it('la banniere est rendue avant les changements de sa journee', () => {
     const source = readFileSync(join(RACINE, 'components/ChangelogButton.tsx'), 'utf8');
     expect(source).toContain('marqueurALaDate(entry.date)');
