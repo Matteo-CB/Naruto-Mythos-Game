@@ -15,6 +15,7 @@ import { MatchEntryGate } from '@/components/tournament/MatchEntryGate';
 import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 import { BreadcrumbJsonLd } from '@/components/Breadcrumbs';
 import { AnimationProvider } from '@/components/AnimationProvider';
+import { SeasonIntroGate } from '@/components/season/SeasonIntroGate';
 import { GamepadNavigator } from '@/components/gamepad/GamepadNavigator';
 import RevealingCardsLoader from '@/components/RevealingCardsLoader';
 import type { Metadata } from 'next';
@@ -181,6 +182,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <ConnectionStatusIndicator />
         <ReconnectPrompt />
         <MatchEntryGate />
+        <SeasonIntroGate />
         <GamepadNavigator />
       </NextIntlClientProvider>
     </SessionProvider>

@@ -4129,5 +4129,39 @@
       "top-200": "Assegnato ai duecento migliori giocatori alla chiusura della stagione {season}. La classifica finale è congelata e il distintivo resta per sempre.",
       "tournament-winner": "Assegnato al vincitore di un torneo. Si ottiene alla prima vittoria e resta sul profilo per sempre."
     }
+  },
+  "seasonIntro": {
+    "kicker": "Nuova stagione",
+    "title": "Cosa cambia per te",
+    "next": "Avanti",
+    "close": "Chiudi",
+    "rank": "Posizione {rank}",
+    "page": {
+      "highlander": {
+        "title": "La modalità Highlander",
+        "body": "Un formato nuovo con la sua classifica: almeno 40 carte e una sola copia di ognuna. Spunta la casella Highlander prima di creare la partita online e il selettore ti proporrà solo mazzi validi."
+      },
+      "badges": {
+        "title": "I distintivi",
+        "body": "Puoi ottenere distintivi in più modi: chiudendo in alto nella classifica di una stagione o vincendo un torneo. Scegli quello che porti nelle impostazioni e ti seguirà ovunque compaia la tua bandiera: classifica, profilo e tavolo di gioco.",
+        "imageAlt": "La scelta del distintivo nelle impostazioni"
+      },
+      "saison": {
+        "title": "La tua stagione {season}",
+        "body": "Ecco cosa ti ha fruttato la classifica di fine stagione. Questi distintivi restano sul tuo profilo per sempre, anche se la tua classifica cambia."
+      },
+      "elo": {
+        "title": "La tua ripartenza",
+        "body": "I distacchi di ELO sono stati compressi per aprire la nuova stagione. Nessuno riparte da zero: il tuo posto è conservato e le leghe ora salgono molto più in alto di prima.",
+        "before": "Prima",
+        "after": "Adesso"
+      }
+    }
+  },
+  "adminSeasonIntro": {
+    "title": "Anteprima delle novità di stagione",
+    "subtitle": "Apre la finestra che vedranno i giocatori già iscritti, con dati estratti a caso a ogni clic.",
+    "cta": "Vedi un'estrazione",
+    "drawn": "Estrazione: {badges} distintivo/i, {before} ELO diventa {after}"
   }
 }

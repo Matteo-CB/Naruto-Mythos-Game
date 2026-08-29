@@ -4129,5 +4129,39 @@
       "top-200": "Awarded to the two hundred best players when the {season} season closed. The final standing is frozen and the badge stays on the account forever.",
       "tournament-winner": "Awarded to the winner of a tournament. It is earned on the first win and stays on the account forever."
     }
+  },
+  "seasonIntro": {
+    "kicker": "New season",
+    "title": "What changes for you",
+    "next": "Next",
+    "close": "Close",
+    "rank": "Rank {rank}",
+    "page": {
+      "highlander": {
+        "title": "Highlander mode",
+        "body": "A new format with its own ranking: at least 40 cards, and a single copy of each card. Tick the Highlander box before creating your online game, and the deck picker will only offer you valid decks."
+      },
+      "badges": {
+        "title": "Badges",
+        "body": "You can earn badges in several ways: by finishing high in a season ranking, or by winning a tournament. Pick the one you wear in your settings, and it follows you everywhere your flag appears: leaderboard, profile and game board.",
+        "imageAlt": "The badge picker in the settings"
+      },
+      "saison": {
+        "title": "Your {season} season",
+        "body": "Here is what your end of season standing earned you. These badges stay on your account forever, even when your ranking changes."
+      },
+      "elo": {
+        "title": "Your fresh start",
+        "body": "ELO gaps were tightened to open the new season. Nobody restarted from zero: your place is kept, and the leagues now climb far higher than before.",
+        "before": "Before",
+        "after": "Now"
+      }
+    }
+  },
+  "adminSeasonIntro": {
+    "title": "Season intro preview",
+    "subtitle": "Opens the window existing players will see, with data drawn at random on every click.",
+    "cta": "Draw one",
+    "drawn": "Draw: {badges} badge(s), {before} ELO becomes {after}"
   }
 }

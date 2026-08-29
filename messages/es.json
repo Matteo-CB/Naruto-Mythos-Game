@@ -4134,5 +4134,39 @@
       "top-200": "Otorgada a los doscientos mejores jugadores al cerrar la temporada {season}. La clasificación final queda congelada y la insignia permanece para siempre.",
       "tournament-winner": "Otorgada al ganador de un torneo. Se consigue con la primera victoria y permanece en la cuenta para siempre."
     }
+  },
+  "seasonIntro": {
+    "kicker": "Nueva temporada",
+    "title": "Lo que cambia para ti",
+    "next": "Siguiente",
+    "close": "Cerrar",
+    "rank": "Puesto {rank}",
+    "page": {
+      "highlander": {
+        "title": "El modo Highlander",
+        "body": "Un formato nuevo con su propio ranking: mínimo 40 cartas y una sola copia de cada una. Marca la casilla Highlander antes de crear tu partida en línea y el selector solo te ofrecerá mazos válidos."
+      },
+      "badges": {
+        "title": "Las insignias",
+        "body": "Puedes ganar insignias de varias formas: terminando alto en el ranking de una temporada o ganando un torneo. Elige la que llevas en tus ajustes y te acompañará allí donde aparezca tu bandera: ranking, perfil y mesa de juego.",
+        "imageAlt": "La selección de insignia en los ajustes"
+      },
+      "saison": {
+        "title": "Tu temporada {season}",
+        "body": "Esto es lo que te dio tu clasificación final. Estas insignias se quedan en tu cuenta para siempre, aunque tu ranking cambie."
+      },
+      "elo": {
+        "title": "Tu nuevo comienzo",
+        "body": "Las diferencias de ELO se han comprimido para abrir la nueva temporada. Nadie empieza de cero: se mantiene tu puesto y las ligas ahora suben mucho más alto que antes.",
+        "before": "Antes",
+        "after": "Ahora"
+      }
+    }
+  },
+  "adminSeasonIntro": {
+    "title": "Vista previa de las novedades de temporada",
+    "subtitle": "Abre la ventana que verán los jugadores ya registrados, con datos al azar en cada clic.",
+    "cta": "Ver una tirada",
+    "drawn": "Tirada: {badges} insignia(s), {before} ELO pasa a {after}"
   }
 }

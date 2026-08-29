@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { ModerationTab } from '@/components/admin/ModerationTab';
+import { SeasonIntroPreview } from '@/components/admin/SeasonIntroPreview';
 import { useSession } from 'next-auth/react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/lib/i18n/navigation';
@@ -462,6 +463,8 @@ export default function AdminPage() {
                 {tc('adminBoosterSim.runCta')}
               </Link>
             </div>
+
+            <SeasonIntroPreview />
 
             <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: 'var(--t-surface)', border: '1px solid var(--t-border)' }}>
               <h2 className="text-sm font-bold uppercase tracking-wider mb-4" style={{ color: 'var(--t-muted)' }}>{tc('adminReveal.title')}</h2>

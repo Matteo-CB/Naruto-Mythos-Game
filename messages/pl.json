@@ -4129,5 +4129,39 @@
       "top-200": "Przyznawana dwustu najlepszym graczom w chwili zamknięcia sezonu {season}. Końcowy ranking jest zamrożony, a odznaka zostaje na zawsze.",
       "tournament-winner": "Przyznawana zwycięzcy turnieju. Zdobywa się ją przy pierwszej wygranej i zostaje na koncie na zawsze."
     }
+  },
+  "seasonIntro": {
+    "kicker": "Nowy sezon",
+    "title": "Co się zmienia dla ciebie",
+    "next": "Dalej",
+    "close": "Zamknij",
+    "rank": "Miejsce {rank}",
+    "page": {
+      "highlander": {
+        "title": "Tryb Highlander",
+        "body": "Nowy format z własnym rankingiem: minimum 40 kart i tylko jedna kopia każdej. Zaznacz pole Highlander przed stworzeniem gry online, a wybór talii pokaże ci tylko te poprawne."
+      },
+      "badges": {
+        "title": "Odznaki",
+        "body": "Odznaki zdobywa się na kilka sposobów: kończąc wysoko w rankingu sezonu albo wygrywając turniej. Wybierz tę, którą nosisz, w ustawieniach, a będzie ci towarzyszyć wszędzie tam, gdzie pojawia się twoja flaga: w rankingu, na profilu i przy stole.",
+        "imageAlt": "Wybór odznaki w ustawieniach"
+      },
+      "saison": {
+        "title": "Twój sezon {season}",
+        "body": "Oto co dało ci końcowe miejsce w rankingu. Te odznaki zostają na koncie na zawsze, nawet gdy ranking się zmieni."
+      },
+      "elo": {
+        "title": "Twój nowy start",
+        "body": "Różnice ELO zostały ściśnięte na otwarcie nowego sezonu. Nikt nie zaczyna od zera: twoje miejsce jest zachowane, a ligi sięgają teraz znacznie wyżej niż wcześniej.",
+        "before": "Przedtem",
+        "after": "Teraz"
+      }
+    }
+  },
+  "adminSeasonIntro": {
+    "title": "Podgląd nowości sezonu",
+    "subtitle": "Otwiera okno, które zobaczą już zarejestrowani gracze, z danymi losowanymi przy każdym kliknięciu.",
+    "cta": "Wylosuj",
+    "drawn": "Losowanie: {badges} odznak, {before} ELO staje się {after}"
   }
 }

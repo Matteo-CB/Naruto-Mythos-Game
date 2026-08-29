@@ -4129,5 +4129,39 @@
       "top-200": "Atribuído aos duzentos melhores jogadores no fecho da temporada {season}. A classificação final fica congelada e o emblema fica para sempre.",
       "tournament-winner": "Atribuído ao vencedor de um torneio. Ganha-se na primeira vitória e fica na conta para sempre."
     }
+  },
+  "seasonIntro": {
+    "kicker": "Nova temporada",
+    "title": "O que muda para ti",
+    "next": "Seguinte",
+    "close": "Fechar",
+    "rank": "Posição {rank}",
+    "page": {
+      "highlander": {
+        "title": "O modo Highlander",
+        "body": "Um formato novo com a sua classificação: no mínimo 40 cartas e uma só cópia de cada uma. Marca a caixa Highlander antes de criar a tua partida online e o seletor só te dará baralhos válidos."
+      },
+      "badges": {
+        "title": "Os emblemas",
+        "body": "Podes ganhar emblemas de várias formas: acabando bem numa classificação de temporada ou vencendo um torneio. Escolhe o que usas nas definições e ele segue-te onde a tua bandeira aparecer: classificação, perfil e mesa de jogo.",
+        "imageAlt": "A escolha do emblema nas definições"
+      },
+      "saison": {
+        "title": "A tua temporada {season}",
+        "body": "Eis o que a tua classificação final te deu. Estes emblemas ficam na tua conta para sempre, mesmo que a tua classificação mude."
+      },
+      "elo": {
+        "title": "O teu recomeço",
+        "body": "As diferenças de ELO foram apertadas para abrir a nova temporada. Ninguém recomeçou do zero: o teu lugar é mantido e as ligas sobem agora muito mais alto do que antes.",
+        "before": "Antes",
+        "after": "Agora"
+      }
+    }
+  },
+  "adminSeasonIntro": {
+    "title": "Pré-visualização das novidades da temporada",
+    "subtitle": "Abre a janela que os jogadores já registados vão ver, com dados sorteados a cada clique.",
+    "cta": "Ver um sorteio",
+    "drawn": "Sorteio: {badges} emblema(s), {before} ELO passa a {after}"
   }
 }

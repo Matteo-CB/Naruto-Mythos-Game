@@ -4135,5 +4135,39 @@
       "top-200": "Décerné aux deux cents meilleurs joueurs à la fermeture de la saison {season}. Le classement de fin de saison est figé et le badge reste sur le compte pour toujours.",
       "tournament-winner": "Décerné au vainqueur d'un tournoi. Il se gagne dès la première victoire et reste sur le compte pour toujours."
     }
+  },
+  "seasonIntro": {
+    "kicker": "Nouvelle saison",
+    "title": "Ce qui change pour toi",
+    "next": "Suivant",
+    "close": "Fermer",
+    "rank": "Rang {rank}",
+    "page": {
+      "highlander": {
+        "title": "Le mode Highlander",
+        "body": "Un nouveau format avec son propre classement: 40 cartes minimum, et une seule copie de chaque carte. Coche la case Highlander avant de créer ta partie en ligne, et le choix de deck ne te proposera que les decks valides."
+      },
+      "badges": {
+        "title": "Les badges",
+        "body": "Tu peux gagner des badges de plusieurs façons: en terminant haut au classement d'une saison, ou en remportant un tournoi. Choisis celui que tu portes dans tes réglages, et il te suit partout où ton drapeau apparaît: classement, profil et plateau de jeu.",
+        "imageAlt": "La sélection du badge dans les réglages"
+      },
+      "saison": {
+        "title": "Ta saison {season}",
+        "body": "Voici ce que ton classement de fin de saison t'a rapporté. Ces badges restent sur ton compte pour toujours, même si ton classement change."
+      },
+      "elo": {
+        "title": "Ton nouveau départ",
+        "body": "Les écarts d'ELO ont été resserrés pour ouvrir la nouvelle saison. Personne n'est reparti de zéro: ton rang est conservé, et les ligues montent maintenant bien plus haut qu'avant.",
+        "before": "Avant",
+        "after": "Maintenant"
+      }
+    }
+  },
+  "adminSeasonIntro": {
+    "title": "Aperçu des nouveautés de saison",
+    "subtitle": "Ouvre la fenêtre que verront les joueurs déjà inscrits, avec des données tirées au hasard à chaque clic.",
+    "cta": "Voir un tirage",
+    "drawn": "Tirage: {badges} badge(s), {before} ELO devient {after}"
   }
 }

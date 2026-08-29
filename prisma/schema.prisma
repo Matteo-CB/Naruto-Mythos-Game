@@ -70,6 +70,7 @@ model User {
   gamepadEnabled          Boolean              @default(true)
   countryCode             String?
   selectedSeasonBadge     String?
+  seasonIntroSeenAt       DateTime?
   chatVisibility          String               @default("everyone")
   fastAnimations          Boolean              @default(false)
   allowNonFriendMessages  Boolean              @default(true)
