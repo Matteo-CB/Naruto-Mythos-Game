@@ -1,4 +1,5 @@
 import type { GameState, PlayerID, CharacterInPlay, PendingAction } from '../engine/types';
+import { effetsActifsDe } from '@/lib/effects/handlers/SS/attachmentStatics';
 import { generateInstanceId } from '../engine/utils/id';
 import { logAction } from '../engine/utils/gameLog';
 import { isDuelConditionMet } from './duelUtils';
@@ -29,7 +30,7 @@ export function triggerOnDefeatEffects(
 
         
         if ((topCard.set === 'KS' && topCard.number === 3) && controllingPlayer === defeatedCharOwner) {
-          const hasEffect = (topCard.effects ?? []).some(
+          const hasEffect = effetsActifsDe(char).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
           );
           if (hasEffect) {
@@ -54,7 +55,7 @@ export function triggerOnDefeatEffects(
 
 
         if (topCard.set === 'SS' && topCard.number === 115 && controllingPlayer !== defeatedCharOwner && defeatedBy === controllingPlayer) {
-          const rockLeeDuel = (topCard.effects ?? []).find(
+          const rockLeeDuel = effetsActifsDe(char).find(
             (e) => e.type === 'DUEL' && e.description.includes('[⧗]'),
           );
           if (rockLeeDuel && isDuelConditionMet(newState, missionIndex, rockLeeDuel.description)) {
@@ -85,7 +86,7 @@ export function triggerOnDefeatEffects(
         }
         
         if ((topCard.set === 'KS' && topCard.number === 136)) {
-          const hasEffect = (topCard.effects ?? []).some(
+          const hasEffect = effetsActifsDe(char).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
           );
           if (hasEffect) {

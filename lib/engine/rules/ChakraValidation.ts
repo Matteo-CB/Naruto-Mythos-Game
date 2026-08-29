@@ -1,6 +1,6 @@
 import type { GameState, PlayerID, CharacterCard } from '../types';
 import { foodAttachmentDiscountCount } from '@/lib/effects/handlers/SS/staticAuras';
-import { virtualSoundFourCount, textIsBlanked } from '@/lib/effects/handlers/SS/attachmentStatics';
+import { virtualSoundFourCount, textIsBlanked, effetsActifsDe } from '@/lib/effects/handlers/SS/attachmentStatics';
 import { reductionPremiereFrappe } from './firstStrikeDiscount';
 import { missionCostReduction } from './missionCostReduction';
 
@@ -87,6 +87,35 @@ export function perAllyDiscountAmount(
   return count;
 }
 
+const REMISE_DE_GROUPE_PARTOUT = /friendly\s+(.+?)\s+characters?\s+cost\s+(\d+)\s+less\s+to\s+play\s+anywhere/i;
+
+export function remiseDeGroupePartout(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  state: GameState | any,
+  player: PlayerID,
+  card: CharacterCard,
+): number {
+  if (!isCharacterCard(card)) return 0;
+  const groupe = String(card.group ?? '').toUpperCase();
+  if (!groupe) return 0;
+
+  const cote = player === 'player1' ? 'player1Characters' : 'player2Characters';
+  let remise = 0;
+  for (const mission of state.activeMissions ?? []) {
+    for (const enJeu of (mission?.[cote] ?? [])) {
+      if (enJeu.isHidden) continue;
+      for (const effet of effetsActifsDe(enJeu)) {
+        if (effet.type !== 'MAIN' || !effet.description.includes('[⧗]')) continue;
+        const trouve = REMISE_DE_GROUPE_PARTOUT.exec(effet.description);
+        if (!trouve) continue;
+        if (trouve[1].trim().toUpperCase() !== groupe) continue;
+        remise += Number(trouve[2]) || 0;
+      }
+    }
+  }
+  return remise;
+}
+
 export function calculateEffectiveCost(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   state: GameState | any,
@@ -128,6 +157,9 @@ export function calculateEffectiveCost(
     cost = Math.max(remiseMission.plancher, cost - remiseMission.montant);
   }
 
+  const remisePartout = remiseDeGroupePartout(state, player, card);
+  if (remisePartout > 0) cost = Math.max(0, cost - remisePartout);
+
   const friendlyChars = player === 'player1' ? mission.player1Characters : mission.player2Characters;
   if (!friendlyChars) return cost;
 
@@ -143,7 +175,7 @@ export function calculateEffectiveCost(
     const topCard = getTopCard(charInMission);
     if (!topCard) continue;
 
-    for (const effect of topCard.effects ?? []) {
+    for (const effect of effetsActifsDe(charInMission)) {
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
 
       
@@ -167,20 +199,6 @@ export function calculateEffectiveCost(
     if (sanshos > 0) cost = Math.max(0, cost - sanshos);
   }
 
-  if (card.group === 'Sand Village' && isCharacterCard(card)) {
-    const friendlySideKey = player === 'player1' ? 'player1Characters' : 'player2Characters';
-    let rasaCount = 0;
-    for (const m of state.activeMissions ?? []) {
-      for (const c of (m?.[friendlySideKey] ?? [])) {
-        if (c.isHidden) continue;
-        const cTop = getTopCard(c);
-        if (!cTop) continue;
-        if (String(cTop.set) !== 'SS' || String(cTop.number) !== '51') continue;
-        rasaCount++;
-      }
-    }
-    if (rasaCount > 0) cost = Math.max(0, cost - rasaCount);
-  }
 
   for (const effect of card.effects ?? []) {
     if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
@@ -310,7 +328,7 @@ export function hasKurenai034CostReduction(
     if (charInMission.isHidden) continue;
     const topCard = getTopCard(charInMission);
     if (!topCard) continue;
-    for (const effect of topCard.effects ?? []) {
+    for (const effect of effetsActifsDe(charInMission)) {
       if (effect.type !== 'MAIN' || !effect.description.includes('[⧗]')) continue;
       if ((topCard.set === 'KS' && topCard.number === 34) && effect.description.includes('Team 8') && effect.description.includes('less')) {
         if ((card.keywords ?? []).includes('Team 8') && card.id !== topCard.id) {

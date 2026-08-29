@@ -96,7 +96,7 @@ import { annoncerJetonsRetires } from '@/lib/quests/jetonsRetires';
 import { annoncerDefaite } from '@/lib/quests/defaiteAnnoncee';
 import { annoncerEquipementDefausse, annoncerDefaiteParEquipement } from '@/lib/quests/equipementPose';
 import { hasFlexibleUpgradeRestriction, isRestrictedUpgradeTarget } from '@/lib/engine/rules/flexibleUpgradeRestriction';
-import { forestOfDeathActive, textIsBlanked } from './handlers/SS/attachmentStatics';
+import { forestOfDeathActive, textIsBlanked, effetsActifsDe } from './handlers/SS/attachmentStatics';
 import { rememberPeek } from './handlers/SS/hiddenPeek';
 
 
@@ -443,7 +443,7 @@ function isFirstStrikeArmed(
 ): boolean {
   if (!isOwnPlayAction || !topCard) return false;
   if (character.isHidden) return false;
-  if (!(topCard.effects ?? []).some((e: { type: string }) => e.type === 'FIRST_STRIKE')) return false;
+  if (!effetsActifsDe(character).some((e: { type: string }) => e.type === 'FIRST_STRIKE')) return false;
   if (!isFirstCardPlayedThisRound(state, player)) return false;
   return !!getEffectHandler(topCard.id, 'FIRST_STRIKE' as EffectType);
 }
@@ -6763,8 +6763,7 @@ export class EffectEngine {
         for (const m of newState.activeMissions) {
           for (const c of m[s108Side]) {
             if (c.isHidden) continue;
-            const top = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
-            if ((top.effects ?? []).some((e: { type: string; description: string }) => e.type === 'DUEL' && !e.description.includes('[⧗]'))) {
+            if (effetsActifsDe(c).some((e: { type: string; description: string }) => e.type === 'DUEL' && !e.description.includes('[⧗]'))) {
               s108Candidates.push(c.instanceId);
             }
           }
@@ -19968,7 +19967,7 @@ export class EffectEngine {
     const topCard = character.stack?.length > 0 ? character.stack[character.stack?.length - 1] : character.card;
 
     for (const effectType of remaining) {
-      const hasEffect = (topCard.effects ?? []).some((e) => e.type === effectType);
+      const hasEffect = effetsActifsDe(character).some((e) => e.type === effectType);
       if (!hasEffect) {
         console.warn(`[EffectEngine] processRemainingEffects: card ${topCard.id} (${topCard.name_fr}) has no ${effectType} effect. Skipping.`);
         continue;
@@ -21493,7 +21492,7 @@ export class EffectEngine {
         if (char.isHidden) continue;
         const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
         if ((topCard.set === 'KS' && topCard.number === 4) && topCard.rarity === 'UC') {
-          const hasEffect = (topCard.effects ?? []).some(
+          const hasEffect = effetsActifsDe(char).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('hand instead'),
           );
           if (hasEffect) return true;
@@ -21524,7 +21523,7 @@ export class EffectEngine {
         ? charResult.character.stack[charResult.character.stack?.length - 1]
         : charResult.character.card;
       if ((topCard.set === 'KS' && topCard.number === 56)) {
-        const hasProtection = (topCard.effects ?? []).some(
+        const hasProtection = effetsActifsDe(charResult.character).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('chakra'),
         );
         if (hasProtection) {
@@ -22542,7 +22541,7 @@ export class EffectEngine {
           if (topCard.set !== 'KS' || topCard.number !== 56) return { state, blocked: false };
 
           
-          const hasProtection = (topCard.effects ?? []).some(
+          const hasProtection = effetsActifsDe(char).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.toLowerCase().includes('chakra'),
           );
           if (!hasProtection) return { state, blocked: false };
@@ -24149,7 +24148,7 @@ export class EffectEngine {
         ? charResult.character.stack[charResult.character.stack?.length - 1]
         : charResult.character.card;
       if ((topCard.set === 'KS' && topCard.number === 75) && !charResult.character.isHidden) {
-        const hasMoveProtection = (topCard.effects ?? []).some(
+        const hasMoveProtection = effetsActifsDe(charResult.character).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('moved or defeated'),
         );
         if (hasMoveProtection) {
@@ -24595,7 +24594,7 @@ export class EffectEngine {
 
     
     if ((topCard.set === 'KS' && topCard.number === 48)) {
-      const hasReplacement = (topCard.effects ?? []).some(
+      const hasReplacement = effetsActifsDe(targetChar).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('defeated') && e.description.includes('hide'),
       );
       if (hasReplacement) {
@@ -24605,7 +24604,7 @@ export class EffectEngine {
 
     
     if ((topCard.set === 'KS' && topCard.number === 75) && isEnemyEffect) {
-      const hasReplacement = (topCard.effects ?? []).some(
+      const hasReplacement = effetsActifsDe(targetChar).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('defeated by enemy') && e.description.includes('hide'),
       );
       if (hasReplacement) {

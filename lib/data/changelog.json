@@ -11,6 +11,7 @@
       "categories": [
         "fix",
         "fix",
+        "fix",
         "feature",
         "feature",
         "feature",
@@ -24,6 +25,7 @@
       ],
       "title_fr": "Mise à jour",
       "changes_fr": [
+        "La Bombe aveuglante efface vraiment le texte: la carte touchée ne réduit plus les coûts, ne marque plus et ne se déclenche plus",
         "Toutes les cartes du set 2 sont maintenant autorisées en classé, plus aucune carte n'est bannie",
         "Les quêtes conseillées sur la page des récompenses viennent enfin de la saison en cours",
         "Une fenêtre d'accueil résume les nouveautés de la saison à ta première visite, une seule fois",
@@ -39,6 +41,7 @@
       ],
       "title_en": "Update",
       "changes_en": [
+        "Flash Bomb truly blanks the text: the affected card no longer discounts, no longer scores and no longer triggers",
         "Every set 2 card is now allowed in ranked, no card is banned any more",
         "The suggested quests on the rewards page finally come from the current season",
         "A welcome window sums up the season news on your first visit, once and for all",
@@ -54,6 +57,7 @@
       ],
       "title_es": "Actualización",
       "changes_es": [
+        "La Bomba cegadora borra de verdad el texto: la carta afectada ya no abarata, ya no puntúa y ya no se activa",
         "Todas las cartas del set 2 ya se permiten en clasificatoria, ninguna carta está prohibida",
         "Las misiones sugeridas en la página de recompensas vienen por fin de la temporada actual",
         "Una ventana de bienvenida resume las novedades de la temporada en tu primera visita, una sola vez",
@@ -69,6 +73,7 @@
       ],
       "title_pt": "Atualização",
       "changes_pt": [
+        "A Bomba de luz apaga mesmo o texto: a carta afetada já não baixa custos, já não pontua e já não dispara",
         "Todas as cartas do set 2 são permitidas no ranqueado, nenhuma carta está banida",
         "As missões sugeridas na página de recompensas vêm finalmente da temporada atual",
         "Uma janela de boas-vindas resume as novidades da temporada na tua primeira visita, uma só vez",
@@ -84,6 +89,7 @@
       ],
       "title_it": "Aggiornamento",
       "changes_it": [
+        "La Bomba accecante cancella davvero il testo: la carta colpita non sconta più, non segna più e non si attiva più",
         "Tutte le carte del set 2 sono ammesse in classificata, nessuna carta è più bandita",
         "Le missioni consigliate nella pagina delle ricompense vengono finalmente dalla stagione in corso",
         "Una finestra di benvenuto riassume le novità della stagione alla prima visita, una volta sola",
@@ -99,6 +105,7 @@
       ],
       "title_pl": "Aktualizacja",
       "changes_pl": [
+        "Bomba olśniewająca naprawdę wymazuje tekst: trafiona karta nie obniża już kosztów, nie punktuje i się nie uruchamia",
         "Wszystkie karty z setu 2 są dozwolone w rankingu, żadna karta nie jest już zbanowana",
         "Polecane zadania na stronie nagród pochodzą wreszcie z bieżącego sezonu",
         "Okno powitalne podsumowuje nowości sezonu przy pierwszej wizycie, tylko raz",
@@ -114,6 +121,7 @@
       ],
       "title_ja": "アップデート",
       "changes_ja": [
+        "閃光弾がテキストを本当に消すようになり、対象のカードはコストを下げず、得点せず、発動もしなくなりました",
         "セット2のカードがすべてランクマッチで使用可能になり、禁止カードはなくなりました",
         "報酬ページのおすすめクエストが現在のシーズンから選ばれるようになりました",
         "初回アクセス時にシーズンの新要素をまとめた案内が一度だけ表示されます",

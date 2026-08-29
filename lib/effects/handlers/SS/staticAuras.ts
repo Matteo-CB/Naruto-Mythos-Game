@@ -1,6 +1,7 @@
 import type { CharacterInPlay, GameState, PlayerID } from '@/lib/engine/types';
 import { characterHasGroup } from '@/lib/effects/groupUtils';
 import { isDuelConditionMet } from '@/lib/effects/duelUtils';
+import { effetsActifsDe } from './attachmentStatics';
 
 export function topCardOf(char: CharacterInPlay) {
   return char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
@@ -78,7 +79,7 @@ export function ss2StaticPowerModifier(
   }
 
   if (numero === 54) {
-    const duel = (top.effects ?? []).find((e) => e.type === 'DUEL' && e.description.includes('[⧗]'));
+    const duel = effetsActifsDe(char).find((e) => e.type === 'DUEL' && e.description.includes('[⧗]'));
     if (duel && isDuelConditionMet(state, missionIndex, duel.description)) modifier -= 3;
   }
 

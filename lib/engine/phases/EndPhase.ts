@@ -1,4 +1,5 @@
 import type { GameState, PlayerID, CharacterInPlay } from '../types';
+import { effetsActifsDe } from '@/lib/effects/handlers/SS/attachmentStatics';
 import { logSystem, logAction } from '../utils/gameLog';
 import { shouldRetainPowerTokens, isMovementBlockedByKurenai } from '../../effects/ContinuousEffects';
 import { EffectEngine } from '../../effects/EffectEngine';
@@ -98,7 +99,7 @@ export function scanEndOfRoundInteractiveEffects(state: GameState): EndOfRoundEf
 
         
         if ((topCard.set === 'KS' && topCard.number === 103) && !processedGS.has(char.instanceId)) {
-          const hasEffect = (topCard.effects ?? []).some(
+          const hasEffect = effetsActifsDe(char).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
               e.description.toLowerCase().includes('hide a character'),
           );
@@ -113,7 +114,7 @@ export function scanEndOfRoundInteractiveEffects(state: GameState): EndOfRoundEf
 
         
         if (((topCard.set === 'KS' && topCard.number === 117) || (topCard.set === 'KS' && topCard.number === 151)) && !processedRL.has(char.instanceId)) {
-          const hasEffect = (topCard.effects ?? []).some(
+          const hasEffect = effetsActifsDe(char).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
               (e.description.includes('move this character') || e.description.includes('must move')),
           );
@@ -128,7 +129,7 @@ export function scanEndOfRoundInteractiveEffects(state: GameState): EndOfRoundEf
 
         
         if ((topCard.set === 'KS' && topCard.number === 28) && !processedAK.has(char.instanceId)) {
-          const hasEffect = (topCard.effects ?? []).some(
+          const hasEffect = effetsActifsDe(char).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
           );
           if (hasEffect) {
@@ -512,7 +513,7 @@ function handleEndOfRoundAutoTriggers(state: GameState): GameState {
 
         
         if (isSummon && invocationDoitRentrer(newState, char, player, newState.activeMissions.indexOf(mission))) {
-          const isGiantSpider103 = (topCard.effects ?? []).some(
+          const isGiantSpider103 = effetsActifsDe(char).some(
             (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
               e.description.toLowerCase().includes('hide a character'),
           );
@@ -531,7 +532,7 @@ function handleEndOfRoundAutoTriggers(state: GameState): GameState {
         }
 
         
-        const hasAkamaruReturn = (topCard.effects ?? []).some(
+        const hasAkamaruReturn = effetsActifsDe(char).some(
           (e) => e.type === 'MAIN' &&
             e.description.includes('[⧗]') &&
             e.description.includes('Kiba Inuzuka') &&
@@ -659,7 +660,7 @@ export function handleRockLee117Move(
         
         if (topCard.set !== 'KS' || (topCard.number !== 117 && topCard.number !== 151)) continue;
 
-        const hasMove = (topCard.effects ?? []).some(
+        const hasMove = effetsActifsDe(char).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]') &&
             (e.description.includes('move this character') || e.description.includes('must move')),
         );
@@ -772,7 +773,7 @@ export function handleAkamaru028Return(state: GameState, targetInstanceId?: stri
         if (topCard.set !== 'KS' || topCard.number !== 28) continue;
 
         
-        const hasReturnEffect = (topCard.effects ?? []).some(
+        const hasReturnEffect = effetsActifsDe(char).some(
           (e) => e.type === 'MAIN' && e.description.includes('[⧗]'),
         );
         if (!hasReturnEffect) continue;

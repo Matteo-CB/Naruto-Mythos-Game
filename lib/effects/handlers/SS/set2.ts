@@ -5,6 +5,7 @@ import { logAction } from '@/lib/engine/utils/gameLog';
 import { getEffectivePower } from '@/lib/effects/powerUtils';
 import { playLessBlockedRevealResult, playLessSelectionResult, type PlayLessCategory } from '@/lib/effects/handlers/shared/playLess';
 import { ss000DeckHounds, ss000HasPlayableHound } from './ss000Search';
+import { effetsActifsDe } from './attachmentStatics';
 
 function sideFor(player: PlayerID, which: 'friendly' | 'enemy'): 'player1Characters' | 'player2Characters' {
   const friendly = player === 'player1' ? 'player1Characters' : 'player2Characters';
@@ -372,8 +373,7 @@ function stadium108ScoreHandler(ctx: EffectContext): EffectResult {
   for (const m of state.activeMissions) {
     for (const c of m[friendlySide]) {
       if (c.isHidden) continue;
-      const top = topOf(c);
-      if ((top.effects ?? []).some((e) => e.type === 'DUEL' && !e.description.includes('[⧗]'))) {
+      if (effetsActifsDe(c).some((e) => e.type === 'DUEL' && !e.description.includes('[⧗]'))) {
         candidates.push(c.instanceId);
       }
     }

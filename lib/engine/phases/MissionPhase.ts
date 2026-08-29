@@ -1,5 +1,6 @@
 import type { GameState, PlayerID, ActiveMission, MissionScoringProgress, ScoreEffectSource, PendingEffect, PendingAction } from '../types';
 import { logSystem, logAction } from '../utils/gameLog';
+import { effetsActifsDe } from '@/lib/effects/handlers/SS/attachmentStatics';
 import { calculateCharacterPower } from './PowerCalculation';
 import { teamTrainingBonus, missionCompteDouble, missionSidePowerBonus } from '../../effects/missions/ssMissions';
 import { generateInstanceId } from '../utils/id';
@@ -193,7 +194,7 @@ function checkOrochimaru051OnMission(state: GameState, missionIndex: number, pla
     if (char.isHidden) continue;
     const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
     if (topCard.set !== 'KS' || topCard.number !== 51) continue;
-    const hasMove = (topCard.effects ?? []).some(
+    const hasMove = effetsActifsDe(char).some(
       (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('lost this mission'),
     );
     if (hasMove) return true;
@@ -406,10 +407,10 @@ export function collectScoreEffectSources(
     if (textIsBlanked(char)) continue;
     if (processed.includes(char.instanceId)) continue; // Already resolved
     const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-    const hasCharScore = (topCard.effects ?? []).some((e) => e.type === 'SCORE');
+    const hasCharScore = effetsActifsDe(char).some((e) => e.type === 'SCORE');
     if (!hasCharScore) continue;
 
-    const scoreEffect = (topCard.effects ?? []).find((e) => e.type === 'SCORE');
+    const scoreEffect = effetsActifsDe(char).find((e) => e.type === 'SCORE');
     sources.push({
       cardId: topCard.id,
       instanceId: char.instanceId,
@@ -788,7 +789,7 @@ function resolveRemainingScoreEffects(
     if (processedCharIds.includes(char.instanceId)) continue;
 
     const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
-    const hasCharScore = (topCard.effects ?? []).some((e) => e.type === 'SCORE');
+    const hasCharScore = effetsActifsDe(char).some((e) => e.type === 'SCORE');
     if (!hasCharScore) continue;
 
     const result = EffectEngine.resolveScoreEffectSingle(newState, player, missionIndex, topCard.id, char);
@@ -826,7 +827,7 @@ function handleOrochimaru051Move(state: GameState, missionIndex: number, winner:
       const topCard = char.stack?.length > 0 ? char.stack[char.stack?.length - 1] : char.card;
       if (topCard.set !== 'KS' || topCard.number !== 51) continue;
 
-      const hasMove = (topCard.effects ?? []).some(
+      const hasMove = effetsActifsDe(char).some(
         (e) => e.type === 'MAIN' && e.description.includes('[⧗]') && e.description.includes('lost this mission'),
       );
       if (!hasMove) continue;
