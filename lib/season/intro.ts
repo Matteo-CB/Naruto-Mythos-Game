@@ -1,6 +1,6 @@
 import { SAISON_ARCHIVEE } from '@/lib/badges/saisonBadges';
 
-export const DATE_DE_DEPLOIEMENT = new Date('2026-08-30T00:00:00.000Z');
+export const DATE_DE_DEPLOIEMENT = new Date('2026-08-29T16:00:00.000Z');
 
 export const PAGES_DE_LINTRO = ['highlander', 'badges', 'saison', 'elo'] as const;
 

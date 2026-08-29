@@ -13,7 +13,7 @@ import { InfiniteSegment } from '@/components/battlepass/InfiniteSegment';
 import { BoosterSetTile } from '@/components/boosters/BoosterSetTile';
 import { BoosterCarousel } from '@/components/boosters/BoosterCarousel';
 import { getSetName } from '@/lib/data/sets/registry';
-import { SAISON_COURANTE } from '@/lib/quests/questData';
+import { SAISON_COURANTE, SAISON_ARCHIVEE } from '@/lib/quests/questData';
 import { BoosterRatesPanel } from '@/components/boosters/BoosterRatesPanel';
 import { BoosterOpenAnimation } from '@/components/boosters/BoosterOpenAnimation';
 import { BoosterOpenFailureScreen } from '@/components/boosters/BoosterOpenFailureScreen';
@@ -424,9 +424,12 @@ export default function RewardsHubPage() {
     return t('tabQuests');
   };
 
+  const quetesDeLaSaison = mainQuests.filter((q) => (q.season ?? SAISON_ARCHIVEE) === SAISON_COURANTE);
+  const quetesArchivees = mainQuests.filter((q) => (q.season ?? SAISON_ARCHIVEE) !== SAISON_COURANTE);
+
   const recommendedQuests: QuestRow[] = (() => {
     const byLevel: Record<number, QuestRow | null> = { 1: null, 2: null, 3: null, 4: null };
-    for (const q of mainQuests) {
+    for (const q of quetesDeLaSaison) {
       if (q.claimed) continue;
       const cur = byLevel[q.level];
       const qScore = (q.completed ? 1 : 0) * 2 + (q.progress / Math.max(1, q.target));
@@ -435,9 +438,6 @@ export default function RewardsHubPage() {
     }
     return [1, 2, 3, 4].map((l) => byLevel[l]).filter((q): q is QuestRow => q !== null);
   })();
-
-  const quetesDeLaSaison = mainQuests.filter((q) => (q.season ?? 'KS') === 'SS');
-  const quetesArchivees = mainQuests.filter((q) => (q.season ?? 'KS') !== 'SS');
 
   const levelCounts = [1, 2, 3, 4].map((level) => ({
     level,

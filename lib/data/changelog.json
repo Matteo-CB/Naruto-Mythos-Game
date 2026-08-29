@@ -9,6 +9,7 @@
     {
       "date": "2026-08-29",
       "categories": [
+        "fix",
         "feature",
         "feature",
         "feature",
@@ -22,6 +23,7 @@
       ],
       "title_fr": "Mise à jour",
       "changes_fr": [
+        "Les quêtes conseillées sur la page des récompenses viennent enfin de la saison en cours",
         "Une fenêtre d'accueil résume les nouveautés de la saison à ta première visite, une seule fois",
         "Le scellé Shinobi Shiren est ouvert: il devient le set proposé par défaut, en salle comme en tournoi",
         "Les tournois donnent des boosters des deux sets, et une carte tirée parmi les variantes introuvables ailleurs",
@@ -35,6 +37,7 @@
       ],
       "title_en": "Update",
       "changes_en": [
+        "The suggested quests on the rewards page finally come from the current season",
         "A welcome window sums up the season news on your first visit, once and for all",
         "Shinobi Shiren sealed is open: it becomes the set offered by default, in rooms and tournaments",
         "Tournaments now grant boosters from both sets, plus a card drawn among the variants found nowhere else",
@@ -48,6 +51,7 @@
       ],
       "title_es": "Actualización",
       "changes_es": [
+        "Las misiones sugeridas en la página de recompensas vienen por fin de la temporada actual",
         "Una ventana de bienvenida resume las novedades de la temporada en tu primera visita, una sola vez",
         "El sellado Shinobi Shiren está abierto: es el set propuesto por defecto, en salas y torneos",
         "Los torneos dan sobres de los dos sets y una carta sacada entre las variantes que no salen en ningún otro sitio",
@@ -61,6 +65,7 @@
       ],
       "title_pt": "Atualização",
       "changes_pt": [
+        "As missões sugeridas na página de recompensas vêm finalmente da temporada atual",
         "Uma janela de boas-vindas resume as novidades da temporada na tua primeira visita, uma só vez",
         "O selado Shinobi Shiren está aberto: passa a ser o set proposto por defeito, em salas e torneios",
         "Os torneios dão boosters dos dois sets e uma carta sorteada entre as variantes que não saem noutro lado",
@@ -74,6 +79,7 @@
       ],
       "title_it": "Aggiornamento",
       "changes_it": [
+        "Le missioni consigliate nella pagina delle ricompense vengono finalmente dalla stagione in corso",
         "Una finestra di benvenuto riassume le novità della stagione alla prima visita, una volta sola",
         "Il sigillato Shinobi Shiren è aperto: diventa il set proposto di default, in stanza e in torneo",
         "I tornei danno bustine dei due set e una carta estratta tra le varianti introvabili altrove",
@@ -87,6 +93,7 @@
       ],
       "title_pl": "Aktualizacja",
       "changes_pl": [
+        "Polecane zadania na stronie nagród pochodzą wreszcie z bieżącego sezonu",
         "Okno powitalne podsumowuje nowości sezonu przy pierwszej wizycie, tylko raz",
         "Sealed Shinobi Shiren jest otwarty: to teraz domyślny zestaw, w pokojach i w turniejach",
         "Turnieje dają boostery z obu zestawów i kartę losowaną spośród wariantów nie do zdobycia gdzie indziej",
@@ -100,6 +107,7 @@
       ],
       "title_ja": "アップデート",
       "changes_ja": [
+        "報酬ページのおすすめクエストが現在のシーズンから選ばれるようになりました",
         "初回アクセス時にシーズンの新要素をまとめた案内が一度だけ表示されます",
         "忍びの試練のシールドが解禁され、部屋でも大会でも既定のセットになりました",
         "大会報酬が両セットのブースターになり、他では手に入らないバリアントからカードが1枚抽選されます",

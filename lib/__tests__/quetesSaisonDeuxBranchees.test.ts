@@ -133,3 +133,23 @@ describe('la saison Shinobi Shiren est reellement branchee', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 });
+
+describe('la page des recompenses ne recommande que la saison en cours', () => {
+  it('les quetes recommandees sont tirees de la saison courante, pas de tout le catalogue', () => {
+    const page = readFileSync(join(process.cwd(), 'app/[locale]/battlepass/page.tsx'), 'utf8');
+    const bloc = page.slice(page.indexOf('const recommendedQuests'), page.indexOf('return [1, 2, 3, 4]'));
+    expect(bloc, 'la boucle parcourt les quetes de la saison').toContain('for (const q of quetesDeLaSaison)');
+    expect(bloc, 'jamais tout le catalogue').not.toContain('for (const q of mainQuests)');
+  });
+
+  it('le partage des saisons passe par les constantes, jamais par des lettres ecrites en dur', () => {
+    const page = readFileSync(join(process.cwd(), 'app/[locale]/battlepass/page.tsx'), 'utf8');
+    expect(page).toContain('const quetesDeLaSaison = mainQuests.filter((q) => (q.season ?? SAISON_ARCHIVEE) === SAISON_COURANTE)');
+    expect(page).not.toContain("(q.season ?? 'KS') === 'SS'");
+  });
+
+  it('la separation des quetes precede leur recommandation', () => {
+    const page = readFileSync(join(process.cwd(), 'app/[locale]/battlepass/page.tsx'), 'utf8');
+    expect(page.indexOf('const quetesDeLaSaison')).toBeLessThan(page.indexOf('const recommendedQuests'));
+  });
+});
