@@ -23,7 +23,7 @@ import { useMemo } from 'react';
 import { randomHoloHue } from '@/lib/utils/holoColor';
 import { useToastStore } from '@/stores/toastStore';
 import type { CharacterCard, MissionCard } from '@/lib/engine/types';
-import { ALL_SET_IDS, SET_REGISTRY, isSetSealedReady, getSetName } from '@/lib/data/sets/registry';
+import { ALL_SET_IDS, SET_REGISTRY, isSetSealedReady, getSetName , getLatestSealedSetId } from '@/lib/data/sets/registry';
 import { useLocale } from 'next-intl';
 
 type GameMode = 'casual' | 'ranked';
@@ -39,7 +39,7 @@ const EVOLVING_TOGGLE_STORAGE_KEY = 'naruto-mythos-evolving-toggle';
 const HIGHLANDER_TOGGLE_STORAGE_KEY = 'naruto-mythos-highlander-toggle';
 const SEALED_TOGGLE_STORAGE_KEY = 'naruto-mythos-sealed-toggle';
 const SEALED_DEFAULT_BOOSTER_COUNT: 4 | 5 | 6 = 5;
-const SEALED_DEFAULT_SET_CHOICE = 'KS';
+const SEALED_DEFAULT_SET_CHOICE = getLatestSealedSetId() ?? 'random';
 const JOIN_RETRY_INTERVAL_MS = 4000;
 const JOIN_MAX_ATTEMPTS = 10;
 const JOIN_SLOW_RETRY_EVERY = 5;

@@ -8,11 +8,15 @@
         "feature",
         "feature",
         "feature",
+        "feature",
+        "feature",
         "fix",
         "fix"
       ],
       "title_fr": "Mise à jour",
       "changes_fr": [
+        "Le scellé Shinobi Shiren est ouvert: il devient le set proposé par défaut, en salle comme en tournoi",
+        "Les tournois donnent des boosters des deux sets, et une carte tirée parmi les variantes introuvables ailleurs",
         "Un badge Top 200 rejoint les badges de la saison Konoha Shido",
         "Gagner un tournoi donne désormais un badge de vainqueur, à garder sur son compte",
         "Tu peux choisir un badge gagné qui suivra ton drapeau partout, avec son explication au survol",
@@ -23,6 +27,8 @@
       ],
       "title_en": "Update",
       "changes_en": [
+        "Shinobi Shiren sealed is open: it becomes the set offered by default, in rooms and tournaments",
+        "Tournaments now grant boosters from both sets, plus a card drawn among the variants found nowhere else",
         "A Top 200 badge joins the Konoha Shido season badges",
         "Winning a tournament now grants a winner badge, kept on your account",
         "You can pick an earned badge that follows your flag everywhere, with its meaning on hover",
@@ -33,6 +39,8 @@
       ],
       "title_es": "Actualización",
       "changes_es": [
+        "El sellado Shinobi Shiren está abierto: es el set propuesto por defecto, en salas y torneos",
+        "Los torneos dan sobres de los dos sets y una carta sacada entre las variantes que no salen en ningún otro sitio",
         "Una insignia Top 200 se suma a las de la temporada Konoha Shido",
         "Ganar un torneo ahora da una insignia de ganador, que se queda en tu cuenta",
         "Puedes elegir una insignia ganada que acompaña tu bandera en todas partes, con su explicación al pasar el ratón",
@@ -43,6 +51,8 @@
       ],
       "title_pt": "Atualização",
       "changes_pt": [
+        "O selado Shinobi Shiren está aberto: passa a ser o set proposto por defeito, em salas e torneios",
+        "Os torneios dão boosters dos dois sets e uma carta sorteada entre as variantes que não saem noutro lado",
         "Um emblema Top 200 junta-se aos da temporada Konoha Shido",
         "Vencer um torneio dá agora um emblema de vencedor, que fica na tua conta",
         "Podes escolher um emblema ganho que segue a tua bandeira em todo o lado, com a explicação ao passar o rato",
@@ -53,6 +63,8 @@
       ],
       "title_it": "Aggiornamento",
       "changes_it": [
+        "Il sigillato Shinobi Shiren è aperto: diventa il set proposto di default, in stanza e in torneo",
+        "I tornei danno bustine dei due set e una carta estratta tra le varianti introvabili altrove",
         "Un distintivo Top 200 si aggiunge a quelli della stagione Konoha Shido",
         "Vincere un torneo ora dà un distintivo di vincitore, che resta sul profilo",
         "Puoi scegliere un distintivo vinto che segue la tua bandiera ovunque, con la spiegazione al passaggio del mouse",
@@ -63,6 +75,8 @@
       ],
       "title_pl": "Aktualizacja",
       "changes_pl": [
+        "Sealed Shinobi Shiren jest otwarty: to teraz domyślny zestaw, w pokojach i w turniejach",
+        "Turnieje dają boostery z obu zestawów i kartę losowaną spośród wariantów nie do zdobycia gdzie indziej",
         "Odznaka Top 200 dołącza do odznak sezonu Konoha Shido",
         "Wygrana w turnieju daje teraz odznakę zwycięzcy, która zostaje na koncie",
         "Możesz wybrać zdobytą odznakę, która towarzyszy twojej fladze wszędzie, z opisem po najechaniu",
@@ -73,6 +87,8 @@
       ],
       "title_ja": "アップデート",
       "changes_ja": [
+        "忍びの試練のシールドが解禁され、部屋でも大会でも既定のセットになりました",
+        "大会報酬が両セットのブースターになり、他では手に入らないバリアントからカードが1枚抽選されます",
         "コノハ指導シーズンのバッジにトップ 200 が加わりました",
         "トーナメント優勝で優勝バッジがもらえるようになりました。アカウントに残ります",
         "獲得したバッジを1つ選ぶと国旗の横にいつも表示され、カーソルを合わせると説明が出ます",

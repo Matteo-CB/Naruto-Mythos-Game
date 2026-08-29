@@ -1,11 +1,9 @@
 import { prisma } from '@/lib/db/prisma';
 import { grantBoosters } from '@/lib/boosters/openBooster';
 import { awardXp } from '@/lib/battlepass/awardXp';
-import {
-  TOURNAMENT_PRIZE_CARD_IDS,
-  type TournamentPrizeCardId,
-} from '@/lib/variants/constants';
 import { QUEST_XP_BY_LEVEL, BATTLEPASS_SEASON_SET_ID } from '@/lib/battlepass/constants';
+import { SEASON_COMPANION_SET_ID } from '@/lib/battlepass/season';
+import { estUnPrixDeTournoiValide, tirerUnPrixDeTournoi } from './prizePool';
 import { withUserLock } from '@/lib/quests/userLock';
 import { incrementVariant, isVariantOwned } from '@/lib/variants/inventory';
 
@@ -13,14 +11,25 @@ export const WINNER_BOOSTER_COUNT = 3;
 export const PARTICIPANT_BOOSTER_COUNT = 1;
 export const FALLBACK_XP_IF_OWNED = QUEST_XP_BY_LEVEL[4];
 
+export const SETS_RECOMPENSES: readonly string[] = [BATTLEPASS_SEASON_SET_ID, SEASON_COMPANION_SET_ID];
+
 export interface WinnerPrizeResult {
   boostersGranted: number;
-  cardUnlocked: TournamentPrizeCardId | null;
+  cardUnlocked: string | null;
   xpGrantedFallback: number;
 }
 
-export function isValidPrizeCardId(id: unknown): id is TournamentPrizeCardId {
-  return typeof id === 'string' && (TOURNAMENT_PRIZE_CARD_IDS as readonly string[]).includes(id);
+export function isValidPrizeCardId(id: unknown): id is string {
+  return estUnPrixDeTournoiValide(id);
+}
+
+async function offrirLesBoosters(userId: string, parSet: number): Promise<number> {
+  let total = 0;
+  for (const setId of SETS_RECOMPENSES) {
+    await grantBoosters(userId, setId, parSet);
+    total += parSet;
+  }
+  return total;
 }
 
 export async function acquirePrizeAwardLock(tournamentId: string): Promise<boolean> {
@@ -65,20 +74,20 @@ export async function grantWinnerPrize(
       xpGrantedFallback: 0,
     };
 
-    await grantBoosters(userId, BATTLEPASS_SEASON_SET_ID, WINNER_BOOSTER_COUNT);
-    result.boostersGranted = WINNER_BOOSTER_COUNT;
+    result.boostersGranted = await offrirLesBoosters(userId, WINNER_BOOSTER_COUNT);
 
-    if (!isValidPrizeCardId(prizeCardId)) {
+    const carte = isValidPrizeCardId(prizeCardId) ? prizeCardId : tirerUnPrixDeTournoi();
+    if (!carte) {
       return result;
     }
 
-    const owned = await isVariantOwned(userId, prizeCardId);
+    const owned = await isVariantOwned(userId, carte);
     if (owned) {
       await awardXp(userId, FALLBACK_XP_IF_OWNED);
       result.xpGrantedFallback = FALLBACK_XP_IF_OWNED;
     } else {
-      await incrementVariant(userId, prizeCardId);
-      result.cardUnlocked = prizeCardId;
+      await incrementVariant(userId, carte);
+      result.cardUnlocked = carte;
     }
 
     return result;
@@ -87,8 +96,8 @@ export async function grantWinnerPrize(
 
 export async function grantParticipantReward(userId: string): Promise<{ boostersGranted: number }> {
   return withUserLock(userId, async () => {
-    await grantBoosters(userId, BATTLEPASS_SEASON_SET_ID, PARTICIPANT_BOOSTER_COUNT);
-    return { boostersGranted: PARTICIPANT_BOOSTER_COUNT };
+    const boostersGranted = await offrirLesBoosters(userId, PARTICIPANT_BOOSTER_COUNT);
+    return { boostersGranted };
   });
 }
 

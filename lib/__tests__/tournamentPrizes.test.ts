@@ -39,7 +39,9 @@ import {
   WINNER_BOOSTER_COUNT,
   PARTICIPANT_BOOSTER_COUNT,
   FALLBACK_XP_IF_OWNED,
+  SETS_RECOMPENSES,
 } from '@/lib/tournament/prizes';
+import { poolDePrixDeTournoi } from '@/lib/tournament/prizePool';
 
 describe('isValidPrizeCardId', () => {
   it('accepts the 4 whitelisted MV cards', () => {
@@ -73,18 +75,18 @@ describe('grantWinnerPrize', () => {
     variantInvUpsert.mockResolvedValue({ count: 1 });
   });
 
-  it('grants 3 boosters even without a prize card', async () => {
+  it('grants boosters of both sets and draws a card when none was pinned', async () => {
     const r = await grantWinnerPrize('user-1', null);
-    expect(r.boostersGranted).toBe(WINNER_BOOSTER_COUNT);
-    expect(r.cardUnlocked).toBeNull();
+    expect(r.boostersGranted).toBe(WINNER_BOOSTER_COUNT * SETS_RECOMPENSES.length);
+    expect(poolDePrixDeTournoi(), 'chaque vainqueur repart avec une carte').toContain(r.cardUnlocked);
     expect(r.xpGrantedFallback).toBe(0);
-    expect(upsertInventory).toHaveBeenCalledTimes(1);
+    expect(upsertInventory, 'un lot de boosters par set').toHaveBeenCalledTimes(SETS_RECOMPENSES.length);
   });
 
   it('grants 3 boosters + unlocks the card when not owned', async () => {
     variantInvFindUnique.mockResolvedValue(null);
     const r = await grantWinnerPrize('user-1', 'KS-108-MV');
-    expect(r.boostersGranted).toBe(WINNER_BOOSTER_COUNT);
+    expect(r.boostersGranted).toBe(WINNER_BOOSTER_COUNT * SETS_RECOMPENSES.length);
     expect(r.cardUnlocked).toBe('KS-108-MV');
     expect(r.xpGrantedFallback).toBe(0);
     expect(variantInvUpsert).toHaveBeenCalled();
@@ -95,15 +97,15 @@ describe('grantWinnerPrize', () => {
     findUniqueUser.mockResolvedValueOnce({ battlepassXp: 0, battlepassTier: 0, infiniteBoostersGranted: 0 });
     updateUser.mockResolvedValue({});
     const r = await grantWinnerPrize('user-1', 'KS-108-MV');
-    expect(r.boostersGranted).toBe(WINNER_BOOSTER_COUNT);
+    expect(r.boostersGranted).toBe(WINNER_BOOSTER_COUNT * SETS_RECOMPENSES.length);
     expect(r.cardUnlocked).toBeNull();
     expect(r.xpGrantedFallback).toBe(FALLBACK_XP_IF_OWNED);
   });
 
-  it('grants 3 boosters only when prizeCardId is invalid', async () => {
+  it('draws a card from the season pool when prizeCardId is invalid', async () => {
     const r = await grantWinnerPrize('user-1', 'KS-999-XX');
-    expect(r.boostersGranted).toBe(WINNER_BOOSTER_COUNT);
-    expect(r.cardUnlocked).toBeNull();
+    expect(r.boostersGranted).toBe(WINNER_BOOSTER_COUNT * SETS_RECOMPENSES.length);
+    expect(poolDePrixDeTournoi(), 'la carte tiree vient du set de la saison').toContain(r.cardUnlocked);
     expect(r.xpGrantedFallback).toBe(0);
   });
 });
@@ -114,10 +116,10 @@ describe('grantParticipantReward', () => {
     upsertInventory.mockResolvedValue({ count: PARTICIPANT_BOOSTER_COUNT });
   });
 
-  it('grants 1 booster', async () => {
+  it('grants one booster of each set', async () => {
     const r = await grantParticipantReward('user-2');
-    expect(r.boostersGranted).toBe(PARTICIPANT_BOOSTER_COUNT);
-    expect(upsertInventory).toHaveBeenCalledTimes(1);
+    expect(r.boostersGranted).toBe(PARTICIPANT_BOOSTER_COUNT * SETS_RECOMPENSES.length);
+    expect(upsertInventory).toHaveBeenCalledTimes(SETS_RECOMPENSES.length);
   });
 });
 

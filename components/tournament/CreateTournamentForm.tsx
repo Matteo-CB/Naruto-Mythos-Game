@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 import { useTournamentStore, type CreateTournamentInput } from '@/stores/tournamentStore';
 import { useRouter } from '@/lib/i18n/navigation';
 import { RANK_TIERS } from '@/components/EloBadge';
-import { ALL_SET_IDS, SET_REGISTRY, isSetSealedReady, getSetName } from '@/lib/data/sets/registry';
+import { ALL_SET_IDS, SET_REGISTRY, isSetSealedReady, getSetName, getLatestSealedSetId } from '@/lib/data/sets/registry';
 import { TOURNAMENT_PRIZE_CARD_IDS } from '@/lib/variants/constants';
 import { getCardById } from '@/lib/data/cardIndex';
 import { getAllCards } from '@/lib/data/cardLoader';
@@ -53,7 +53,7 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
   const [useBanList, setUseBanList] = useState(true);
   const [bestOfThree, setBestOfThree] = useState(false);
   const [sealedBoosters, setSealedBoosters] = useState<4 | 5 | 6>(5);
-  const [sealedSetChoice, setSealedSetChoice] = useState<string>('random');
+  const [sealedSetChoice, setSealedSetChoice] = useState<string>(getLatestSealedSetId() ?? 'random');
   const [allowedLeagues, setAllowedLeagues] = useState<string[]>([]);
   const [scheduledDate, setScheduledDate] = useState('');
   const [scheduledTime, setScheduledTime] = useState('');

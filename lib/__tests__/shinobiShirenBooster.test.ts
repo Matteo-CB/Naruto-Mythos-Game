@@ -95,9 +95,11 @@ describe('booster Shinobi Shiren', () => {
 });
 
 describe('scelle Shinobi Shiren', () => {
-  it('le set 2 n_est pas propose en scelle', () => {
-    expect(getSealedSetIds()).not.toContain('SS');
-    expect(() => generateSealedPool(6, 'SS')).toThrow();
+  it('le set 2 est propose en scelle', () => {
+    expect(getSealedSetIds()).toContain('SS');
+    const pool = generateSealedPool(6, 'SS');
+    expect(pool.boosters).toHaveLength(6);
+    expect(pool.allCards.every((c) => c.set === 'SS')).toBe(true);
   });
 
   it('six boosters du set 2 donneraient bien 54 personnages et 6 missions', () => {
@@ -114,8 +116,11 @@ describe('scelle Shinobi Shiren', () => {
     }
   });
 
-  it('le scelle par defaut ne tire que le set 1', () => {
-    const pool = generateSealedPool(6, 'random');
-    expect(pool.allCards.every((c) => c.set === 'KS')).toBe(true);
+  it('le scelle aleatoire ne tire que dans les sets ouverts', () => {
+    const ouverts = new Set(getSealedSetIds());
+    for (let essai = 0; essai < 10; essai++) {
+      const pool = generateSealedPool(6, 'random');
+      expect(pool.allCards.every((c) => ouverts.has(String(c.set)))).toBe(true);
+    }
   });
 });

@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/db/prisma';
 import { generateJoinCode } from '@/lib/tournament/tournamentEngine';
 import { sendTournamentCreated } from '@/lib/discord/tournamentCreatedWebhook';
-import { TOURNAMENT_PRIZE_CARD_IDS } from '@/lib/variants/constants';
+import { poolDePrixDeTournoi, tirerUnPrixDeTournoi } from '@/lib/tournament/prizePool';
 import {
   AUTO_TOURNAMENT_MAX_PLAYERS,
   AUTO_TOURNAMENT_REG_HOUR,
@@ -48,8 +48,7 @@ export function parisWallToUtc(year: number, month: number, day: number, hour: n
 }
 
 export function pickDailyPrizeCardId(rng: () => number = Math.random): string {
-  const list = TOURNAMENT_PRIZE_CARD_IDS as readonly string[];
-  return list[Math.floor(rng() * list.length)];
+  return tirerUnPrixDeTournoi(rng) ?? poolDePrixDeTournoi()[0] ?? '';
 }
 
 export interface DailyTournamentResult {

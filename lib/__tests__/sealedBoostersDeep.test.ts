@@ -469,7 +469,7 @@ describe('sealed instance identity inside a pool', () => {
 
 describe('the random set choice never resolves to a non available set', () => {
   it('the shipped registry only exposes KS as sealed ready', () => {
-    expect(getSealedSetIds()).toEqual(['KS']);
+    expect(getSealedSetIds()).toEqual(['KS', 'SS']);
     for (const id of ALL_SET_IDS) {
       if (getSealedSetIds().includes(id)) {
         expect(getSetStatus(id)).toBe('available');
