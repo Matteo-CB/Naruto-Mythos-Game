@@ -50,6 +50,8 @@ describe('chaque nouveau set marque le changelog', () => {
     expect(debut, 'elle passe avant la date de l entree').toBeLessThan(titre);
     expect(source, 'elle est rouge').toContain('var(--t-danger)');
     expect(source, 'jamais une bordure d accent').not.toMatch(/border(Left|Right|Top|Bottom): '[0-9]+px solid var\(--t-danger\)/);
+    const banniere = source.slice(debut, source.indexOf('</motion.div>', debut));
+    expect(banniere, 'aucune ombre, aucun halo').not.toContain('boxShadow');
   });
 
   it('les sept langues savent ecrire le marqueur', () => {
@@ -60,5 +62,34 @@ describe('chaque nouveau set marque le changelog', () => {
       expect(modele, `${code}: le numero`).toContain('{number}');
       expect(modele, `${code}: le nom du set`).toContain('{name}');
     }
+  });
+});
+
+describe('rien de ce qui a ete ajoute ne porte d ombre', () => {
+  const FICHIERS = [
+    'components/ChangelogButton.tsx',
+    'components/badges/BadgeTooltip.tsx',
+    'components/badges/SeasonBadgeModal.tsx',
+    'components/badges/SeasonBadge.tsx',
+    'components/badges/LeagueBadge.tsx',
+    'components/PlayerFlag.tsx',
+    'components/settings/SeasonBadgePicker.tsx',
+    'components/profile/SeasonBadgesPanel.tsx',
+  ];
+
+  it('ni ombre portee ni halo dans les composants de badges et de nouvelles', () => {
+    for (const fichier of FICHIERS) {
+      const source = readFileSync(join(RACINE, fichier), 'utf8');
+      expect(source, `${fichier} ne doit porter aucune ombre`).not.toContain('boxShadow');
+      expect(source, `${fichier} ne doit porter aucun halo`).not.toContain('drop-shadow');
+    }
+  });
+
+  it('l icone de palier du battlepass n a pas non plus d ombre', () => {
+    const source = readFileSync(join(RACINE, 'components/battlepass/TierNode.tsx'), 'utf8');
+    const icone = source.slice(source.indexOf('const icone = iconeDuPalier'));
+    const bloc = icone.slice(icone.indexOf('{icone && ('), icone.indexOf('{isSpecial && isCurrent && ('));
+    expect(bloc, 'l icone ajoutee ne porte aucune ombre').not.toContain('drop-shadow');
+    expect(bloc).not.toContain('boxShadow');
   });
 });

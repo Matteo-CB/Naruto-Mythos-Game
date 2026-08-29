@@ -55,7 +55,6 @@ export function BadgeTooltip({ titre, texte, children, onClick }: BadgeTooltipPr
                 transform: 'translate(-50%, -100%)',
                 maxWidth: 240,
                 backgroundColor: 'var(--t-panel)',
-                boxShadow: '0 10px 30px var(--t-shadow)',
                 borderRadius: 4,
                 pointerEvents: 'none',
                 zIndex: Z_APP_MODAL,

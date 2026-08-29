@@ -232,8 +232,7 @@ export function ChangelogButton() {
                               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                               className="mb-5 flex items-center justify-center px-4 py-3 text-center"
                               style={{
-                                backgroundColor: 'color-mix(in srgb, var(--t-danger) 16%, transparent)',
-                                boxShadow: '0 0 26px color-mix(in srgb, var(--t-danger) 28%, transparent)',
+                                backgroundColor: 'color-mix(in srgb, var(--t-danger) 18%, transparent)',
                                 borderRadius: 3,
                               }}
                             >

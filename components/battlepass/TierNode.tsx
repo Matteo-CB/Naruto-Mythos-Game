@@ -162,9 +162,7 @@ export function TierNode({ tier, xpRequired, reward, reached, isCurrent, fillRat
               left: '-14%',
               bottom: '-10%',
               objectFit: 'contain',
-              filter: reached
-                ? `drop-shadow(0 4px 10px var(--t-shadow)) drop-shadow(0 0 10px ${accentAlpha(45)})`
-                : 'grayscale(0.6) brightness(0.8) drop-shadow(0 3px 8px var(--t-shadow))',
+              filter: reached ? 'none' : 'grayscale(0.6) brightness(0.8)',
               zIndex: 3,
             }}
           />

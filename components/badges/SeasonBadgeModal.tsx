@@ -35,7 +35,7 @@ export function SeasonBadgeModal({ seasonId, badge, rank, onClose }: SeasonBadge
           transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
           onClick={(e) => e.stopPropagation()}
           className="flex flex-col items-center gap-4 p-7 text-center"
-          style={{ backgroundColor: 'var(--t-panel)', boxShadow: '0 24px 60px var(--t-shadow)', maxWidth: 380 }}
+          style={{ backgroundColor: 'var(--t-panel)', maxWidth: 380 }}
         >
           <Image src={imageDuBadge(seasonId ?? '', badge)} alt={titre} width={120} height={120} unoptimized />
 

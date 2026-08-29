@@ -36,7 +36,6 @@ export function LeagueBadge({ league, size = 'md', showLabel = false }: LeagueBa
         height={cote}
         unoptimized
         className="shrink-0"
-        style={{ filter: `drop-shadow(0 0 5px ${palier.color}22)` }}
       />
       {showLabel && (
         <span className="font-display text-[10px] uppercase tracking-widest" style={{ color: palier.color }}>
