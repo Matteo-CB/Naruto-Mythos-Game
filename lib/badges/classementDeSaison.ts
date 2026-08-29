@@ -1,5 +1,5 @@
 import { badgePourLeRang } from './saisonBadges';
-import { getPlayerLeague } from '@/lib/tournament/leagueUtils';
+import { aDesDivisions, echelleDeLaSaison, rangDeLigue, type PalierDeLigue } from '@/lib/leagues/paliers';
 
 export const PARTIES_DE_PLACEMENT = 5;
 
@@ -25,6 +25,7 @@ export interface LigneDeClassement {
   countryCode: string | null;
   badge: string | null;
   league: string;
+  leagueLevel: number | null;
 }
 
 export function partiesJouees(j: JoueurClassable): number {
@@ -38,6 +39,7 @@ export function estClasse(j: JoueurClassable, minimum = PARTIES_DE_PLACEMENT): b
 export function classementDeSaison(
   joueurs: readonly JoueurClassable[],
   minimum = PARTIES_DE_PLACEMENT,
+  echelle: readonly PalierDeLigue[] = echelleDeLaSaison('KS'),
 ): LigneDeClassement[] {
   const retenus = joueurs.filter((j) => estClasse(j, minimum));
   retenus.sort((a, b) =>
@@ -45,8 +47,10 @@ export function classementDeSaison(
     || (b.wins - a.wins)
     || (partiesJouees(b) - partiesJouees(a))
     || a.username.localeCompare(b.username));
+  const divisions = aDesDivisions(echelle);
   return retenus.map((j, i) => {
     const rank = i + 1;
+    const rang = rangDeLigue(j.elo, echelle);
     return {
       userId: j.id,
       username: j.username,
@@ -58,7 +62,8 @@ export function classementDeSaison(
       games: partiesJouees(j),
       countryCode: j.countryCode ?? null,
       badge: badgePourLeRang(rank),
-      league: getPlayerLeague(j.elo),
+      league: rang.key,
+      leagueLevel: divisions ? rang.niveau : null,
     };
   });
 }

@@ -853,7 +853,8 @@
     "deckPublic": "Pubblico",
     "deckPrivate": "Privato",
     "deckPublicHint": "Visibile a tutti",
-    "deckPrivateHint": "Visibile solo a te"
+    "deckPrivateHint": "Visibile solo a te",
+    "rankDivision": "{name} {level}"
   },
   "friends": {
     "title": "Amici",

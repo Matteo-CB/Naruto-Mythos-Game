@@ -11,7 +11,7 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import { FriendshipButton } from '@/components/social/FriendshipButton';
 import { ProfileModerationActions } from '@/components/social/ProfileModerationActions';
-import { getRankTier, PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
+import { getRankTier, rankDivisionLabel, PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
 import { UserBadges } from '@/components/badges/UserBadges';
 import { CountryFlag } from '@/components/CountryFlag';
 import { EloHistoryChart } from '@/components/EloHistoryChart';
@@ -475,7 +475,7 @@ export default function ProfilePage({
               }}
             >
               {leaguesEnabled && displayedPlaced && displayedTier
-                ? t(`rankNames.${displayedTier.key}`)
+                ? t('rankDivision', { name: t(`rankNames.${displayedTier.key}`), level: rankDivisionLabel(displayedElo) })
                 : leaguesEnabled
                   ? t('rankNames.unranked')
                   : '...'}

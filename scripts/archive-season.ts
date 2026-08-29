@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
 import { PrismaClient } from '@prisma/client';
 import { classementDeSaison, PARTIES_DE_PLACEMENT } from '@/lib/badges/classementDeSaison';
+import { echelleDeLaSaison } from '@/lib/leagues/paliers';
 import { PALIERS_DE_BADGE, SAISON_ARCHIVEE } from '@/lib/badges/saisonBadges';
 
 const env = readFileSync('.env', 'utf8');
@@ -22,7 +23,7 @@ async function main() {
   const joueurs = await prisma.user.findMany({
     select: { id: true, username: true, elo: true, wins: true, losses: true, draws: true, countryCode: true },
   });
-  const classement = classementDeSaison(joueurs, MINIMUM);
+  const classement = classementDeSaison(joueurs, MINIMUM, echelleDeLaSaison(SAISON));
   const deja = await prisma.seasonRanking.count({ where: { seasonId: SAISON } });
 
   console.log(APPLIQUER ? `=== ARCHIVAGE DE LA SAISON ${SAISON} ===` : `=== SIMULATION saison ${SAISON}, rien ecrit ===`);
@@ -70,6 +71,7 @@ async function main() {
         countryCode: l.countryCode,
         badge: l.badge,
         league: l.league,
+        leagueLevel: l.leagueLevel,
       },
     });
     ecrites++;

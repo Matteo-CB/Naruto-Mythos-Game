@@ -847,6 +847,7 @@ model SeasonRanking {
   countryCode String?
   badge       String?
   league      String?
+  leagueLevel Int?
   archivedAt  DateTime @default(now())
 
   @@unique([seasonId, userId])

@@ -2327,7 +2327,8 @@
     "deckPublic": "Public",
     "deckPrivate": "Privé",
     "deckPublicHint": "Visible par tous",
-    "deckPrivateHint": "Visible par toi seul"
+    "deckPrivateHint": "Visible par toi seul",
+    "rankDivision": "{name} {level}"
   },
   "replay": {
     "title": "Récapitulatif",

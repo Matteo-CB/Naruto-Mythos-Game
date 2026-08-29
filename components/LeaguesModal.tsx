@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { RANK_TIERS, PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
+import { LIGUES, niveauRomain } from '@/lib/leagues/paliers';
 
 interface LeaguesModalProps {
   open: boolean;
@@ -129,6 +130,16 @@ export function LeaguesModal({ open, onClose }: LeaguesModalProps) {
                         style={{ color: 'var(--t-dim)' }}
                       >
                         {eloRange} ELO
+                      </span>
+                      <span
+                        className="font-inter-force text-[10px] tabular-nums flex flex-wrap gap-x-3"
+                        style={{ color: 'var(--t-muted)' }}
+                      >
+                        {(LIGUES.find((l) => l.key === tier.key)?.seuils ?? []).map((seuil, n) => (
+                          <span key={seuil}>
+                            {tp('rankDivision', { name: '', level: niveauRomain(n + 1) }).trim()} {seuil}
+                          </span>
+                        ))}
                       </span>
                     </div>
                   </motion.div>

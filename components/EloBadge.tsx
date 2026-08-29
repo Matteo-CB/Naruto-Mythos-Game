@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { LIGUES, rangDeLigue, niveauRomain, seuilDEntree } from '@/lib/leagues/paliers';
 
 export const PLACEMENT_MATCHES_REQUIRED = 5;
 
@@ -30,7 +31,7 @@ export interface RankTier {
 export const RANK_TIERS: RankTier[] = [
   {
     key: 'academyStudent',
-    minElo: 0,
+    minElo: seuilDEntree('academyStudent'),
     color: 'var(--t-muted)',
     bgColor: 'rgba(136, 136, 136, 0.08)',
     borderColor: 'rgba(136, 136, 136, 0.25)',
@@ -40,7 +41,7 @@ export const RANK_TIERS: RankTier[] = [
   },
   {
     key: 'genin',
-    minElo: 450,
+    minElo: seuilDEntree('genin'),
     color: 'var(--t-success)',
     bgColor: 'rgba(62, 139, 62, 0.08)',
     borderColor: 'rgba(62, 139, 62, 0.3)',
@@ -50,7 +51,7 @@ export const RANK_TIERS: RankTier[] = [
   },
   {
     key: 'chunin',
-    minElo: 550,
+    minElo: seuilDEntree('chunin'),
     color: '#B37E3E',
     bgColor: 'rgba(179, 126, 62, 0.08)',
     borderColor: 'rgba(179, 126, 62, 0.3)',
@@ -60,7 +61,7 @@ export const RANK_TIERS: RankTier[] = [
   },
   {
     key: 'specialJonin',
-    minElo: 700,
+    minElo: seuilDEntree('specialJonin'),
     color: '#5A7ABB',
     bgColor: 'rgba(90, 122, 187, 0.08)',
     borderColor: 'rgba(90, 122, 187, 0.3)',
@@ -70,7 +71,7 @@ export const RANK_TIERS: RankTier[] = [
   },
   {
     key: 'eliteJonin',
-    minElo: 1000,
+    minElo: seuilDEntree('eliteJonin'),
     color: '#5865F2',
     bgColor: 'rgba(88, 101, 242, 0.08)',
     borderColor: 'rgba(88, 101, 242, 0.3)',
@@ -80,7 +81,7 @@ export const RANK_TIERS: RankTier[] = [
   },
   {
     key: 'legendarySannin',
-    minElo: 1200,
+    minElo: seuilDEntree('legendarySannin'),
     color: '#9B59B6',
     bgColor: 'rgba(155, 89, 182, 0.1)',
     borderColor: 'rgba(155, 89, 182, 0.35)',
@@ -90,7 +91,7 @@ export const RANK_TIERS: RankTier[] = [
   },
   {
     key: 'kage',
-    minElo: 1700,
+    minElo: seuilDEntree('kage'),
     color: 'var(--t-accent)',
     bgColor: 'var(--t-accent-glow)',
     borderColor: 'rgba(196, 163, 90, 0.4)',
@@ -100,7 +101,7 @@ export const RANK_TIERS: RankTier[] = [
   },
   {
     key: 'sageOfSixPaths',
-    minElo: 2000,
+    minElo: seuilDEntree('sageOfSixPaths'),
     color: '#FFD700',
     bgColor: 'rgba(255, 215, 0, 0.1)',
     borderColor: 'rgba(255, 215, 0, 0.5)',
@@ -110,7 +111,7 @@ export const RANK_TIERS: RankTier[] = [
   },
   {
     key: 'willOfFire',
-    minElo: 2500,
+    minElo: seuilDEntree('willOfFire'),
     color: '#FF6B35',
     bgColor: 'rgba(255, 107, 53, 0.12)',
     borderColor: 'rgba(255, 107, 53, 0.6)',
@@ -121,12 +122,19 @@ export const RANK_TIERS: RankTier[] = [
 ];
 
 export function getRankTier(elo: number): RankTier {
-  let matched = RANK_TIERS[0];
-  for (const tier of RANK_TIERS) {
-    if (elo >= tier.minElo) matched = tier;
-  }
-  return matched;
+  const rang = rangDeLigue(elo);
+  return RANK_TIERS.find((t) => t.key === rang.key) ?? RANK_TIERS[0];
 }
+
+export function getRankDivision(elo: number): number {
+  return rangDeLigue(elo).niveau;
+}
+
+export function rankDivisionLabel(elo: number): string {
+  return niveauRomain(rangDeLigue(elo).niveau);
+}
+
+export const LIGUES_AFFICHEES = LIGUES;
 
 export function EloBadge({ elo, size = 'md', showElo = true, totalGames }: EloBadgeProps) {
   const t = useTranslations('profile');
@@ -186,7 +194,7 @@ export function EloBadge({ elo, size = 'md', showElo = true, totalGames }: EloBa
           lineHeight: 1,
         }}
       >
-        {unranked ? t('rankNames.unranked') : t(`rankNames.${tier.key}`)}
+        {unranked ? t('rankNames.unranked') : t('rankDivision', { name: t(`rankNames.${tier.key}`), level: rankDivisionLabel(elo) })}
       </span>
       {showElo && (
         <span
@@ -269,7 +277,7 @@ export function EloBadgeLarge({ elo, totalGames }: { elo: number; totalGames?: n
           lineHeight: 1,
         }}
       >
-        {unranked ? t('rankNames.unranked') : t(`rankNames.${tier.key}`)}
+        {unranked ? t('rankNames.unranked') : t('rankDivision', { name: t(`rankNames.${tier.key}`), level: rankDivisionLabel(elo) })}
       </span>
 
       <span
