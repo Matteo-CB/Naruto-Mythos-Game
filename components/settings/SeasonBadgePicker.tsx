@@ -18,7 +18,7 @@ interface BadgeDeRecompense {
   badge: string;
 }
 
-export function SeasonBadgePicker({ username, disabled }: { username: string | null; disabled?: boolean }) {
+export function SeasonBadgePicker({ disabled }: { disabled?: boolean }) {
   const t = useTranslations('seasonBadges');
   const locale = useLocale();
   const selectedSeasonBadge = useSettingsStore((s) => s.selectedSeasonBadge);
@@ -28,9 +28,8 @@ export function SeasonBadgePicker({ username, disabled }: { username: string | n
   const [charge, setCharge] = useState(false);
 
   useEffect(() => {
-    if (!username) return;
     let annule = false;
-    fetch(`/api/profile/${encodeURIComponent(username)}`)
+    fetch('/api/user/badges')
       .then((r) => (r.ok ? r.json() : null))
       .then((d: { seasonBadges?: BadgeGagne[]; awardBadges?: BadgeDeRecompense[] } | null) => {
         if (annule) return;
@@ -40,7 +39,7 @@ export function SeasonBadgePicker({ username, disabled }: { username: string | n
       })
       .catch(() => { if (!annule) setCharge(true); });
     return () => { annule = true; };
-  }, [username]);
+  }, []);
 
   if (charge && gagnes.length === 0 && recompenses.length === 0) {
     return (

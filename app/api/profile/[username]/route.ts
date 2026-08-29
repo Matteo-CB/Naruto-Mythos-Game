@@ -33,6 +33,7 @@ export async function GET(
       select: {
         id: true,
         username: true,
+        email: true,
         countryCode: true,
         selectedSeasonBadge: true,
         elo: true,

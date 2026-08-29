@@ -70,9 +70,11 @@ export function SeasonBadgesPanel({ badges, recompenses = [] }: SeasonBadgesPane
               )}
               {b.league && <LeagueBadge league={b.league} size="lg" showLabel />}
               <span className="flex flex-col leading-tight">
-                <span className="font-display text-[10px] uppercase tracking-widest tabular-nums" style={{ color: 'var(--t-dim)' }}>
-                  {t('rank', { rank: b.rank })}
-                </span>
+                {b.rank > 0 && (
+                  <span className="font-display text-[10px] uppercase tracking-widest tabular-nums" style={{ color: 'var(--t-dim)' }}>
+                    {t('rank', { rank: b.rank })}
+                  </span>
+                )}
                 <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
                   {getSetName(b.seasonId, locale)}
                 </span>

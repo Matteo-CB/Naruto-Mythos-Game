@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { COUNTRY_CODES } from '@/lib/data/countries';
 import { parseBadgeChoisi } from '@/lib/badges/badgeChoisi';
+import { isAdmin } from '@/lib/auth/admins';
 import { refreshChatLock } from '@/lib/socket/chatLockBridge';
 import { normalizeChatVisibility } from '@/lib/chat/chatRules';
 import { validateStoredBoardPalette } from '@/lib/game/boardPalette';
@@ -119,7 +120,12 @@ export async function PATCH(request: NextRequest) {
     } else if (typeof body.selectedSeasonBadge === 'string') {
       const choix = parseBadgeChoisi(body.selectedSeasonBadge);
       if (choix) {
-        const possede = choix.seasonId
+        const compte = await prisma.user.findUnique({
+          where: { id: session.user.id },
+          select: { username: true, email: true },
+        });
+        const estAdministrateur = !!compte && isAdmin({ username: compte.username, email: compte.email ?? '' });
+        const possede = estAdministrateur ? { id: 'admin' } : choix.seasonId
           ? await prisma.seasonRanking.findFirst({
               where: { userId: session.user.id, seasonId: choix.seasonId, badge: choix.badge },
               select: { id: true },

@@ -444,7 +444,7 @@ export default function SettingsPage() {
             <span className="text-sm font-medium tracking-wide" style={{ color: isLoaded ? 'var(--t-text)' : 'var(--t-dim)' }}>
               {tBadge('pickerLabel')}
             </span>
-            <SeasonBadgePicker username={session?.user?.name ?? null} disabled={!isLoaded} />
+            <SeasonBadgePicker disabled={!isLoaded} />
             <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>
               {tBadge('pickerHint')}
             </p>
