@@ -180,8 +180,6 @@ async function upsertQuestProgress(
   return { questId: quest.id, newProgress, completedNow };
 }
 
-// Une quete distincte se mesure en sources differentes: on retient les sources vues et la
-// progression vaut la taille de l ensemble. Rejouer la meme source ne fait pas avancer.
 async function upsertQueteDistincte(
   userId: string,
   quest: Quest,

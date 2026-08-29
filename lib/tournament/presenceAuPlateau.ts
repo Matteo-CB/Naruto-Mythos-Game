@@ -1,7 +1,3 @@
-// Qui a agi dans la partie d un match de tournoi. Une partie annulee efface la salle, les
-// sockets et la liste des joueurs prets: sans cette memoire, le joueur qui etait bel et bien
-// au plateau devient indistinguable de celui qui n est jamais venu, et c est lui que le
-// forfait d absence frappe.
 
 const agissants = new Map<string, Set<string>>();
 

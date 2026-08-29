@@ -18,8 +18,6 @@ export interface ResumeDeDeck {
   names: string[];
 }
 
-// Ce qu une quete peut demander d un deck: de quel set il vient, combien de cartes en
-// viennent, s il porte un equipement, s il tient a un seul village.
 export function resumerLeDeck(
   cartes: ReadonlyArray<CarteDeDeck>,
   setVise?: string,
@@ -54,8 +52,6 @@ export function resumerLeDeck(
   };
 }
 
-// Le nombre de cartes du set le mieux represente, pour les quetes qui demandent « au moins
-// N cartes du set 2 » sans exiger un deck entier.
 export function compteParSet(cartes: ReadonlyArray<CarteDeDeck>): Record<string, number> {
   const comptes: Record<string, number> = {};
   for (const c of cartes) {

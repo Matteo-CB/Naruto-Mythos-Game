@@ -28,8 +28,6 @@ export function setDe(cardId: string | undefined | null): string | null {
   return m ? m[1] : null;
 }
 
-// Un signal qui nomme sa carte source porte toujours son set et son numero imprime, sans
-// que chaque site d appel ait a les recalculer.
 function enrichirDeLaSource(payload: QuestEventPayload): QuestEventPayload {
   const cardId = typeof payload.sourceCardId === 'string' ? payload.sourceCardId : null;
   if (!cardId) return payload;
@@ -55,9 +53,6 @@ export function emitEngineQuestEvent(
   emitQuestEvent(hook, userId, enrichirDeLaSource({ gameMode: mode, matchKey, ...(payload ?? {}) }));
 }
 
-// Les seuils que les quetes citent reellement, lus une fois dans le catalogue. Emettre a
-// chaque valeur serait du bruit, et coder un seuil en dur rendrait toute nouvelle quete
-// muette.
 function seuilsDuCatalogue(hook: string, cles: string[]): number[] {
   const valeurs = new Set<number>();
   for (const q of QUESTS) {

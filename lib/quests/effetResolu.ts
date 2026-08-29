@@ -1,9 +1,6 @@
 import type { GameState, PlayerID } from '@/lib/engine/types';
 import { emitEngineQuestEvent } from './engineEmit';
 
-// Un effet resolu annonce toujours le meme fait: quelle carte, de quel set, quel numero
-// imprime, sur quelle mission et a quelle manche. La couche quete en tire le reste.
-
 const CROCHET_PAR_EFFET: Readonly<Record<string, string>> = {
   DUEL: 'duel.triggered.with.source',
   FIRST_STRIKE: 'first_strike.used.with.source',
@@ -41,9 +38,6 @@ export function equipementsDeLaMission(state: GameState, missionIndex: number | 
   return numeros;
 }
 
-// Un DUEL continu ne se resout jamais comme un effet instantane, il est simplement actif
-// des que son partenaire est la. Pour le joueur c est bien « declencher le DUEL », donc il
-// est annonce a la pose de la carte quand la condition est remplie.
 export function annoncerDuelContinu(
   state: GameState,
   player: PlayerID,

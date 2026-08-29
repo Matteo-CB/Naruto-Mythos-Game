@@ -49,9 +49,6 @@ async function main() {
   });
   console.log('progressions remises a zero          :', remise.count);
 
-  // Les quetes de la saison archivee gardent leur progression et leur reclamation: elles
-  // appartiennent a une saison close, et le joueur doit pouvoir les consulter.
-
   let offerts = 0;
   for (const joueur of joueurs) {
     for (const { setId, quantite } of BOOSTERS_A_OFFRIR) {

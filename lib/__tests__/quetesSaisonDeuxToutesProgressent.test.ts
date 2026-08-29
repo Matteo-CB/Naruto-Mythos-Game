@@ -44,15 +44,12 @@ function carteNumerotee(n: number, type: string, effet?: string): CarteBrute | u
     && (!effet || (c.effects ?? []).some((e) => e.type === effet)));
 }
 
-// Des cartes reelles du set, choisies pour couvrir chaque condition d ATTACH: village,
-// mot cle, camp. Les identifiants sont verifies au demarrage du banc.
 const ROSTER_AMI = [
   'SS-030-C', 'SS-046-UC', 'SS-003-C', 'SS-053-C', 'SS-052-C',
   'SS-020-C', 'SS-116-R', 'SS-005-C', 'SS-023-C',
 ];
 const ROSTER_ENNEMI = ['SS-014-C', 'SS-009-C', 'SS-041-UC', 'SS-032-C'];
 
-// Les missions du set 2, pour que le decompte annonce bien un set SS.
 const MISSIONS_SS = duSet.filter((c) => c.card_type === 'mission')
   .filter((c, i, l) => l.findIndex((x) => numero(x.id) === numero(c.id)) === i)
   .map((c) => c.id);
@@ -110,8 +107,6 @@ function repondreTout(depart: GameState, prendreLeDernier = false): GameState {
   return courant;
 }
 
-// Fait tourner la partie jusqu a ce que toutes les missions soient decomptees, en jouant
-// toujours celui dont c est le tour et en repondant a chaque question.
 function passerJusquAuDecompte(depart: GameState, tours = 24): GameState {
   let courant = depart;
   for (let i = 0; i < tours; i += 1) {
@@ -144,8 +139,6 @@ function jouerLaPremiereCarte(depart: GameState, missionIndex = 0, prendreLeDern
   }
 }
 
-// Enchaine plusieurs cartes de la main en rendant la main a l adversaire entre deux, et en
-// variant le choix pour ne pas reposer chaque equipement sur le meme porteur.
 function enchainer(depart: GameState, missions: number[], prendreLeDernier = false): GameState {
   let courant = depart;
   for (const missionIndex of missions) {
@@ -265,7 +258,6 @@ describe('chaque quete de Shinobi Shiren progresse pour de vrai', () => {
         && ((c.name_fr ?? '').toUpperCase().includes(nom.toUpperCase())
           || (c.name_en ?? '').toUpperCase().includes(nom.toUpperCase())));
     };
-    // Une seule partie, une seule manche: on enchaine tous les DUELS jouables d affilee.
     const adversaires = duels.map(partenaireDe).filter((c): c is CarteBrute => !!c);
     let etat = plateau({
       p1: ROSTER_AMI,
@@ -332,8 +324,6 @@ describe('chaque quete de Shinobi Shiren progresse pour de vrai', () => {
       const etat = plateau({
         p1: ROSTER_AMI, p2: ROSTER_ENNEMI, main: [carte.id], missions: 4,
       });
-      // La meme garnison sur deux missions: une carte dont le nom se heurte a la premiere
-      // trouve une place sur la seconde, sans perdre son partenaire de DUEL.
       etat.activeMissions[1] = {
         ...etat.activeMissions[1],
         player1Characters: ROSTER_AMI.map((id, i) => simChar(id, { owner: 'player1', instanceId: `m1_p1_${i}` })),
@@ -387,11 +377,9 @@ describe('chaque quete de Shinobi Shiren progresse pour de vrai', () => {
       const distinctes = new Map<number, QuestEventPayload>();
       for (const c of charges) distinctes.set(Number(c.sourceNumber), c);
       const lot = [...distinctes.values()];
-      // Une meme partie, une meme manche: les faits s additionnent et se reunissent.
       for (const charge of lot) {
         enregistrer(hook, 'agregat', { ...charge, matchKey: 'partie-agregat', round: 1 });
       }
-      // Puis une manche par tour, pour couvrir « a chacune des quatre manches ».
       for (let manche = 1; manche <= 4; manche += 1) {
         for (const charge of lot.slice(0, 3)) {
           enregistrer(hook, 'agregat-manches', { ...charge, matchKey: 'partie-manches', round: manche });
@@ -402,47 +390,37 @@ describe('chaque quete de Shinobi Shiren progresse pour de vrai', () => {
   });
 
   it('les situations scriptees couvrent ce qu un plateau generique ne produit pas', () => {
-    // GAARA 078 face a KIMIMARO: son DUEL abat un ennemi a 2 de cout ou moins.
     for (const dernier of [false, true]) {
       jouerLaPremiereCarte(plateau({
         p1: [], p2: ['SS-031-UC', 'SS-003-C'], main: ['SS-078-UC'], missions: 2,
       }), 0, dernier);
     }
 
-    // ITACHI 137 face a KURENAI: l adversaire doit abattre un des siens.
     for (const dernier of [false, true]) {
       jouerLaPremiereCarte(plateau({
         p1: ['SS-003-C'], p2: ['SS-018-UC', 'SS-005-C'], main: ['SS-137-R'], missions: 2,
       }), 0, dernier);
     }
 
-    // TEMARI 119 face a SHIKAMARU: son MAIN doit deplacer un AUTRE ennemi pour que le DUEL
-    // trouve encore son partenaire au moment ou il se resout.
     for (const dernier of [false, true]) {
       jouerLaPremiereCarte(plateau({
         p1: [], p2: ['SS-118-R', 'SS-009-C', 'SS-003-C'], main: ['SS-119-R'], missions: 3,
       }), 0, dernier);
     }
 
-    // ROCK LEE 115 aupres de GAARA: son DUEL continu devient actif.
     jouerLaPremiereCarte(plateau({ p1: ['SS-046-UC'], main: ['SS-115-R'], missions: 2 }));
 
-    // KIBA 014 en premiere frappe devoile puis abat un ennemi cache.
     {
       let etat = plateau({ p1: [], p2: ['SS-003-C'], main: ['SS-014-C'], missions: 2 });
       etat.activeMissions[0].player2Characters[0].isHidden = true;
       jouerLaPremiereCarte(etat);
     }
 
-    // LES DEUX PARCHEMINS sur la meme mission, puis trois equipements a la fois.
     {
       let etat = plateau({
         p1: ['SS-003-C', 'SS-005-C'], missions: 2, missionIds: MISSIONS_SS,
         main: ['SS-096-UC', 'SS-097-UC'],
       });
-      // Chaque parchemin sur un porteur different: le premier choix, puis le dernier. Une
-      // troisieme carte remplacerait l un des deux, la regle n autorisant qu un equipement
-      // par porteur et par joueur.
       etat = jouerLaPremiereCarte(etat, 0, false);
       try { etat = GameEngine.applyAction(etat, 'player2', { type: 'PASS' } as never); } catch { /* ignore */ }
       etat = jouerLaPremiereCarte(etat, 0, true);
@@ -450,7 +428,6 @@ describe('chaque quete de Shinobi Shiren progresse pour de vrai', () => {
       passerJusquAuDecompte(etat);
     }
 
-    // UN EQUIPEMENT DE MISSION sur chacune des quatre missions.
     {
       let etat = plateau({
         p1: ['SS-003-C'], missions: 4, missionIds: MISSIONS_SS,
@@ -459,13 +436,11 @@ describe('chaque quete de Shinobi Shiren progresse pour de vrai', () => {
       etat = enchainer(etat, [0, 1, 2, 3]);
     }
 
-    // LE PARADIS DU BATIFOLAGE fait sauter l equipement deja pose.
     {
       let etat = plateau({ p1: ['SS-003-C'], missions: 2, main: ['SS-100-C', 'SS-088-UC'] });
       etat = enchainer(etat, [0, 0]);
     }
 
-    // LES AIGUILLES EMPOISONNEES revelees vident les jetons de leur porteur.
     {
       let etat = plateau({ p1: ['SS-003-C'], p2: ['SS-005-C'], missions: 2, main: ['SS-084-C'] });
       etat.activeMissions[0].player2Characters[0].powerTokens = 5;
@@ -480,13 +455,11 @@ describe('chaque quete de Shinobi Shiren progresse pour de vrai', () => {
       } catch { /* la revelation refusee ne doit pas arreter le banc */ }
     }
 
-    // UN DUEL declenche sous le STADE D EXAMEN 108.
     {
       let etat = plateau({ p1: [], p2: ['SS-111-R'], missions: 2, missionIds: MISSIONS_SS, main: ['SS-108-C', 'SS-112-R'] });
       etat = enchainer(etat, [0, 0]);
     }
 
-    // LES MISSIONS remportees sous un equipement de mission, et les quatre d une manche.
     for (const equipement of ['SS-107-C', 'SS-103-UC', 'SS-106-C']) {
       let etat = plateau({ p1: ['SS-116-R'], missions: 1, missionIds: MISSIONS_SS, main: [equipement] });
       etat.player1.missionPoints = 18;
@@ -503,8 +476,6 @@ describe('chaque quete de Shinobi Shiren progresse pour de vrai', () => {
         etat.activeMissions[i].player1Characters[0].missionIndex = i;
       }
       etat.player1.missionPoints = 26;
-      // Les missions entrent en jeu une par manche: a la quatrieme, les quatre sont la et se
-      // decomptent dans la meme manche.
       const enDerniereManche = { ...etat, turn: 4 as GameState['turn'] };
       passerJusquAuDecompte(enDerniereManche);
     }
@@ -512,8 +483,6 @@ describe('chaque quete de Shinobi Shiren progresse pour de vrai', () => {
   });
 
   it('les situations a deux camps sont montees directement sur le plateau', () => {
-    // LE PARADIS DU BATIFOLAGE fait sauter l equipement de l ADVERSAIRE pose sur le meme
-    // porteur: le sien serait simplement remplace, la regle n en autorisant qu un par camp.
     {
       const etat = plateau({ p1: ['SS-003-C'], missions: 2, main: ['SS-088-UC'] });
       const hote = etat.activeMissions[0].player1Characters[0];
@@ -525,7 +494,6 @@ describe('chaque quete de Shinobi Shiren progresse pour de vrai', () => {
       jouerLaPremiereCarte(etat, 0);
     }
 
-    // LES AIGUILLES EMPOISONNEES jouees face cachee puis revelees vident leur porteur.
     {
       let etat = plateau({ p1: ['SS-003-C'], p2: ['SS-005-C'], missions: 2, main: ['SS-084-C'] });
       etat.activeMissions[0].player2Characters[0].powerTokens = 6;
@@ -541,7 +509,6 @@ describe('chaque quete de Shinobi Shiren progresse pour de vrai', () => {
       } catch { /* une revelation refusee ne doit pas arreter le banc */ }
     }
 
-    // UN EQUIPEMENT VOLE, repose du cote du voleur.
     {
       const etat = plateau({ p1: ['SS-003-C'], p2: ['SS-005-C'], missions: 2 });
       const cible = etat.activeMissions[0].player2Characters[0];
@@ -551,7 +518,6 @@ describe('chaque quete de Shinobi Shiren progresse pour de vrai', () => {
       );
     }
 
-    // ITACHI 137 face a KURENAI, l adversaire ayant de quoi choisir une victime.
     for (const dernier of [false, true]) {
       const etat = plateau({
         p1: ['SS-003-C'], p2: ['SS-018-UC', 'SS-005-C', 'SS-009-C'],
@@ -560,10 +526,8 @@ describe('chaque quete de Shinobi Shiren progresse pour de vrai', () => {
       jouerLaPremiereCarte(etat, 0, dernier);
     }
 
-    // QUATRE MISSIONS remportees dans la meme manche, par la vraie phase de decompte.
     {
       const etat = plateau({ p1: ['SS-116-R'], missions: 4, missionIds: MISSIONS_SS });
-      // Les quatre rangs de la derniere manche: le decompte suit D, C, B puis A.
       const rangs = ['D', 'C', 'B', 'A'] as const;
       for (let i = 0; i < 4; i += 1) {
         etat.activeMissions[i] = {

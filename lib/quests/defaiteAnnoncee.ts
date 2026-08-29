@@ -2,8 +2,6 @@ import type { CharacterInPlay, GameState, PlayerID } from '@/lib/engine/types';
 import { emitEngineQuestEvent } from './engineEmit';
 import { champsDeLaSource, sourceCourante } from './sourceCourante';
 
-// Le moteur possede plusieurs chemins de defaite. Ils annoncent tous le meme fait par ici,
-// sinon une carte vaincue par l un compterait et par l autre non, sans que rien ne le dise.
 export function annoncerDefaite(
   state: GameState,
   sourcePlayer: PlayerID,
@@ -19,8 +17,6 @@ export function annoncerDefaite(
   emitEngineQuestEvent(state, sourcePlayer, 'character.defeated.by.name', {
     name: sommet.name_fr,
   });
-  // La defaite par carte revient a celui qui a pose la carte, meme quand c est l adversaire
-  // qui designe la victime.
   const source = sourceCourante();
   emitEngineQuestEvent(state, source?.player ?? sourcePlayer, 'character.defeated.by.card', {
     ...champsDeLaSource(),

@@ -66,8 +66,6 @@ async function cartesDuDeckDuVainqueur(tournamentId: string, winnerUserId: strin
   }
 }
 
-// Ce que les quetes de tournoi demandent du deck du vainqueur: son set, ses numeros, la
-// presence d un equipement, et s il a traverse le tournoi sans defaite.
 async function faitsDuTournoi(tournamentId: string, winnerUserId: string): Promise<Record<string, unknown>> {
   const cardIds = await cartesDuDeckDuVainqueur(tournamentId, winnerUserId);
   const cartes = cardIds.map((id) => getCardById(id)).filter((c): c is NonNullable<typeof c> => !!c);
@@ -125,7 +123,6 @@ async function isWinnerDeckMonoVillage(tournamentId: string, winnerUserId: strin
   }
 }
 
-
 const swissRoundLocks = new Map<string, Promise<void>>();
 const matchReadyLocks = new Map<string, Promise<void>>();
 
@@ -158,7 +155,6 @@ async function withMatchReadyLock<T>(matchId: string, fn: () => Promise<T>): Pro
     release();
   }
 }
-
 
 export function cleanupTournamentMapsByIds(tournamentId: string, matchIds: readonly string[]): void {
   for (const matchId of matchIds) {
@@ -790,15 +786,11 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
       const otherPlayerId = match.player1Id === userId ? match.player2Id : match.player1Id;
       if (!otherPlayerId || !match.player1Id || !match.player2Id) return;
 
-
-
-
       const dbSaysOtherWasReady = match.absentPlayerId === userId;
       const memorySaysBothReady = ready.size >= 2;
       const bothReady = memorySaysBothReady || dbSaysOtherWasReady;
 
       if (!bothReady) {
-
 
         const alreadyWaitingForOther = match.absentPlayerId === otherPlayerId;
         if (!alreadyWaitingForOther) {
@@ -980,7 +972,6 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
   });
 
 }
-
 
 const STUCK_MATCH_HARD_TIMEOUT_MS = 35 * 60_000;
 const STUCK_MATCH_NO_PROGRESS_MS = 10 * 60_000;
@@ -1196,7 +1187,6 @@ export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
     console.error('[Tournament] sweepOrphanTournamentMatches error:', err);
   }
 }
-
 
 export const STARTUP_REHYDRATE_GRACE_MS = 90_000;
 
@@ -1416,7 +1406,6 @@ export async function handleMatchForfeit(io: Server, tournamentId: string, match
     finalizeAndScheduleRoomDeletion(rooms, match.roomCode);
   }
 
-
   const tournament = await prisma.tournament.findUnique({ where: { id: tournamentId }, select: { format: true } });
   const isSwiss = tournament?.format === 'swiss';
   const isDoubleElim = tournament?.format === 'double_elimination';
@@ -1582,7 +1571,6 @@ export async function handleTournamentMatchEnd(io: Server, tournamentId: string,
       loserId: loserId ?? null,
     });
 
-
     const tournament = await prisma.tournament.findUnique({ where: { id: tournamentId }, select: { format: true } });
     const isSwiss = tournament?.format === 'swiss';
     const isDoubleElim = tournament?.format === 'double_elimination';
@@ -1613,10 +1601,6 @@ export async function handleTournamentMatchEnd(io: Server, tournamentId: string,
   }
 }
 
-
-
-
-
 export async function handleSwissMatchEnd(
   io: Server,
   tournamentId: string,
@@ -1636,7 +1620,6 @@ export async function handleSwissMatchEnd(
     io.to(`tournament:${tournamentId}`).emit('tournament:standings-updated', { standings });
     return;
   }
-
 
   const lockKey = `${tournamentId}:${match.round}`;
   return withSwissRoundLock(lockKey, async () => {
@@ -1905,10 +1888,6 @@ export async function handleSwissMatchEnd(
   });
 }
 
-
-
-
-
 function buildSwissData(
   participants: Array<{ userId: string; username: string; seed: number | null }>,
   matches: Array<{
@@ -1953,10 +1932,6 @@ async function buildCurrentStandings(tournamentId: string) {
   const { swissPlayers, swissResults } = buildSwissData(tournament.participants, tournament.matches);
   return computeStandings(swissPlayers, swissResults);
 }
-
-
-
-
 
 export async function annulerResultatPerimeDuMatchSuivant(
   tournamentId: string,
@@ -2047,9 +2022,6 @@ export async function advanceMatchWinner(
   });
 
   if (!nextMatch) {
-
-
-
 
     const tournamentMeta = await prisma.tournament.findUnique({
       where: { id: tournamentId },

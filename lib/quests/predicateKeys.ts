@@ -3,8 +3,6 @@ import type { QuestEventPayload } from './hooks';
 export const CLES_SEUIL_GTE: ReadonlySet<string> = new Set(['streak', 'threshold', 'minPrinted', 'depth', 'tier', 'power', 'tokens']);
 export const CLES_SEUIL_LTE: ReadonlySet<string> = new Set(['maxRound']);
 
-// Les faits de fin de partie, compares au signal de resume. Le suffixe dit le sens de la
-// comparaison, pour qu une quete se lise sans avoir a ouvrir le filtre.
 export const CLES_AU_MOINS: ReadonlyMap<string, string> = new Map([
   ['deckSetCountAtLeast', 'deckSetCount'],
   ['attachmentsPlacedAtLeast', 'attachmentsPlaced'],
@@ -16,24 +14,18 @@ export const CLES_AU_PLUS: ReadonlyMap<string, string> = new Map([
   ['attachmentsPlacedAtMost', 'attachmentsPlaced'],
 ]);
 
-// Le signal porte une liste, la quete cite un seul element: on teste l appartenance.
-// Sert aux equipements de mission presents au moment du fait.
 export const CLES_APPARTENANCE_DANS_LE_SIGNAL: ReadonlyMap<string, string> = new Map([
   ['attachmentNumber', 'missionAttachments'],
 ]);
 
-// La quete cite plusieurs sources acceptables, le signal en porte une seule.
 export const CLES_PLUSIEURS_SOURCES: ReadonlyMap<string, string> = new Map([
   ['sourceNumbers', 'sourceNumber'],
 ]);
 
-// Un seuil atteint d un coup: le signal porte le compte courant, la quete sa cible.
 export const CLES_ATTEINTES: ReadonlySet<string> = new Set(['sameRound', 'everyRound', 'simultaneous', 'threshold']);
 
-// La quete se mesure en sources differentes, pas en passages.
 export const CLE_DISTINCT = 'distinct';
 
-// La quete demande que plusieurs numeros soient reunis au meme endroit.
 export const CLE_PAIRE = 'pairNumbers';
 
 export const TOUTES_LES_CLES: ReadonlySet<string> = new Set([
@@ -99,8 +91,6 @@ export function paireReunie(attendu: unknown, payload: QuestEventPayload): boole
   return demandes.every((n) => presents.has(n));
 }
 
-// Un fait atteint d un coup vaut la cible entiere: deux DUELS dans la meme manche
-// terminent la quete qui en demande deux, ils ne comptent pas un par un.
 export function compteAtteint(
   predicate: Record<string, unknown>,
   payload: QuestEventPayload,

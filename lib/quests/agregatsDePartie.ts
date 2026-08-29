@@ -1,9 +1,5 @@
 import type { QuestEventPayload } from './hooks';
 
-// Le moteur annonce un fait brut avec sa manche. Les quetes qui parlent de « deux DUELS
-// dans la meme manche », « un DUEL a chacune des quatre manches » ou « cinq DUELS
-// differents dans la partie » se deduisent ici, pour que le moteur ignore tout des quetes.
-
 const MANCHES_PAR_PARTIE = 4;
 
 interface Suivi {
@@ -21,7 +17,6 @@ export function reinitialiserAgregats(): void {
   suivis.clear();
 }
 
-// Rend le signal enrichi, ou null si le fait ne se prete pas a un agregat de partie.
 export function enrichirDesAgregats(
   hook: string,
   userId: string,
@@ -52,9 +47,6 @@ export function enrichirDesAgregats(
     ...payload,
     sameRound: deLaManche.size,
     everyRound: Math.min(manchesServies, MANCHES_PAR_PARTIE),
-    // Les sources deja vues dans la partie, pour les quetes qui demandent d en reunir
-    // plusieurs. Le signal garde la sienne quand il en porte deja une, comme la mission qui
-    // annonce les equipements presents au decompte.
     pairNumbers: payload.pairNumbers ?? [...suivi.vusDansLaPartie],
   };
 }

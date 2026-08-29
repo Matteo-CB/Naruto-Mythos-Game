@@ -15,9 +15,6 @@ function jetonsParPersonnage(state: GameState): Map<string, number> {
   return parId;
 }
 
-// On compte ce que chaque personnage a perdu, pas la variation du total: une carte qui
-// deplace des jetons d un camp a l autre en retire bel et bien a sa cible, et le total ne
-// bougerait pas.
 function jetonsPerdus(avant: GameState, apres: GameState): number {
   const av = jetonsParPersonnage(avant);
   const ap = jetonsParPersonnage(apres);
@@ -30,9 +27,6 @@ function jetonsPerdus(avant: GameState, apres: GameState): number {
   return perdus;
 }
 
-// Aucun utilitaire central ne retire les jetons: chaque carte le fait a sa facon. On mesure
-// donc la difference de part et d autre de l effet, ce qui couvre toutes les cartes, y
-// compris celles ajoutees plus tard.
 export function annoncerJetonsRetires(avant: GameState, apres: GameState, player: PlayerID): void {
   const retires = jetonsPerdus(avant, apres);
   if (retires <= 0) return;

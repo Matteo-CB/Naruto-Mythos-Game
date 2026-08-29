@@ -3,8 +3,6 @@ import type { Quest, QuestSeason } from './types';
 export const SAISON_ARCHIVEE: QuestSeason = 'KS';
 export const SAISON_COURANTE: QuestSeason = 'SS';
 
-// Genere depuis doc/QUETES_SET_2.txt: 183 quetes, 46/46/46/45 par niveau.
-// Le document reste la reference du texte, des identifiants, des cibles et des portees.
 export const QUETES_SHINOBI_SHIREN: Quest[] = [
   {
     id: 'ss-duel-078', level: 1, target: 1, scope: 'cumulative',

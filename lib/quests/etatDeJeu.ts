@@ -3,11 +3,6 @@ import { emitEngineQuestEvent } from './engineEmit';
 import { numeroImprime, setDeLaCarte } from './effetResolu';
 import { HOOK_EQUIPEMENT_POSE } from './equipementPose';
 
-// Certaines quetes ne portent pas sur un fait qui se produit mais sur une situation qui se
-// constate: trois equipements en jeu en meme temps, un equipement de mission sur les quatre
-// missions, deux parchemins reunis. On balaie le plateau apres chaque action, comme le font
-// deja les seuils de puissance.
-
 function campDe(att: { owner: PlayerID; controlledBy?: PlayerID | null }): PlayerID {
   return (att.controlledBy ?? att.owner) as PlayerID;
 }

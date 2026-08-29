@@ -8,7 +8,6 @@ export const HOOK_DEFAITE_PAR_EQUIPEMENT = 'character.defeated.by.attachment';
 
 interface CarteEquipement { id?: string; name_fr?: string; name_en?: string }
 
-// Le camp effectif d un equipement: un equipement vole compte pour celui qui le controle.
 function campDe(att: { owner: PlayerID; controlledBy?: PlayerID | null }): PlayerID {
   return (att.controlledBy ?? att.owner) as PlayerID;
 }
@@ -34,8 +33,6 @@ export function annoncerEquipementPose(
   });
 }
 
-// Les numeros que ce joueur a reunis sur cette mission, personnages compris. Sert aux
-// quetes qui demandent deux equipements precis au meme endroit.
 function numerosSurLaMission(state: GameState, player: PlayerID, missionIndex?: number): number[] {
   if (missionIndex === undefined || missionIndex < 0) return [];
   const mission = state.activeMissions?.[missionIndex];

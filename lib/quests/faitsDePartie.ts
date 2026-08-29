@@ -1,10 +1,5 @@
 import type { QuestEventPayload } from './hooks';
 
-// Ce qu un joueur a fait pendant une partie, retenu au fil de l eau pour que la fin de
-// partie puisse repondre a « sans jamais poser d equipement » ou « en ayant declenche un
-// DUEL a chaque fois ». Un compteur en memoire suffit: si le serveur redemarre en cours de
-// partie, la partie elle-meme est perdue.
-
 interface Faits {
   duelsTriggered: number;
   firstStrikesUsed: number;
@@ -38,8 +33,6 @@ export function oublierLaPartie(matchKey: string): void {
   }
 }
 
-// Les faits d etat sont annonces a chaque action, donc un equipement pose serait compte
-// autant de fois qu il y a d actions. Seuls les faits ponctuels alimentent le compteur.
 const FAITS_PONCTUELS: ReadonlyMap<string, keyof Faits> = new Map([
   ['duel.triggered.with.source', 'duelsTriggered'],
   ['first_strike.used.with.source', 'firstStrikesUsed'],

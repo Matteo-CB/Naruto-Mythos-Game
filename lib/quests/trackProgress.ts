@@ -76,9 +76,6 @@ function predicateMatches(
 
 const CLES_DE_NOM: ReadonlySet<string> = new Set(['sourceName', 'name', 'targetName']);
 
-// Un nom de carte s ecrit avec ou sans accent, en majuscules ou non, et le moteur annonce
-// tantot la version francaise tantot l anglaise. La comparaison ne doit pas dependre de ce
-// detail, sinon une quete reste muette sans que rien ne le signale.
 function normaliserLeNom(valeur: unknown): string {
   return String(valeur ?? '')
     .normalize('NFD')
@@ -113,8 +110,6 @@ export function estQueteDistincte(quest: Quest): boolean {
   return quest.predicate?.[CLE_DISTINCT] === true;
 }
 
-// La cle qui identifie une source deja vue. Sans elle, une quete distincte ne peut pas
-// compter, donc l evenement est ignore plutot que compte a tort comme un passage de plus.
 export function cleDistincte(payload: QuestEventPayload | undefined): string | null {
   if (!payload) return null;
   const brut = payload.distinctKey ?? payload.sourceNumber ?? payload.missionNumber ?? payload.sourceName;

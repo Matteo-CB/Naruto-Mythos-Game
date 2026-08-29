@@ -14,9 +14,6 @@ import { QUEST_XP_BY_LEVEL } from '@/lib/battlepass/constants';
 const RACINE = process.cwd();
 const LANGUES_AJOUTEES = ['es', 'pt', 'it', 'pl', 'ja'] as const;
 
-// Le document de conception vit hors du depot. La garde reste muette quand il manque,
-// plutot que de faire echouer une copie fraiche du projet, mais elle verifie tout des qu il
-// est la.
 const CHEMIN_DOCUMENT = join(RACINE, 'doc/QUETES_SET_2.txt');
 const documentPresent = existsSync(CHEMIN_DOCUMENT);
 

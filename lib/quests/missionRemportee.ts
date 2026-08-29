@@ -9,7 +9,6 @@ function campDe(att: { owner: PlayerID; controlledBy?: PlayerID | null }): Playe
   return (att.controlledBy ?? att.owner) as PlayerID;
 }
 
-// Les numeros que le vainqueur avait reunis sur cette mission au moment du decompte.
 function numerosDuVainqueurSurLaMission(
   state: GameState,
   player: PlayerID,
@@ -34,9 +33,6 @@ function numerosDuVainqueurSurLaMission(
   return numeros;
 }
 
-// La mission est annoncee a chaque decompte, pas une fois en fin de partie: sans cela une
-// quete qui demande de remporter les quatre missions d une meme manche ne pourrait jamais
-// se mesurer, et remporter dix fois la meme mission ne compterait qu une.
 export function annoncerMissionRemportee(
   state: GameState,
   player: PlayerID,

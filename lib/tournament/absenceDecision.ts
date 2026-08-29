@@ -10,9 +10,6 @@ export interface AbsenceEvidence {
   onlineP1: boolean;
   onlineP2: boolean;
   gameLive: boolean;
-  // Un joueur qui a deja agi dans la partie de ce match est prouve present. Il ne peut plus
-  // etre declare absent, meme si la partie a ete annulee depuis et que toute autre trace de
-  // sa presence a disparu.
   aAgiP1: boolean;
   aAgiP2: boolean;
   cycles: number;
