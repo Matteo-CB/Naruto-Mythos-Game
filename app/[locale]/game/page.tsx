@@ -130,7 +130,8 @@ export default function GamePage() {
       redirectTimerRef.current = setTimeout(() => {
         const gs = useGameStore.getState();
         const ss = useSocketStore.getState();
-        if (!gs.visibleState && !gs.gameState && !ss.isSpectating) {
+        const partieVivanteAuServeur = !!ss.visibleState && !ss.gameEnded;
+        if (!gs.visibleState && !gs.gameState && !ss.isSpectating && !partieVivanteAuServeur) {
           router.push('/');
         }
       }, 5000);

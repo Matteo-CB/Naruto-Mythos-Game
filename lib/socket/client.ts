@@ -312,7 +312,6 @@ interface SocketStore {
   opponentDisconnected: boolean;
   opponentForfeitAt: number | null;
 
-
   pendingReconnect: { roomCode: string; playerRole: 'player1' | 'player2'; tournamentId?: string | null } | null;
   dismissReconnect: () => void;
   acceptReconnect: () => void;
@@ -480,7 +479,6 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           socket.emit('auth:register', { userId, username });
         }
 
-
         socket.emit('games:list');
 
         requestRejoinIfNeeded();
@@ -524,7 +522,6 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         set({ seatBound: false });
         requestRejoinIfNeeded(true);
       });
-
 
       socket.io.on('reconnect_failed', () => {
         console.error('[Socket] Reconnection failed after all attempts');
@@ -701,10 +698,9 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       
 
-      socket.on('game:started', () => {
-        console.log('[Socket] Game started');
-        const alreadyStarted = get().gameStarted;
-        set(alreadyStarted
+      const demarrerLaPartie = () => {
+        const dejaCommencee = get().gameStarted;
+        set(dejaCommencee
           ? { gameStarted: true, _lastStateUpdate: Date.now() }
           : { gameStarted: true, _lastStateUpdate: Date.now(), opponentDisconnected: false, opponentForfeitAt: null });
         markSeatBound();
@@ -734,6 +730,11 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         }, 5000);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         set({ _resyncTimer: resyncTimer } as any);
+      };
+
+      socket.on('game:started', () => {
+        console.log('[Socket] Game started');
+        demarrerLaPartie();
       });
 
       socket.on(
@@ -760,8 +761,13 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
           }
           set(update as SocketStore);
           if (!get().isSpectating) {
-            markSeatBound();
-            persistMatchContext();
+            if (!get().gameStarted && unpacked) {
+              console.log('[Socket] State received without a start event, entering the game anyway');
+              demarrerLaPartie();
+            } else {
+              markSeatBound();
+              persistMatchContext();
+            }
           }
         },
       );
@@ -884,7 +890,6 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       });
 
       
-
 
       
 

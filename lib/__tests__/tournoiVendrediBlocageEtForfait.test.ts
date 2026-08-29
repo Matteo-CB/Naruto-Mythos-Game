@@ -54,8 +54,6 @@ describe('un joueur qui a agi au plateau ne peut plus etre declare absent', () =
   });
 
   it('le joueur qui a fait son mulligan echappe au forfait, celui qui n a rien fait le prend', () => {
-    // La partie a ete annulee: plus de salle, plus de socket, la liste des prets est vide.
-    // Sans la memoire du plateau, les deux joueurs se ressemblent.
     const sansMemoire = decideAbsenceOutcome(preuve());
     expect(sansMemoire.kind, 'sans memoire, les deux tombent').toBe('forfeit');
     expect(sansMemoire.kind === 'forfeit' && sansMemoire.players).toEqual([PRESENT, ABSENT]);
@@ -92,8 +90,6 @@ describe('un joueur qui revient pendant l avant-partie n est pas laisse sur le t
     const handler = bloc.slice(0, bloc.indexOf('});') + 3);
     expect(handler, 'le tirage deja resolu doit etre rejoue au revenant').toContain('room.coinFlipResolved');
     expect(handler).toContain("socket.emit('coin-flip-sync')");
-    // Et il ne doit surtout pas repartir dans la poignee de main, qui ne se terminerait
-    // jamais puisque l autre joueur a deja confirme.
     const avantLeRetour = handler.indexOf('room.coinFlipResolved');
     const marquage = handler.indexOf('room.coinFlipDone[player] = true');
     expect(avantLeRetour).toBeLessThan(marquage);

@@ -818,7 +818,6 @@ export function onChessClockTick(room: RoomData, io: SocketIOServer): void {
     return;
   }
 
-
   clearStaleDisconnectStamp(room, 'player1', io);
   clearStaleDisconnectStamp(room, 'player2', io);
 
@@ -856,7 +855,6 @@ export function onChessClockTick(room: RoomData, io: SocketIOServer): void {
     handleChessClockExpiry(room, active, io, 'bank-empty');
     return;
   }
-
 
   const opponentOfActive: PlayerID = active === 'player1' ? 'player2' : 'player1';
   const opponentDisconnected = opponentOfActive === 'player1'
@@ -915,17 +913,12 @@ export function scheduleMissionAdvance(room: RoomData, code: string, io: SocketI
   }, MISSION_ADVANCE_DELAY_MS);
 }
 
-
-
-
 const CHESS_CLOCK_WATCHDOG_INTERVAL_MS = 30_000;
 
 export const STALEMATE_NO_PROGRESS_MS = 5 * 60 * 1000;
 export const STALEMATE_CANCEL_MS = 8 * 60 * 1000;
 
-
 const DISCONNECT_HARD_FORFEIT_MS = CHESS_CLOCK_DISCONNECT_FORFEIT_MS;
-
 
 export function chessClockWatchdog(io: SocketIOServer): void {
   const now = Date.now();
@@ -952,22 +945,18 @@ export function chessClockWatchdog(io: SocketIOServer): void {
       const needed = whoseInputIsAwaited(room.gameState);
       const active = room.chessClock.active;
 
-
       if (needed && active !== needed) {
         console.warn(`[ChessClockWatchdog] ${code}: clock active=${active} but input needed from ${needed}, re-syncing`);
         syncChessClock(room, now);
       }
-
 
       if (room.chessClock.active && !room.chessClockTickTimer) {
         console.warn(`[ChessClockWatchdog] ${code}: tick timer missing while clock active=${room.chessClock.active}, restarting`);
         startChessClockTickLoop(room, io);
       }
 
-
       onChessClockTick(room, io);
       if (room.finalized) continue;
-
 
       const p1Disc = room.player1DisconnectedAt;
       const p2Disc = room.player2DisconnectedAt;
@@ -1039,7 +1028,6 @@ export function getSocketIO(): SocketIOServer | null {
   return ioInstance;
 }
 
-
 let bannedCardCache: Map<string, string | null> | null = null; // cardId -> reason
 let bannedCardCacheTime = 0;
 const BAN_CACHE_TTL = 60_000;
@@ -1093,7 +1081,6 @@ async function isUserGameBanned(userId: string): Promise<boolean> {
   return true;
 }
 
-
 function cleanupPlayerRoom(socket: Socket): void {
   const existingCode = playerRooms.get(socket.id);
   if (!existingCode) return;
@@ -1125,7 +1112,6 @@ function cleanupPlayerRoom(socket: Socket): void {
   }
   playerRooms.delete(socket.id);
 }
-
 
 function getPublicRoomList(): Array<{ code: string; hostName: string; gameMode: string; createdAt: number; isEvolving: boolean; holoHue: number | null; isRanked: boolean; isAnonymous: boolean; sealedSetChoice: string | null }> {
   const list: Array<{ code: string; hostName: string; gameMode: string; createdAt: number; isEvolving: boolean; holoHue: number | null; isRanked: boolean; isAnonymous: boolean; sealedSetChoice: string | null }> = [];
@@ -1246,7 +1232,6 @@ function broadcastActiveGames(io: SocketIOServer): void {
   }
   io.to('games-watchers').emit('games:list-update', { games: activeGames });
 }
-
 
 function cleanupStaleRooms(io: SocketIOServer): void {
   const now = Date.now();
@@ -1667,7 +1652,6 @@ export async function maybeStartTournamentGame(
   }
 }
 
-
 export type GameEndWinReason = 'score' | 'forfeit' | 'timeout' | 'clock' | 'idle' | 'disconnect';
 
 async function finalizeGameEnd(
@@ -1735,7 +1719,6 @@ async function finalizeGameEnd(
   import('@/lib/db/gameCleanup')
     .then(({ cleanupOldGames }) => cleanupOldGames())
     .catch(() => {});
-
 
   const isEvolving = room.isEvolving === true;
   const eloField: 'elo' | 'evolvingElo' = isEvolving ? 'evolvingElo' : 'elo';
@@ -1913,7 +1896,6 @@ async function finalizeGameEnd(
           const p2Wins = changes.player2NewConsecWins;
           if (p1Wins >= 2) emitQuestEvent('ranked.win.streak', room.hostId, { gameMode: 'ranked', streak: p1Wins });
           if (p2Wins >= 2) emitQuestEvent('ranked.win.streak', room.guestId, { gameMode: 'ranked', streak: p2Wins });
-
 
           const winnerIsP1 = winner === 'player1';
           const winnerUserId = winnerIsP1 ? room.hostId : room.guestId;
@@ -2326,7 +2308,6 @@ async function finalizeGameEnd(
   })();
 }
 
-
 export function armMulliganIdleTimer(
   room: RoomData,
   code: string,
@@ -2713,8 +2694,6 @@ function buildSpectatorState(room: RoomData, hiddenIds: Set<string>): VisibleGam
   return stateForViewer(spectatorState, false, hiddenIds);
 }
 
-// Envoie a la socket du siege et, si le joueur en a d autres, a celles-la aussi. La vue
-// envoyee est celle du siege, donc la meme information part sur chacun de ses onglets.
 function envoyerAuSiege(
   io: SocketIOServer,
   socketDuSiege: string | null | undefined,
@@ -2753,10 +2732,6 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
     const p1State = GameEngine.getVisibleStateForTransport(room.gameState, 'player1');
     const p2State = GameEngine.getVisibleStateForTransport(room.gameState, 'player2');
 
-    // Un joueur peut avoir plusieurs sockets vivantes: deux onglets, ou une reconnexion dont
-    // l ancienne connexion n est pas encore tombee. Le siege n en retient qu une; envoyer
-    // l etat a cette seule socket laisse l onglet que le joueur regarde vraiment sur un ecran
-    // fige, sans qu il puisse jouer ni comprendre pourquoi.
     envoyerAuSiege(io, room.hostSocket, room.hostId, 'game:state-update', {
       visibleState: packVisibleState(stateForViewer(p1State, hostPrivileged, hiddenIds)),
       playerRole: 'player1',
@@ -2935,7 +2910,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
     console.error('[FATAL] Unhandled rejection:', reason instanceof Error ? reason.message : reason);
   });
 
-
   rehydrateAbsenceTimers(io).catch((err) => {
     console.error('[Tournament] Initial absence rehydrate error:', err);
   });
@@ -2945,9 +2919,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
   setInterval(() => sweepOrphanTournamentMatches(io).catch(() => {}), 5 * 60_000);
   startTournamentLaunchReconciler(io);
 
-
   setInterval(() => cleanupStaleRooms(io), 60_000);
-
 
   setInterval(() => {
     try { chessClockWatchdog(io); } catch (err) {
@@ -3193,7 +3165,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       console.log(`[Socket] game:rejoin: ${player} reconnecting in room ${roomCode}, old socket: ${oldSocketId}, new socket: ${socket.id}`);
 
-
       markSeatPresent(room, isHost ? 'player1' : 'player2', socket.id, io);
 
       if (oldSocketId && oldSocketId !== socket.id) {
@@ -3219,12 +3190,10 @@ export function setupSocketHandlers(io: SocketIOServer) {
         }
       }
 
-
       registerUserSocket(userId, socket.id);
       getUnreadDmCount(userId)
         .then((total) => socket.emit('dm:unread-count', { total }))
         .catch(() => {});
-
 
       if (room.finalBroadcast) {
         console.log(`[Socket] game:rejoin: room ${roomCode} is already over, replaying ${room.finalBroadcast.event} to ${player}`);
@@ -3292,7 +3261,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
           room.replayStateSnapshots = [];
           room.replaySnapshotLogLengths = [];
           room.replayClockSnapshots = [];
-
 
           let hostName = 'Player 1';
           let guestName = 'Player 2';
@@ -3384,7 +3352,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       console.log(`[Socket] Creating room for user ${data.userId}, socket ${socket.id}`);
 
-
       cleanupPlayerRoom(socket);
 
       let code: string;
@@ -3458,7 +3425,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
         chessClockLastInputKey: null,
       };
 
-
       try {
         const hostUser = await prisma.user.findUnique({ where: { id: data.userId }, select: { allowSpectatorHand: true } });
         room.hostAllowSpectatorHand = hostUser?.allowSpectatorHand ?? false;
@@ -3530,7 +3496,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
-
       if (room.hostId === data.userId) {
         if (room.tournamentId) {
           console.log(`[Socket] Tournament host ${data.userId} joining room ${data.code}`);
@@ -3592,13 +3557,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
         return;
       }
 
-
       if (room.guestId && room.guestId !== data.userId) {
         console.log(`[Socket] Room ${data.code} is full`);
         socket.emit('room:error', { message: 'Room is full', errorKey: 'game.error.roomFull' });
         return;
       }
-
 
       if (room.guestId === data.userId) {
         console.log(`[Socket] User ${data.userId} rejoining room ${data.code}`);
@@ -3659,7 +3622,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
         holoHue: room.holoHue ?? null,
       });
 
-
       if (!room.isPrivate) {
         broadcastRoomList(io);
       }
@@ -3682,7 +3644,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
 
       await maybeStartTournamentGame(room, data.code, io);
-
 
       if (room.isSealed && room.tournamentId) {
         try {
@@ -4083,7 +4044,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         console.log(`[Socket] P1 visible: hand=${p1State.myState.hand.length}, phase=${p1State.phase}`);
         console.log(`[Socket] P2 visible: hand=${p2State.myState.hand.length}, phase=${p2State.phase}`);
 
-        if (room.hostSocket) {
+        if (room.hostSocket || room.hostId) {
           envoyerAuSiege(io, room.hostSocket, room.hostId, 'game:state-update', {
             visibleState: packVisibleState(p1State),
             playerRole: 'player1',
@@ -4094,7 +4055,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         } else {
           console.error(`[Socket] Host socket is null! Cannot send state-update`);
         }
-        if (room.guestSocket) {
+        if (room.guestSocket || room.guestId) {
           envoyerAuSiege(io, room.guestSocket, room.guestId, 'game:state-update', {
             visibleState: packVisibleState(p2State),
             playerRole: 'player2',
@@ -4149,16 +4110,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
       console.log(`[Socket] Resync state sent to ${seat} in room ${code}`);
     });
 
-
     socket.on('coin-flip-done', () => {
       const resolved = resolveRoomSeatForSocket(socket, io);
       if (!resolved) return;
       const { code, room, seat } = resolved;
       const player = seat;
 
-      // Le tirage n a lieu qu une fois. Un joueur qui se reconnecte pendant l avant-partie
-      // renvoie sa confirmation et attend la synchronisation: sans cette reponse immediate il
-      // reste bloque sur l ecran du tirage et n atteint jamais le mulligan.
       if (room.coinFlipResolved) {
         console.log(`[Socket] coin-flip-done from ${player} in room ${code} after resolution, replaying the sync for them`);
         socket.emit('coin-flip-sync');
@@ -4214,7 +4171,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
           }
         }
       }
-
 
       const hasPendingAction = room.gameState.pendingActions.some((p: { player: string }) => p.player === player);
       if (room.gameState.activePlayer !== player && !hasPendingAction) {
@@ -4330,15 +4286,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
         console.log(`[Socket] Action applied, new phase: ${room.gameState.phase}, activePlayer: ${room.gameState.activePlayer}`);
 
-        // Ce joueur vient d agir au plateau. Meme si la partie est annulee ensuite et que
-        // toute trace de sa presence disparait, il ne pourra plus etre declare absent.
         noterUneActionAuPlateau(room.tournamentMatchId, player === 'player1' ? room.hostId : room.guestId);
 
         
 
-
         broadcastState(room, io);
-
 
         io.to(code).emit('game:action-performed', {
           player,
@@ -4351,7 +4303,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
             armMulliganIdleTimer(room, code, io);
           }
         }
-
 
         const winner = GameEngine.getWinner(room.gameState);
         if (winner) {
@@ -4437,7 +4388,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       console.log(`[Socket] Rematch accepted in room ${code}, redirecting to deck select (sealed: ${room.isSealed})`);
       room.rematchOffer = undefined;
-
 
       room.gameState = null;
       room.hostDeck = null;
@@ -4579,9 +4529,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         }
       }
 
-
       cleanupPlayerRoom(socket);
-
 
       cleanupStaleRooms(io);
 
@@ -4599,8 +4547,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
           if (!existingRoom.isPrivate) broadcastRoomList(io);
         }
       }
-
-
 
       let foundRoom: RoomData | null = null;
       for (const [code, room] of rooms) {
@@ -4784,7 +4730,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
       socket.join(`spec:${data.roomCode}`);
       playerRooms.set(socket.id, `spec:${data.roomCode}`);
 
-
       try {
         syncChessClock(room);
         startChessClockTickLoop(room, io);
@@ -4821,7 +4766,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
       if (room.chatMessages.length > 100) room.chatMessages = room.chatMessages.slice(-100);
       io.to(data.roomCode).emit('chat:message', joinMsg);
     });
-
 
     socket.on('spectate:request-state', (data: { roomCode: string }) => {
       const room = rooms.get(data.roomCode);
@@ -5221,7 +5165,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
             return;
           }
 
-
           if (room.gameState && room.gameState.phase === 'gameOver') {
             console.log(`[Socket] ${player} disconnected during gameOver in room ${code}`);
             const opponentSocket = isHost ? room.guestSocket : room.hostSocket;
@@ -5238,7 +5181,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
             rooms.delete(code);
           }
 
-
           else if (room.gameState && room.gameState.phase !== 'gameOver' && !room.finalized) {
             console.log(`[Socket] ${player} disconnected during game in room ${code}, chess clock continues`);
             const disconnectedAt = Date.now();
@@ -5249,7 +5191,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
                 forfeitMs: CHESS_CLOCK_DISCONNECT_FORFEIT_MS,
               });
             }
-
 
             if (isHost) {
               room.hostSocket = '';
@@ -5300,8 +5241,6 @@ export function setupSocketHandlers(io: SocketIOServer) {
     });
   });
 }
-
-
 
 export function getActiveGameCount(): number {
   let count = 0;

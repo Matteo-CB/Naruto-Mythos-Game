@@ -3,34 +3,42 @@
     {
       "date": "2026-08-29",
       "categories": [
+        "fix",
         "fix"
       ],
       "title_fr": "Mise à jour",
       "changes_fr": [
+        "Tournoi: la partie s'ouvre même si le signal de départ se perd, fini l'écran qui recharge en boucle",
         "Tournoi: un joueur qui a deux onglets ouverts ne se retrouve plus devant un écran figé"
       ],
       "title_en": "Update",
       "changes_en": [
+        "Tournament: the game opens even if the start signal is lost, no more screen looping back to the home page",
         "Tournament: a player with two tabs open no longer ends up facing a frozen screen"
       ],
       "title_es": "Actualización",
       "changes_es": [
+        "Torneo: la partida se abre aunque se pierda la señal de inicio, se acabó la pantalla que vuelve al inicio",
         "Torneo: un jugador con dos pestañas abiertas ya no se queda ante una pantalla congelada"
       ],
       "title_pt": "Atualização",
       "changes_pt": [
+        "Torneio: a partida abre mesmo que o sinal de início se perca, acabou o ecrã que volta sempre ao início",
         "Torneio: um jogador com dois separadores abertos já não fica perante um ecrã congelado"
       ],
       "title_it": "Aggiornamento",
       "changes_it": [
+        "Torneo: la partita si apre anche se il segnale di inizio va perso, basta schermate che tornano alla home",
         "Torneo: un giocatore con due schede aperte non resta più davanti a uno schermo bloccato"
       ],
       "title_pl": "Aktualizacja",
       "changes_pl": [
+        "Turniej: partia otwiera się nawet gdy sygnał startu zaginie, koniec z ekranem wracającym na stronę główną",
         "Turniej: gracz z dwiema otwartymi kartami nie zostaje już przed zamrożonym ekranem"
       ],
       "title_ja": "アップデート",
       "changes_ja": [
+        "トーナメント: 開始の合図が届かなくても対戦が始まり、ホームに戻され続ける画面がなくなりました",
         "大会：タブを二つ開いているプレイヤーが、固まった画面に取り残されなくなった"
       ]
     },
