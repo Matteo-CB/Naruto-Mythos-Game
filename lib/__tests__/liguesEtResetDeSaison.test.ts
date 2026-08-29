@@ -22,7 +22,7 @@ import {
   PLANCHER_ELO,
 } from '@/lib/elo/resetDeSaison';
 import { classementDeSaison } from '@/lib/badges/classementDeSaison';
-import { ELO_ROLES, CLE_DE_LIGUE, getRoleForElo } from '@/lib/discord/roles';
+import { ELO_ROLES, CLE_DE_LIGUE, getRoleForElo, getRankLabel } from '@/lib/discord/roles';
 
 const RACINE = process.cwd();
 const LOCALES = ['en', 'fr', 'es', 'pt', 'it', 'pl', 'ja'];
@@ -102,6 +102,47 @@ describe('les deux tables de ligues ne peuvent plus diverger', () => {
     for (const role of ELO_ROLES) {
       expect(role.minElo, role.key).toBe(seuilDEntree(CLE_DE_LIGUE[role.key]));
     }
+  });
+
+  it('changer de niveau dans sa ligue ne change ni le role ni le titre', () => {
+    for (const ligue of LIGUES) {
+      const roles = ligue.seuils.map((seuil) => getRoleForElo(seuil).key);
+      expect(new Set(roles).size, `${ligue.key}: un seul role pour ses trois niveaux`).toBe(1);
+      const titres = ligue.seuils.map((seuil) => getRankLabel(seuil));
+      expect(new Set(titres).size, `${ligue.key}: un seul titre pour ses trois niveaux`).toBe(1);
+    }
+  });
+
+  it('le role ne bouge qu au changement de ligue, jamais au changement de numero', () => {
+    const rangs = tousLesRangs();
+    const changements: string[] = [];
+    for (let i = 1; i < rangs.length; i++) {
+      const avant = getRoleForElo(rangs[i - 1].seuil);
+      const apres = getRoleForElo(rangs[i].seuil);
+      if (apres.minElo > avant.minElo) changements.push(`${rangs[i].key} ${niveauRomain(rangs[i].niveau)}`);
+      if (rangs[i].key === rangs[i - 1].key) {
+        expect(apres.key, `${rangs[i].key}: le numero ne doit pas promouvoir`).toBe(avant.key);
+        expect(apres.minElo, 'aucune alerte entre deux niveaux d une meme ligue').toBe(avant.minElo);
+      }
+    }
+    expect(changements, 'une promotion par ligue, au premier niveau seulement').toEqual([
+      'genin I', 'chunin I', 'specialJonin I', 'eliteJonin I',
+      'legendarySannin I', 'kage I', 'sageOfSixPaths I', 'willOfFire I',
+    ]);
+  });
+
+  it('le titre annonce ne porte jamais le numero de niveau', () => {
+    for (const rang of tousLesRangs()) {
+      const titre = getRankLabel(rang.seuil);
+      expect(titre, titre).not.toMatch(/\b(I|II|III)\b/);
+    }
+  });
+
+  it('l alerte de montee se decide sur le role, pas sur le palier affiche', () => {
+    const source = readFileSync(join(RACINE, 'lib/discord/rankUpWebhook.ts'), 'utf8');
+    expect(source).toContain('newRole.minElo > oldRole.minElo');
+    expect(source, 'jamais le niveau dans la decision').not.toContain('getRankDivision');
+    expect(source).not.toContain('niveauRomain');
   });
 
   it('les cles de ligue restent celles connues des tournois', () => {
