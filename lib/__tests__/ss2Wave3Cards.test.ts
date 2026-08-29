@@ -475,7 +475,7 @@ describe('the eight new cards are wired into the data and the rules', () => {
       expect(card, `${id} exists`).toBeTruthy();
       expect(card.set).toBe('SS');
       expect(card.has_visual, 'art flag matches the file').toBe(!!card.image_file);
-      expect(isStaticRankedBanned(id), 'set 2 stays out of ranked').toBe(true);
+      expect(isStaticRankedBanned(id), 'set 2 is playable in ranked').toBe(false);
 
       for (const locale of LOCALES) {
         const file = locale === 'fr'

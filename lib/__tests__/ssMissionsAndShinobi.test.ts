@@ -97,7 +97,7 @@ describe('the Shinobi variants are a real rarity with real cards', () => {
         FORCE_UNLOCKED_CARD_IDS.has(id),
         `${id}: plus aucune variante n est offerte, elles se gagnent toutes`,
       ).toBe(false);
-      expect(isStaticRankedBanned(id), `${id} banned in ranked`).toBe(true);
+      expect(isStaticRankedBanned(id), `${id} playable in ranked`).toBe(false);
     }
   });
 

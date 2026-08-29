@@ -124,11 +124,18 @@ describe('recordRankedDeckUsage + computeCardUsage (decks played in ranked games
     expect(args.distinct).toEqual(['userId']);
   });
 
-  it('marks ranked-banned cards with the BAN tier', async () => {
+  it('marks a card banned in base with the BAN tier', async () => {
+    fakeBannedFindMany.mockResolvedValue([{ cardId: 'SS-112-SPV' }]);
     await recordRankedDeckUsage([['KS-036-C'], null]);
     const r = await computeCardUsage();
     const banned = r.cards.find((c) => c.cardId === 'SS-112-SPV')!;
     expect(banned.tier).toBe('BAN');
+  });
+
+  it('sans aucun bannissement, plus aucune carte ne porte le palier BAN', async () => {
+    await recordRankedDeckUsage([['KS-036-C'], null]);
+    const r = await computeCardUsage();
+    expect(r.cards.filter((c) => c.tier === 'BAN')).toEqual([]);
   });
 
   it('yields no data when there are no ranked games in the window', async () => {

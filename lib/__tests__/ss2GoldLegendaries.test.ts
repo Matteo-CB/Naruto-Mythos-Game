@@ -362,9 +362,9 @@ describe('the gold Gaara still offers its draw when it defeats an enemy', () => 
 
 describe('the three gold cards are wired into the collection rules', () => {
   for (const id of [TSUNADE_GOLD, JIRAIYA_GOLD, GAARA_GOLD]) {
-    it(`${id} se gagne et reste banni du classe comme le reste du set 2`, () => {
+    it(`${id} se gagne et se joue en classe comme le reste du set 2`, () => {
       expect(isForceUnlockedCard(id), `${id} se gagne, il n est offert a personne`).toBe(false);
-      expect(isStaticRankedBanned(id)).toBe(true);
+      expect(isStaticRankedBanned(id)).toBe(false);
     });
 
     it(`${id} carries its art, its Legendary rarity and a description in every language`, () => {

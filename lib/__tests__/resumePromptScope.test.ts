@@ -78,7 +78,7 @@ describe('the four Secret cards are wired in', () => {
     }
   });
 
-  it('they stay out of ranked while the set is not released', () => {
-    for (const id of SECRETS) expect(isStaticRankedBanned(id), id).toBe(true);
+  it('elles sont jouables en classe comme le reste du set', () => {
+    for (const id of SECRETS) expect(isStaticRankedBanned(id), id).toBe(false);
   });
 });

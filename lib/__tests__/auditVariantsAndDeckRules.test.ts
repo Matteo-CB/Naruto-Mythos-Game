@@ -1079,11 +1079,8 @@ describe('tournament ban list and restricted filters', () => {
 });
 
 describe('static ranked ban list', () => {
-  it('bans every id on the static list', () => {
-    expect(STATIC_RANKED_BANNED_CARD_IDS.size).toBeGreaterThan(0);
-    for (const id of STATIC_RANKED_BANNED_CARD_IDS) {
-      expect(isStaticRankedBanned(id), id).toBe(true);
-    }
+  it('la liste statique est vide, plus aucune carte publiee n est bannie', () => {
+    expect(STATIC_RANKED_BANNED_CARD_IDS.size).toBe(0);
   });
 
   it('bans every card of a not yet released set', () => {
@@ -1093,9 +1090,9 @@ describe('static ranked ban list', () => {
     applySetStatusOverrides(null);
   });
 
-  it('keeps the explicitly banned set 2 promos out of ranked', () => {
-    expect(isStaticRankedBanned('SS-149-L')).toBe(true);
-    expect(isStaticRankedBanned('SS-147-POPV')).toBe(true);
+  it('laisse les promos du set 2 entrer en classe', () => {
+    expect(isStaticRankedBanned('SS-149-L')).toBe(false);
+    expect(isStaticRankedBanned('SS-147-POPV')).toBe(false);
   });
 
   it('lets the released set 2 cards into ranked', () => {
