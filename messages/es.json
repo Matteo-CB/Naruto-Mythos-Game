@@ -4082,5 +4082,16 @@
     "matchEnded": "Partida terminada",
     "watchLive": "Ver en directo",
     "playersCannotWatch": "Participas en este torneo, así que no puedes ver las otras mesas."
+  },
+  "seasonBadges": {
+    "title": "Insignias de temporada",
+    "empty": "Sin insignia de temporada",
+    "rank": "Puesto {rank}",
+    "tier": {
+      "top-1": "1.º del ranking",
+      "top-10": "Top 10",
+      "top-50": "Top 50",
+      "top-100": "Top 100"
+    }
   }
 }

@@ -4077,5 +4077,16 @@
     "matchEnded": "Partita finita",
     "watchLive": "Guarda dal vivo",
     "playersCannotWatch": "Stai partecipando a questo torneo, quindi non puoi guardare gli altri tavoli."
+  },
+  "seasonBadges": {
+    "title": "Distintivi di stagione",
+    "empty": "Nessun distintivo di stagione",
+    "rank": "Posizione {rank}",
+    "tier": {
+      "top-1": "1º in classifica",
+      "top-10": "Top 10",
+      "top-50": "Top 50",
+      "top-100": "Top 100"
+    }
   }
 }

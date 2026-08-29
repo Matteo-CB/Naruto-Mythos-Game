@@ -59,7 +59,7 @@ model User {
   questProgresses         QuestProgress[]
   dailyQuestProgresses    DailyQuestProgress[]
   stripeCustomerId        String?
-  siteTheme            String?  @default("ks")
+  siteTheme               String?              @default("ks")
   hideDeckBuilderVariants Boolean              @default(false)
   manualPowerMode         Boolean              @default(false)
   gamepadEnabled          Boolean              @default(true)
@@ -632,8 +632,6 @@ model UserBan {
   createdAt DateTime  @default(now())
 }
 
-
-
 model AdminAction {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   actorId   String   @db.ObjectId
@@ -646,7 +644,6 @@ model AdminAction {
   @@index([action, createdAt])
   @@index([actorId, createdAt])
 }
-
 
 model VariantInventory {
   id     String @id @default(auto()) @map("_id") @db.ObjectId
@@ -834,4 +831,25 @@ model DailyPlayStat {
   playerIds String[] @default([])
   deckKeys  String[] @default([])
   updatedAt DateTime @updatedAt
+}
+
+model SeasonRanking {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  seasonId    String
+  userId      String   @db.ObjectId
+  username    String
+  rank        Int
+  elo         Int
+  wins        Int      @default(0)
+  losses      Int      @default(0)
+  draws       Int      @default(0)
+  games       Int      @default(0)
+  countryCode String?
+  badge       String?
+  league      String?
+  archivedAt  DateTime @default(now())
+
+  @@unique([seasonId, userId])
+  @@index([seasonId, rank])
+  @@index([userId])
 }

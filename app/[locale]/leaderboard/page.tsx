@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useTrackOnMount } from '@/lib/hooks/useTrackUi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/i18n/navigation';
@@ -13,6 +13,10 @@ import { CloudBackground } from '@/components/CloudBackground';
 import { Footer } from '@/components/Footer';
 import { RANK_TIERS, PLACEMENT_MATCHES_REQUIRED, getRankTier } from '@/components/EloBadge';
 import { UserBadges } from '@/components/badges/UserBadges';
+import { SeasonBadge } from '@/components/badges/SeasonBadge';
+import { LeagueBadge } from '@/components/badges/LeagueBadge';
+import { SAISON_ARCHIVEE } from '@/lib/badges/saisonBadges';
+import { getSetName } from '@/lib/data/sets/registry';
 import { LeaguesModal } from '@/components/LeaguesModal';
 import { FriendsSection } from '@/components/social/FriendsSection';
 import { useSocialBadge } from '@/lib/hooks/useSocialBadge';
@@ -39,7 +43,21 @@ interface LeaderboardUser {
   tournamentWins?: number;
 }
 
-type LeaderboardType = 'ranked' | 'evolving';
+type LeaderboardType = 'ranked' | 'evolving' | 'season';
+
+interface SeasonRow {
+  userId: string;
+  username: string;
+  rank: number;
+  elo: number;
+  wins: number;
+  losses: number;
+  draws: number;
+  games: number;
+  countryCode: string | null;
+  badge: string | null;
+  league: string | null;
+}
 
 const ROW_CLIP = 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)';
 
@@ -162,6 +180,83 @@ function LeaderRow({
   );
 }
 
+function SeasonLeaderRow({
+  row,
+  seasonId,
+  index,
+  isSelf,
+}: {
+  row: SeasonRow;
+  seasonId: string;
+  index: number;
+  isSelf: boolean;
+}) {
+  const total = row.wins + row.losses;
+  const winRate = total > 0 ? Math.round((row.wins / total) * 100) : 0;
+  const altBg = index % 2 === 0 ? 'var(--t-accent-surface)' : 'var(--t-accent-surface-hover)';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3, delay: Math.min(index * 0.025, 0.4), ease: 'easeOut' }}
+      whileHover={{ x: 4 }}
+      className="relative grid items-center gap-2 sm:gap-3 px-3 sm:px-5 py-2 sm:py-2.5 cursor-default mb-1"
+      style={{
+        backgroundColor: isSelf ? 'var(--t-accent-tint)' : altBg,
+        gridTemplateColumns: 'auto auto 1fr auto auto auto',
+        clipPath: ROW_CLIP,
+      }}
+    >
+      <span
+        className="font-display text-base sm:text-lg tabular-nums w-7 sm:w-9 text-center"
+        style={{ color: isSelf ? 'var(--t-on-accent-surface)' : 'var(--t-on-accent-surface-text)', letterSpacing: '0.02em' }}
+      >
+        {row.rank}
+      </span>
+
+      {row.badge || row.league ? (
+        <span className="inline-flex items-center gap-1.5">
+          {row.league && <LeagueBadge league={row.league} size="md" />}
+          {row.badge && <SeasonBadge seasonId={seasonId} badge={row.badge} rank={row.rank} size="md" />}
+        </span>
+      ) : (
+        <span className="inline-flex items-center justify-center font-display text-[14px]" style={{ width: 30, height: 30, color: 'var(--t-on-accent-surface-text)' }}>
+          ·
+        </span>
+      )}
+
+      <div className="flex items-center gap-1.5 min-w-0">
+        <CountryFlag code={row.countryCode} size={18} />
+        <Link
+          href={`/profile/${encodeURIComponent(row.username)}` as '/'}
+          className="font-display text-base truncate transition-colors hover:text-[var(--t-accent)]"
+          style={{ color: 'var(--t-on-accent-surface-text)', letterSpacing: '0.02em' }}
+        >
+          {row.username}
+        </Link>
+      </div>
+
+      <div className="hidden sm:flex font-inter-force items-center gap-1.5">
+        <span className="text-[10px] tabular-nums" style={{ color: 'var(--t-success)' }}>{row.wins}W</span>
+        <span className="text-[10px] tabular-nums" style={{ color: 'var(--t-danger)' }}>{row.losses}L</span>
+      </div>
+
+      <span className="hidden sm:block font-inter-force text-xs tabular-nums w-10 text-right" style={{ color: 'var(--t-dim)' }}>
+        {winRate}%
+      </span>
+
+      <span
+        className="font-display text-lg sm:text-xl tabular-nums w-16 text-right"
+        style={{ color: 'var(--t-accent)', letterSpacing: '0.02em' }}
+      >
+        {row.elo}
+      </span>
+    </motion.div>
+  );
+}
+
 function FilterPill({
   active,
   onClick,
@@ -230,6 +325,8 @@ export default function LeaderboardPage() {
     return url.searchParams.get('tab') === 'friends' ? 'friends' : 'leaderboard';
   });
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
+  const [seasonRows, setSeasonRows] = useState<SeasonRow[]>([]);
+  const [seasonAvailable, setSeasonAvailable] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPlayers, setTotalPlayers] = useState(0);
@@ -244,8 +341,13 @@ export default function LeaderboardPage() {
   const [boardType, setBoardType] = useState<LeaderboardType>(() => {
     if (typeof window === 'undefined') return 'ranked';
     const url = new URL(window.location.href);
-    return url.searchParams.get('type') === 'evolving' ? 'evolving' : 'ranked';
+    const demande = url.searchParams.get('type');
+    if (demande === 'evolving') return 'evolving';
+    if (demande === 'season') return 'season';
+    return 'ranked';
   });
+  const locale = useLocale();
+  const nomDeLaSaisonArchivee = getSetName(SAISON_ARCHIVEE, locale);
 
   const switchHubTab = useCallback((next: HubTab) => {
     if (next === hubTab) return;
@@ -265,8 +367,8 @@ export default function LeaderboardPage() {
     setCurrentPage(1);
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
-      if (next === 'evolving') url.searchParams.set('type', 'evolving');
-      else url.searchParams.delete('type');
+      if (next === 'ranked') url.searchParams.delete('type');
+      else url.searchParams.set('type', next);
       window.history.replaceState({}, '', url.toString());
     }
   }, []);
@@ -292,11 +394,30 @@ export default function LeaderboardPage() {
   }, []);
 
   useEffect(() => {
+    fetch(`/api/leaderboard/season?seasonId=${SAISON_ARCHIVEE}&limit=1`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((d) => setSeasonAvailable((d?.total ?? 0) > 0))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
     setLoading(true);
     const offset = (currentPage - 1) * PLAYERS_PER_PAGE;
     const searchParam = debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : '';
-    const leagueParam = boardType === 'evolving' || !leagueFilter ? '' : `&league=${encodeURIComponent(leagueFilter)}`;
     const countryParam = countryFilter ? `&country=${encodeURIComponent(countryFilter)}` : '';
+    if (boardType === 'season') {
+      fetch(`/api/leaderboard/season?seasonId=${SAISON_ARCHIVEE}&limit=${PLAYERS_PER_PAGE}&offset=${offset}${searchParam}${countryParam}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setSeasonRows(data.rows || []);
+          setTotalPlayers(data.total || 0);
+          setAvailableCountries(data.countries || []);
+          setLoading(false);
+        })
+        .catch(() => setLoading(false));
+      return;
+    }
+    const leagueParam = boardType === 'evolving' || !leagueFilter ? '' : `&league=${encodeURIComponent(leagueFilter)}`;
     const typeParam = boardType === 'evolving' ? `&type=evolving` : '';
     fetch(`/api/leaderboard?limit=${PLAYERS_PER_PAGE}&offset=${offset}${searchParam}${leagueParam}${countryParam}${typeParam}`)
       .then((res) => res.json())
@@ -333,7 +454,7 @@ export default function LeaderboardPage() {
       .sort((a, b) => a.name.localeCompare(b.name, bcp47));
   }, [availableCountries, bcp47]);
 
-  const pageKey = useMemo(() => `${currentPage}-${debouncedSearch}-${leagueFilter}-${countryFilter}`, [currentPage, debouncedSearch, leagueFilter, countryFilter]);
+  const pageKey = useMemo(() => `${boardType}-${currentPage}-${debouncedSearch}-${leagueFilter}-${countryFilter}`, [boardType, currentPage, debouncedSearch, leagueFilter, countryFilter]);
 
   return (
     <main id="main-content" className="min-h-screen relative flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--t-bg)' }}>
@@ -470,6 +591,22 @@ export default function LeaderboardPage() {
           >
             {t('toggleType.evolving')}
           </button>
+          {seasonAvailable && (
+            <button
+              type="button"
+              onClick={() => handleBoardTypeChange('season')}
+              className="font-display text-[11px] uppercase tracking-widest px-4 py-1.5 transition-colors"
+              style={{
+                color: boardType === 'season' ? 'var(--t-bg)' : 'var(--t-accent)',
+                backgroundColor: boardType === 'season' ? 'var(--t-accent)' : 'transparent',
+                borderRadius: 9999,
+                cursor: 'pointer',
+                outline: 'none',
+              }}
+            >
+              {nomDeLaSaisonArchivee}
+            </button>
+          )}
         </motion.div>
 
         <motion.div
@@ -501,7 +638,7 @@ export default function LeaderboardPage() {
           </div>
         </motion.div>
 
-        {leaguesEnabled && boardType !== 'evolving' && (
+        {leaguesEnabled && boardType === 'ranked' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -572,6 +709,38 @@ export default function LeaderboardPage() {
 
           {loading ? (
             <SkeletonGrid />
+          ) : boardType === 'season' ? (
+            seasonRows.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-center justify-center py-20"
+              >
+                <p className="font-display text-sm uppercase tracking-widest" style={{ color: 'var(--t-dim)' }}>{t('noPlayers')}</p>
+              </motion.div>
+            ) : (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={pageKey}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="flex flex-col">
+                    {seasonRows.map((row, index) => (
+                      <SeasonLeaderRow
+                        key={row.userId}
+                        row={row}
+                        seasonId={SAISON_ARCHIVEE}
+                        index={index}
+                        isSelf={selfUsername === row.username}
+                      />
+                    ))}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            )
           ) : users.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}

@@ -255,6 +255,12 @@ export async function GET(
     const modeStats: Record<string, { games: number; wins: number; losses: number }> = {};
     for (const r of modeStatRows) modeStats[r.mode] = { games: r.games, wins: r.wins, losses: r.losses };
 
+    const seasonBadges = await prisma.seasonRanking.findMany({
+      where: { userId: user.id },
+      orderBy: { rank: 'asc' },
+      select: { seasonId: true, badge: true, league: true, rank: true, elo: true },
+    }).catch(() => [] as Array<{ seasonId: string; badge: string | null; league: string | null; rank: number; elo: number }>);
+
     const { decks: _omit, ...userWithoutDecks } = user;
     void _omit;
     const follow = await getFollowState(viewerId, user.id);
@@ -275,6 +281,7 @@ export async function GET(
       consecutiveWinsRanked,
       consecutiveWinsEvolving,
       modeStats,
+      seasonBadges,
       followerCount: follow.followerCount,
       followingCount: follow.followingCount,
       viewerFollowing: follow.following,

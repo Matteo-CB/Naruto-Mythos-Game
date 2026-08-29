@@ -16,6 +16,7 @@ import { UserBadges } from '@/components/badges/UserBadges';
 import { CountryFlag } from '@/components/CountryFlag';
 import { EloHistoryChart } from '@/components/EloHistoryChart';
 import { DeckStatsPanel } from '@/components/profile/DeckStatsPanel';
+import { SeasonBadgesPanel } from '@/components/profile/SeasonBadgesPanel';
 import { FollowButton } from '@/components/social/FollowButton';
 import { ProfilePostsSection } from '@/components/profile/ProfilePostsSection';
 import Image from 'next/image';
@@ -93,6 +94,7 @@ interface ProfileData {
   discordUsername: string | null;
   createdAt: string;
   modeStats?: Record<string, { games: number; wins: number; losses: number }>;
+  seasonBadges?: Array<{ seasonId: string; badge: string | null; league: string | null; rank: number; elo: number }>;
   decks: Array<{ id: string; name: string; createdAt: string; evolvingPoints?: number; evolvingCompatible?: boolean; isPublic?: boolean; cardIds?: string[]; missionIds?: string[] }>;
   canViewDeckContents?: boolean;
   followerCount?: number;
@@ -797,6 +799,10 @@ export default function ProfilePage({
               </div>
             </div>
           </section>
+        )}
+
+        {(profile.seasonBadges?.length ?? 0) > 0 && (
+          <SeasonBadgesPanel badges={profile.seasonBadges!} />
         )}
 
         {(profileMode === 'ranked' || profileMode === 'evolving') && (
