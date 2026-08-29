@@ -1,6 +1,40 @@
 {
   "entries": [
     {
+      "date": "2026-08-29",
+      "categories": [
+        "fix"
+      ],
+      "title_fr": "Mise à jour",
+      "changes_fr": [
+        "Tournoi: un joueur qui a deux onglets ouverts ne se retrouve plus devant un écran figé"
+      ],
+      "title_en": "Update",
+      "changes_en": [
+        "Tournament: a player with two tabs open no longer ends up facing a frozen screen"
+      ],
+      "title_es": "Actualización",
+      "changes_es": [
+        "Torneo: un jugador con dos pestañas abiertas ya no se queda ante una pantalla congelada"
+      ],
+      "title_pt": "Atualização",
+      "changes_pt": [
+        "Torneio: um jogador com dois separadores abertos já não fica perante um ecrã congelado"
+      ],
+      "title_it": "Aggiornamento",
+      "changes_it": [
+        "Torneo: un giocatore con due schede aperte non resta più davanti a uno schermo bloccato"
+      ],
+      "title_pl": "Aktualizacja",
+      "changes_pl": [
+        "Turniej: gracz z dwiema otwartymi kartami nie zostaje już przed zamrożonym ekranem"
+      ],
+      "title_ja": "アップデート",
+      "changes_ja": [
+        "大会：タブを二つ開いているプレイヤーが、固まった画面に取り残されなくなった"
+      ]
+    },
+    {
       "date": "2026-08-28",
       "categories": [
         "fix",

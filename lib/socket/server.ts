@@ -1641,10 +1641,10 @@ export async function maybeStartTournamentGame(
     const p1State = GameEngine.getVisibleStateForTransport(room.gameState, 'player1');
     const p2State = GameEngine.getVisibleStateForTransport(room.gameState, 'player2');
     const playerNames = { player1: hostName, player2: guestName };
-    io.to(room.hostSocket).emit('game:state-update', { visibleState: packVisibleState(p1State), playerRole: 'player1', playerNames, chessClock });
-    io.to(room.guestSocket).emit('game:state-update', { visibleState: packVisibleState(p2State), playerRole: 'player2', playerNames, chessClock });
-    io.to(room.hostSocket).emit('game:started');
-    io.to(room.guestSocket).emit('game:started');
+    envoyerAuSiege(io, room.hostSocket, room.hostId, 'game:state-update', { visibleState: packVisibleState(p1State), playerRole: 'player1', playerNames, chessClock });
+    envoyerAuSiege(io, room.guestSocket, room.guestId, 'game:state-update', { visibleState: packVisibleState(p2State), playerRole: 'player2', playerNames, chessClock });
+    envoyerAuSiege(io, room.hostSocket, room.hostId, 'game:started', undefined);
+    envoyerAuSiege(io, room.guestSocket, room.guestId, 'game:started', undefined);
     if (room.tournamentId) broadcastTournamentLiveMatches(io, room.tournamentId);
     console.log(`[Socket] Tournament game auto-started in room ${code}`);
 
@@ -2345,8 +2345,8 @@ export function armMulliganIdleTimer(
 
   const deadline = Date.now() + CHESS_CLOCK_MULLIGAN_IDLE_MS;
   room.mulliganDeadline = deadline;
-  if (room.hostSocket) io.to(room.hostSocket).emit('game:mulligan-deadline', { deadline, durationMs: CHESS_CLOCK_MULLIGAN_IDLE_MS });
-  if (room.guestSocket) io.to(room.guestSocket).emit('game:mulligan-deadline', { deadline, durationMs: CHESS_CLOCK_MULLIGAN_IDLE_MS });
+  envoyerAuSiege(io, room.hostSocket, room.hostId, 'game:mulligan-deadline', { deadline, durationMs: CHESS_CLOCK_MULLIGAN_IDLE_MS });
+  envoyerAuSiege(io, room.guestSocket, room.guestId, 'game:mulligan-deadline', { deadline, durationMs: CHESS_CLOCK_MULLIGAN_IDLE_MS });
 
   room.chessClockMulliganTimer = setTimeout(() => {
     handleMulliganIdleTimeout(room, code, io).catch((err) => {
@@ -2713,6 +2713,27 @@ function buildSpectatorState(room: RoomData, hiddenIds: Set<string>): VisibleGam
   return stateForViewer(spectatorState, false, hiddenIds);
 }
 
+// Envoie a la socket du siege et, si le joueur en a d autres, a celles-la aussi. La vue
+// envoyee est celle du siege, donc la meme information part sur chacun de ses onglets.
+function envoyerAuSiege(
+  io: SocketIOServer,
+  socketDuSiege: string | null | undefined,
+  userId: string | null | undefined,
+  evenement: string,
+  charge: unknown,
+): void {
+  const deja = new Set<string>();
+  if (socketDuSiege) {
+    io.to(socketDuSiege).emit(evenement, charge);
+    deja.add(socketDuSiege);
+  }
+  if (!userId) return;
+  for (const autre of getUserSocketIds(userId)) {
+    if (deja.has(autre)) continue;
+    io.to(autre).emit(evenement, charge);
+  }
+}
+
 function broadcastState(room: RoomData, io: SocketIOServer): void {
   if (!room.gameState) return;
   ensureRevealMeta(room);
@@ -2732,22 +2753,22 @@ function broadcastState(room: RoomData, io: SocketIOServer): void {
     const p1State = GameEngine.getVisibleStateForTransport(room.gameState, 'player1');
     const p2State = GameEngine.getVisibleStateForTransport(room.gameState, 'player2');
 
-    if (room.hostSocket) {
-      io.to(room.hostSocket).emit('game:state-update', {
-        visibleState: packVisibleState(stateForViewer(p1State, hostPrivileged, hiddenIds)),
-        playerRole: 'player1',
-        playerNames,
-        chessClock,
-      });
-    }
-    if (room.guestSocket) {
-      io.to(room.guestSocket).emit('game:state-update', {
-        visibleState: packVisibleState(stateForViewer(p2State, guestPrivileged, hiddenIds)),
-        playerRole: 'player2',
-        playerNames,
-        chessClock,
-      });
-    }
+    // Un joueur peut avoir plusieurs sockets vivantes: deux onglets, ou une reconnexion dont
+    // l ancienne connexion n est pas encore tombee. Le siege n en retient qu une; envoyer
+    // l etat a cette seule socket laisse l onglet que le joueur regarde vraiment sur un ecran
+    // fige, sans qu il puisse jouer ni comprendre pourquoi.
+    envoyerAuSiege(io, room.hostSocket, room.hostId, 'game:state-update', {
+      visibleState: packVisibleState(stateForViewer(p1State, hostPrivileged, hiddenIds)),
+      playerRole: 'player1',
+      playerNames,
+      chessClock,
+    });
+    envoyerAuSiege(io, room.guestSocket, room.guestId, 'game:state-update', {
+      visibleState: packVisibleState(stateForViewer(p2State, guestPrivileged, hiddenIds)),
+      playerRole: 'player2',
+      playerNames,
+      chessClock,
+    });
 
     
     if (room.spectators.size > 0) {
@@ -3294,7 +3315,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           const p2State = GameEngine.getVisibleStateForTransport(room.gameState, 'player2');
 
           if (room.hostSocket) {
-            io.to(room.hostSocket).emit('game:state-update', {
+            envoyerAuSiege(io, room.hostSocket, room.hostId, 'game:state-update', {
               visibleState: packVisibleState(p1State),
               playerRole: 'player1',
               playerNames: { player1: hostName, player2: guestName },
@@ -3302,7 +3323,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
             });
           }
           if (room.guestSocket) {
-            io.to(room.guestSocket).emit('game:state-update', {
+            envoyerAuSiege(io, room.guestSocket, room.guestId, 'game:state-update', {
               visibleState: packVisibleState(p2State),
               playerRole: 'player2',
               playerNames: { player1: hostName, player2: guestName },
@@ -4063,7 +4084,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         console.log(`[Socket] P2 visible: hand=${p2State.myState.hand.length}, phase=${p2State.phase}`);
 
         if (room.hostSocket) {
-          io.to(room.hostSocket).emit('game:state-update', {
+          envoyerAuSiege(io, room.hostSocket, room.hostId, 'game:state-update', {
             visibleState: packVisibleState(p1State),
             playerRole: 'player1',
             playerNames: { player1: hostName, player2: guestName },
@@ -4074,7 +4095,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
           console.error(`[Socket] Host socket is null! Cannot send state-update`);
         }
         if (room.guestSocket) {
-          io.to(room.guestSocket).emit('game:state-update', {
+          envoyerAuSiege(io, room.guestSocket, room.guestId, 'game:state-update', {
             visibleState: packVisibleState(p2State),
             playerRole: 'player2',
             playerNames: { player1: hostName, player2: guestName },
