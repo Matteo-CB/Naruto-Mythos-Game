@@ -43,6 +43,13 @@ export async function GET(request: NextRequest) {
       prisma.seasonRanking.count({ where }),
     ]);
 
+    const porteurs = await prisma.user.findMany({
+      where: { id: { in: rows.map((r) => r.userId) } },
+      select: { id: true, selectedSeasonBadge: true },
+    });
+    const badgeParJoueur = new Map(porteurs.map((u) => [u.id, u.selectedSeasonBadge]));
+    const lignes = rows.map((r) => ({ ...r, selectedSeasonBadge: badgeParJoueur.get(r.userId) ?? null }));
+
     const distinctCountries = await prisma.seasonRanking.findMany({
       where: { seasonId, countryCode: { not: null } },
       distinct: ['countryCode'],
@@ -53,7 +60,7 @@ export async function GET(request: NextRequest) {
       .filter((c): c is string => typeof c === 'string' && c.length > 0)
       .sort();
 
-    const response = NextResponse.json({ seasonId, rows, total, limit, offset, countries });
+    const response = NextResponse.json({ seasonId, rows: lignes, total, limit, offset, countries });
     response.headers.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=900');
     return response;
   } catch {

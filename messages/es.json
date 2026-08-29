@@ -2340,7 +2340,8 @@
     "deckPublicHint": "Visible para todos",
     "deckPrivateHint": "Visible solo para ti",
     "rankDivision": "{name} {level}",
-    "mode_highlander": "Highlander"
+    "mode_highlander": "Highlander",
+    "leagueTooltip": "{name}. Niveles: {paliers}."
   },
   "replay": {
     "title": "Resumen de la partida",
@@ -4108,6 +4109,23 @@
       "top-10": "Top 10",
       "top-50": "Top 50",
       "top-100": "Top 100"
+    },
+    "pickerLabel": "Insignia mostrada junto a tu bandera",
+    "pickerHint": "Esta insignia te acompaña allí donde aparece tu bandera. Solo puedes elegir las que has ganado.",
+    "pickerNone": "Ninguna",
+    "pickerEmpty": "Todavía no has ganado ninguna insignia de temporada.",
+    "close": "Cerrar",
+    "explication": {
+      "top-1": "Terminó primero en la temporada {season}.",
+      "top-10": "Terminó entre los diez primeros de la temporada {season}.",
+      "top-50": "Terminó entre los cincuenta primeros de la temporada {season}.",
+      "top-100": "Terminó entre los cien primeros de la temporada {season}."
+    },
+    "description": {
+      "top-1": "Otorgada al jugador clasificado primero al cerrar la temporada {season}. Solo un jugador la lleva y permanece en la cuenta para siempre.",
+      "top-10": "Otorgada a los diez mejores jugadores al cerrar la temporada {season}. La clasificación final queda congelada y la insignia permanece para siempre.",
+      "top-50": "Otorgada a los cincuenta mejores jugadores al cerrar la temporada {season}. La clasificación final queda congelada y la insignia permanece para siempre.",
+      "top-100": "Otorgada a los cien mejores jugadores al cerrar la temporada {season}. La clasificación final queda congelada y la insignia permanece para siempre."
     }
   }
 }

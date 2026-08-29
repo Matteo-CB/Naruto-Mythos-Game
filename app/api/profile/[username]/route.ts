@@ -34,6 +34,7 @@ export async function GET(
         id: true,
         username: true,
         countryCode: true,
+        selectedSeasonBadge: true,
         elo: true,
         evolvingElo: true,
         wins: true,

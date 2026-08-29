@@ -2341,7 +2341,8 @@
     "deckPublicHint": "Visible par tous",
     "deckPrivateHint": "Visible par toi seul",
     "rankDivision": "{name} {level}",
-    "mode_highlander": "Highlander"
+    "mode_highlander": "Highlander",
+    "leagueTooltip": "{name}. Paliers: {paliers}."
   },
   "replay": {
     "title": "Récapitulatif",
@@ -4109,6 +4110,23 @@
       "top-10": "Top 10",
       "top-50": "Top 50",
       "top-100": "Top 100"
+    },
+    "pickerLabel": "Badge affiché à côté de ton drapeau",
+    "pickerHint": "Ce badge te suit partout où ton drapeau apparaît. Tu ne peux choisir que ceux que tu as gagnés.",
+    "pickerNone": "Aucun",
+    "pickerEmpty": "Tu n'as encore gagné aucun badge de saison.",
+    "close": "Fermer",
+    "explication": {
+      "top-1": "Terminé premier du classement de la saison {season}.",
+      "top-10": "Terminé dans les dix premiers de la saison {season}.",
+      "top-50": "Terminé dans les cinquante premiers de la saison {season}.",
+      "top-100": "Terminé dans les cent premiers de la saison {season}."
+    },
+    "description": {
+      "top-1": "Décerné au joueur classé premier à la fermeture de la saison {season}. Un seul joueur le porte, et il reste sur le compte pour toujours.",
+      "top-10": "Décerné aux dix meilleurs joueurs à la fermeture de la saison {season}. Le classement de fin de saison est figé et le badge reste sur le compte pour toujours.",
+      "top-50": "Décerné aux cinquante meilleurs joueurs à la fermeture de la saison {season}. Le classement de fin de saison est figé et le badge reste sur le compte pour toujours.",
+      "top-100": "Décerné aux cent meilleurs joueurs à la fermeture de la saison {season}. Le classement de fin de saison est figé et le badge reste sur le compte pour toujours."
     }
   }
 }

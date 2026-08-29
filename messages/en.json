@@ -2335,7 +2335,8 @@
     "deckPublicHint": "Visible to everyone",
     "deckPrivateHint": "Visible only to you",
     "rankDivision": "{name} {level}",
-    "mode_highlander": "Highlander"
+    "mode_highlander": "Highlander",
+    "leagueTooltip": "{name}. Levels: {paliers}."
   },
   "replay": {
     "title": "Match Recap",
@@ -4103,6 +4104,23 @@
       "top-10": "Top 10",
       "top-50": "Top 50",
       "top-100": "Top 100"
+    },
+    "pickerLabel": "Badge shown next to your flag",
+    "pickerHint": "This badge follows you everywhere your flag appears. You can only pick one you have earned.",
+    "pickerNone": "None",
+    "pickerEmpty": "You have not earned a season badge yet.",
+    "close": "Close",
+    "explication": {
+      "top-1": "Finished first in the {season} season.",
+      "top-10": "Finished in the top ten of the {season} season.",
+      "top-50": "Finished in the top fifty of the {season} season.",
+      "top-100": "Finished in the top hundred of the {season} season."
+    },
+    "description": {
+      "top-1": "Awarded to the player ranked first when the {season} season closed. Only one player wears it, and it stays on the account forever.",
+      "top-10": "Awarded to the ten best players when the {season} season closed. The final standing is frozen and the badge stays on the account forever.",
+      "top-50": "Awarded to the fifty best players when the {season} season closed. The final standing is frozen and the badge stays on the account forever.",
+      "top-100": "Awarded to the hundred best players when the {season} season closed. The final standing is frozen and the badge stays on the account forever."
     }
   }
 }

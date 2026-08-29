@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/lib/i18n/navigation';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { CountryFlag } from '@/components/CountryFlag';
+import { PlayerFlag } from '@/components/PlayerFlag';
 import { useLocaleBcp47 } from '@/lib/i18n/useLocaleMeta';
 import { COUNTRIES } from '@/lib/data/countries';
 import { CloudBackground } from '@/components/CloudBackground';
@@ -28,6 +29,7 @@ interface LeaderboardUser {
   id: string;
   username: string;
   countryCode?: string | null;
+  selectedSeasonBadge?: string | null;
   elo: number;
   evolvingElo?: number;
   wins: number;
@@ -61,6 +63,7 @@ interface SeasonRow {
   countryCode: string | null;
   badge: string | null;
   league: string | null;
+  selectedSeasonBadge: string | null;
 }
 
 const ROW_CLIP = 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)';
@@ -154,7 +157,7 @@ function LeaderRow({
       )}
 
       <div className="flex items-center gap-1.5 min-w-0">
-        <CountryFlag code={user.countryCode} size={18} />
+        <PlayerFlag code={user.countryCode} badge={user.selectedSeasonBadge} size={18} />
         <Link
           href={`/profile/${encodeURIComponent(user.username)}` as '/'}
           className="font-display text-base truncate transition-colors hover:text-[var(--t-accent)]"
@@ -232,7 +235,7 @@ function SeasonLeaderRow({
       )}
 
       <div className="flex items-center gap-1.5 min-w-0">
-        <CountryFlag code={row.countryCode} size={18} />
+        <PlayerFlag code={row.countryCode} badge={row.selectedSeasonBadge} size={18} masquerLeBadge={row.badge} />
         <Link
           href={`/profile/${encodeURIComponent(row.username)}` as '/'}
           className="font-display text-base truncate transition-colors hover:text-[var(--t-accent)]"

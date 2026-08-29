@@ -858,7 +858,8 @@
     "deckPublicHint": "Visível para todos",
     "deckPrivateHint": "Visível só para você",
     "rankDivision": "{name} {level}",
-    "mode_highlander": "Highlander"
+    "mode_highlander": "Highlander",
+    "leagueTooltip": "{name}. Níveis: {paliers}."
   },
   "friends": {
     "title": "Amigos",
@@ -4103,6 +4104,23 @@
       "top-10": "Top 10",
       "top-50": "Top 50",
       "top-100": "Top 100"
+    },
+    "pickerLabel": "Emblema mostrado ao lado da tua bandeira",
+    "pickerHint": "Este emblema segue-te onde a tua bandeira aparecer. Só podes escolher os que ganhaste.",
+    "pickerNone": "Nenhum",
+    "pickerEmpty": "Ainda não ganhaste nenhum emblema de temporada.",
+    "close": "Fechar",
+    "explication": {
+      "top-1": "Terminou em primeiro na temporada {season}.",
+      "top-10": "Terminou entre os dez primeiros da temporada {season}.",
+      "top-50": "Terminou entre os cinquenta primeiros da temporada {season}.",
+      "top-100": "Terminou entre os cem primeiros da temporada {season}."
+    },
+    "description": {
+      "top-1": "Atribuído ao jogador classificado em primeiro no fecho da temporada {season}. Só um jogador o tem e fica na conta para sempre.",
+      "top-10": "Atribuído aos dez melhores jogadores no fecho da temporada {season}. A classificação final fica congelada e o emblema fica para sempre.",
+      "top-50": "Atribuído aos cinquenta melhores jogadores no fecho da temporada {season}. A classificação final fica congelada e o emblema fica para sempre.",
+      "top-100": "Atribuído aos cem melhores jogadores no fecho da temporada {season}. A classificação final fica congelada e o emblema fica para sempre."
     }
   }
 }

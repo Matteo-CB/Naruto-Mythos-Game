@@ -92,6 +92,7 @@ export async function GET(request: NextRequest) {
         highlanderWins: true,
         highlanderLosses: true,
         highlanderDraws: true,
+        selectedSeasonBadge: true,
         role: true,
         badgePrefs: true,
         consecutiveWins: true,
@@ -114,7 +115,7 @@ export async function GET(request: NextRequest) {
       else if (country) unrankedConditions.push({ countryCode: country });
       const allUsers = await prisma.user.findMany({
         where: { AND: unrankedConditions },
-        select: { id: true, username: true, countryCode: true, elo: true, evolvingElo: true, wins: true, losses: true, draws: true, evolvingWins: true, evolvingLosses: true, evolvingDraws: true, highlanderElo: true, highlanderWins: true, highlanderLosses: true, highlanderDraws: true, role: true, badgePrefs: true, consecutiveWins: true, consecutiveLosses: true, tournamentWins: true },
+        select: { id: true, username: true, countryCode: true, elo: true, evolvingElo: true, wins: true, losses: true, draws: true, evolvingWins: true, evolvingLosses: true, evolvingDraws: true, highlanderElo: true, highlanderWins: true, highlanderLosses: true, highlanderDraws: true, selectedSeasonBadge: true, role: true, badgePrefs: true, consecutiveWins: true, consecutiveLosses: true, tournamentWins: true },
         orderBy: { createdAt: 'desc' },
         take: 500,
       });

@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { SeasonBadge } from '@/components/badges/SeasonBadge';
+import { SeasonBadgeModal } from '@/components/badges/SeasonBadgeModal';
 import { LeagueBadge } from '@/components/badges/LeagueBadge';
 import { trieLesBadges, type BadgeDeSaison } from '@/lib/badges/saisonBadges';
 import { getSetName } from '@/lib/data/sets/registry';
@@ -15,6 +17,7 @@ export function SeasonBadgesPanel({ badges }: SeasonBadgesPanelProps) {
   const t = useTranslations('seasonBadges');
   const locale = useLocale();
   const ordonnes = trieLesBadges(badges);
+  const [ouvert, setOuvert] = useState<BadgeDeSaison | null>(null);
 
   return (
     <div className="mb-7">
@@ -36,7 +39,16 @@ export function SeasonBadgesPanel({ badges }: SeasonBadgesPanelProps) {
               className="flex items-center gap-4 px-4 py-3"
               style={{ backgroundColor: 'var(--t-panel)', borderRadius: 4 }}
             >
-              {b.badge && <SeasonBadge seasonId={b.seasonId} badge={b.badge} rank={b.rank} size="lg" showLabel />}
+              {b.badge && (
+                <SeasonBadge
+                  seasonId={b.seasonId}
+                  badge={b.badge}
+                  rank={b.rank}
+                  size="lg"
+                  showLabel
+                  onClick={() => setOuvert(b)}
+                />
+              )}
               {b.league && <LeagueBadge league={b.league} size="lg" showLabel />}
               <span className="flex flex-col leading-tight">
                 <span className="font-display text-[10px] uppercase tracking-widest tabular-nums" style={{ color: 'var(--t-dim)' }}>
@@ -49,6 +61,14 @@ export function SeasonBadgesPanel({ badges }: SeasonBadgesPanelProps) {
             </motion.div>
           ))}
         </div>
+      )}
+      {ouvert?.badge && (
+        <SeasonBadgeModal
+          seasonId={ouvert.seasonId}
+          badge={ouvert.badge}
+          rank={ouvert.rank}
+          onClose={() => setOuvert(null)}
+        />
       )}
     </div>
   );

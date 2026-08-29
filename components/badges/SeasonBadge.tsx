@@ -5,8 +5,9 @@ import { useLocale, useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { imageDuBadge } from '@/lib/badges/saisonBadges';
 import { getSetName } from '@/lib/data/sets/registry';
+import { BadgeTooltip } from '@/components/badges/BadgeTooltip';
 
-const TAILLES = { sm: 22, md: 34, lg: 56 } as const;
+const TAILLES = { xs: 16, sm: 22, md: 34, lg: 56 } as const;
 
 export type TailleDeBadge = keyof typeof TAILLES;
 
@@ -16,35 +17,48 @@ interface SeasonBadgeProps {
   rank?: number;
   size?: TailleDeBadge;
   showLabel?: boolean;
+  onClick?: () => void;
 }
 
-export function SeasonBadge({ seasonId, badge, rank, size = 'md', showLabel = false }: SeasonBadgeProps) {
+export function useTexteDeBadge(seasonId: string, badge: string, rank?: number) {
   const t = useTranslations('seasonBadges');
   const locale = useLocale();
-  const cote = TAILLES[size];
   const nomDeSaison = getSetName(seasonId, locale);
   const palier = t.has(`tier.${badge}`) ? t(`tier.${badge}`) : badge;
-  const titre = rank ? `${nomDeSaison} - ${palier} (${t('rank', { rank })})` : `${nomDeSaison} - ${palier}`;
+  const titre = `${nomDeSaison} ${palier}`;
+  const resume = t.has(`explication.${badge}`)
+    ? t(`explication.${badge}`, { season: nomDeSaison })
+    : titre;
+  const description = t.has(`description.${badge}`)
+    ? t(`description.${badge}`, { season: nomDeSaison, rank: rank ?? 0 })
+    : resume;
+  return { nomDeSaison, palier, titre, resume, description };
+}
+
+export function SeasonBadge({ seasonId, badge, rank, size = 'md', showLabel = false, onClick }: SeasonBadgeProps) {
+  const cote = TAILLES[size];
+  const { nomDeSaison, palier, titre, resume } = useTexteDeBadge(seasonId, badge, rank);
 
   return (
-    <motion.span
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.25 }}
-      title={titre}
-      className="inline-flex items-center gap-2"
-    >
-      <Image src={imageDuBadge(seasonId, badge)} alt={titre} width={cote} height={cote} unoptimized />
-      {showLabel && (
-        <span className="flex flex-col leading-tight">
-          <span className="font-display text-[11px] uppercase tracking-widest" style={{ color: 'var(--t-accent)' }}>
-            {palier}
+    <BadgeTooltip titre={titre} texte={resume} onClick={onClick}>
+      <motion.span
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.25 }}
+        className="inline-flex items-center gap-2"
+      >
+        <Image src={imageDuBadge(seasonId, badge)} alt={titre} width={cote} height={cote} unoptimized />
+        {showLabel && (
+          <span className="flex flex-col leading-tight">
+            <span className="font-display text-[11px] uppercase tracking-widest" style={{ color: 'var(--t-accent)' }}>
+              {palier}
+            </span>
+            <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
+              {nomDeSaison}
+            </span>
           </span>
-          <span className="font-display text-[9px] uppercase tracking-widest" style={{ color: 'var(--t-muted)' }}>
-            {nomDeSaison}
-          </span>
-        </span>
-      )}
-    </motion.span>
+        )}
+      </motion.span>
+    </BadgeTooltip>
   );
 }

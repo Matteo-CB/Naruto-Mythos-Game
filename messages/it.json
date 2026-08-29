@@ -858,7 +858,8 @@
     "deckPublicHint": "Visibile a tutti",
     "deckPrivateHint": "Visibile solo a te",
     "rankDivision": "{name} {level}",
-    "mode_highlander": "Highlander"
+    "mode_highlander": "Highlander",
+    "leagueTooltip": "{name}. Livelli: {paliers}."
   },
   "friends": {
     "title": "Amici",
@@ -4103,6 +4104,23 @@
       "top-10": "Top 10",
       "top-50": "Top 50",
       "top-100": "Top 100"
+    },
+    "pickerLabel": "Distintivo mostrato accanto alla tua bandiera",
+    "pickerHint": "Questo distintivo ti segue ovunque appaia la tua bandiera. Puoi scegliere solo quelli che hai vinto.",
+    "pickerNone": "Nessuno",
+    "pickerEmpty": "Non hai ancora vinto nessun distintivo di stagione.",
+    "close": "Chiudi",
+    "explication": {
+      "top-1": "Ha chiuso primo la stagione {season}.",
+      "top-10": "Ha chiuso tra i primi dieci della stagione {season}.",
+      "top-50": "Ha chiuso tra i primi cinquanta della stagione {season}.",
+      "top-100": "Ha chiuso tra i primi cento della stagione {season}."
+    },
+    "description": {
+      "top-1": "Assegnato al giocatore primo in classifica alla chiusura della stagione {season}. Lo porta un solo giocatore e resta sul profilo per sempre.",
+      "top-10": "Assegnato ai dieci migliori giocatori alla chiusura della stagione {season}. La classifica finale è congelata e il distintivo resta per sempre.",
+      "top-50": "Assegnato ai cinquanta migliori giocatori alla chiusura della stagione {season}. La classifica finale è congelata e il distintivo resta per sempre.",
+      "top-100": "Assegnato ai cento migliori giocatori alla chiusura della stagione {season}. La classifica finale è congelata e il distintivo resta per sempre."
     }
   }
 }

@@ -5,11 +5,13 @@
       "categories": [
         "feature",
         "feature",
+        "feature",
         "fix",
         "fix"
       ],
       "title_fr": "Mise à jour",
       "changes_fr": [
+        "Tu peux choisir un badge gagné qui suivra ton drapeau partout, avec son explication au survol",
         "Nouveau mode Highlander: 40 cartes minimum, une seule copie de chaque carte, avec son propre classement",
         "Les ligues montent désormais en trois niveaux chacune, de Genin I jusqu'à Héritier de la Volonté du Feu III",
         "Tournoi: la partie s'ouvre même si le signal de départ se perd, fini l'écran qui recharge en boucle",
@@ -17,6 +19,7 @@
       ],
       "title_en": "Update",
       "changes_en": [
+        "You can pick an earned badge that follows your flag everywhere, with its meaning on hover",
         "New Highlander mode: at least 40 cards, a single copy of each card, with its own ranking",
         "Every league now has three levels, from Genin I all the way up to Inheritor of the Will of Fire III",
         "Tournament: the game opens even if the start signal is lost, no more screen looping back to the home page",
@@ -24,6 +27,7 @@
       ],
       "title_es": "Actualización",
       "changes_es": [
+        "Puedes elegir una insignia ganada que acompaña tu bandera en todas partes, con su explicación al pasar el ratón",
         "Nuevo modo Highlander: mínimo 40 cartas, una sola copia de cada carta, con su propio ranking",
         "Cada liga tiene ahora tres niveles, desde Genin I hasta Heredero de la Voluntad de Fuego III",
         "Torneo: la partida se abre aunque se pierda la señal de inicio, se acabó la pantalla que vuelve al inicio",
@@ -31,6 +35,7 @@
       ],
       "title_pt": "Atualização",
       "changes_pt": [
+        "Podes escolher um emblema ganho que segue a tua bandeira em todo o lado, com a explicação ao passar o rato",
         "Novo modo Highlander: no mínimo 40 cartas, uma só cópia de cada carta, com a sua classificação",
         "Cada liga tem agora três níveis, de Genin I até Herdeiro da Vontade do Fogo III",
         "Torneio: a partida abre mesmo que o sinal de início se perca, acabou o ecrã que volta sempre ao início",
@@ -38,6 +43,7 @@
       ],
       "title_it": "Aggiornamento",
       "changes_it": [
+        "Puoi scegliere un distintivo vinto che segue la tua bandiera ovunque, con la spiegazione al passaggio del mouse",
         "Nuova modalità Highlander: almeno 40 carte, una sola copia di ogni carta, con la sua classifica",
         "Ogni lega ha ora tre livelli, da Genin I fino a Erede della Volontà del Fuoco III",
         "Torneo: la partita si apre anche se il segnale di inizio va perso, basta schermate che tornano alla home",
@@ -45,6 +51,7 @@
       ],
       "title_pl": "Aktualizacja",
       "changes_pl": [
+        "Możesz wybrać zdobytą odznakę, która towarzyszy twojej fladze wszędzie, z opisem po najechaniu",
         "Nowy tryb Highlander: minimum 40 kart, tylko jedna kopia każdej karty, z własnym rankingiem",
         "Każda liga ma teraz trzy poziomy, od Genin I aż po Dziedzica Woli Ognia III",
         "Turniej: partia otwiera się nawet gdy sygnał startu zaginie, koniec z ekranem wracającym na stronę główną",
@@ -52,6 +59,7 @@
       ],
       "title_ja": "アップデート",
       "changes_ja": [
+        "獲得したバッジを1つ選ぶと国旗の横にいつも表示され、カーソルを合わせると説明が出ます",
         "新モード ハイランダー: 40枚以上、同じカードは1枚まで、専用のランキング付き",
         "各リーグが3段階になりました。下忍 I から火の意志を継ぐ者 III まで",
         "トーナメント: 開始の合図が届かなくても対戦が始まり、ホームに戻され続ける画面がなくなりました",

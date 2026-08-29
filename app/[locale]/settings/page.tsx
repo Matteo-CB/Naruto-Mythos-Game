@@ -8,6 +8,7 @@ import { isTouchPrimaryDevice } from '@/lib/utils/device';
 import { CloudBackground } from '@/components/CloudBackground';
 import { DecorativeIcons } from '@/components/DecorativeIcons';
 import { FlagPicker } from '@/components/FlagPicker';
+import { SeasonBadgePicker } from '@/components/settings/SeasonBadgePicker';
 import { ChatSettingsSection } from '@/components/settings/ChatSettingsSection';
 import { BoardColorsSection } from '@/components/settings/BoardColorsSection';
 import { SiteThemeSection } from '@/components/settings/SiteThemeSection';
@@ -38,6 +39,7 @@ export default function SettingsPage() {
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   useEffect(() => { setIsTouchDevice(isTouchPrimaryDevice()); }, []);
   const tFlag = useTranslations('flag');
+  const tBadge = useTranslations('seasonBadges');
 
   const [usernameInput, setUsernameInput] = useState('');
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -433,6 +435,18 @@ export default function SettingsPage() {
             <FlagPicker value={countryCode} onChange={setCountryCode} disabled={!isLoaded} />
             <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>
               {tFlag('hint')}
+            </p>
+          </div>
+
+          <div style={{ height: '1px', backgroundColor: 'var(--t-divider)' }} />
+
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium tracking-wide" style={{ color: isLoaded ? 'var(--t-text)' : 'var(--t-dim)' }}>
+              {tBadge('pickerLabel')}
+            </span>
+            <SeasonBadgePicker username={session?.user?.name ?? null} disabled={!isLoaded} />
+            <p className="text-xs tracking-wide" style={{ color: 'var(--t-dim)' }}>
+              {tBadge('pickerHint')}
             </p>
           </div>
         </div>

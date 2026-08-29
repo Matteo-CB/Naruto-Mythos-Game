@@ -3,6 +3,8 @@
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { RANK_TIERS } from '@/components/EloBadge';
+import { BadgeTooltip } from '@/components/badges/BadgeTooltip';
+import { LIGUES, niveauRomain, seuilDEntree } from '@/lib/leagues/paliers';
 
 const TAILLES = { sm: 22, md: 30, lg: 44 } as const;
 
@@ -19,8 +21,14 @@ export function LeagueBadge({ league, size = 'md', showLabel = false }: LeagueBa
   const cote = TAILLES[size];
   const nom = t.has(`rankNames.${league}`) ? t(`rankNames.${league}`) : league;
 
+  const seuils = LIGUES.find((l) => l.key === league)?.seuils ?? [seuilDEntree(league)];
+  const detail = t.has('leagueTooltip')
+    ? t('leagueTooltip', { name: nom, paliers: seuils.map((s, i) => `${niveauRomain(i + 1)} ${s}`).join(', ') })
+    : nom;
+
   return (
-    <span className="inline-flex items-center gap-2" title={nom}>
+    <BadgeTooltip titre={nom} texte={detail}>
+    <span className="inline-flex items-center gap-2">
       <Image
         src={palier.image}
         alt={nom}
@@ -36,5 +44,6 @@ export function LeagueBadge({ league, size = 'md', showLabel = false }: LeagueBa
         </span>
       )}
     </span>
+    </BadgeTooltip>
   );
 }

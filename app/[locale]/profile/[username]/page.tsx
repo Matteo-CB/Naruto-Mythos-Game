@@ -13,7 +13,7 @@ import { FriendshipButton } from '@/components/social/FriendshipButton';
 import { ProfileModerationActions } from '@/components/social/ProfileModerationActions';
 import { getRankTier, rankDivisionLabel, PLACEMENT_MATCHES_REQUIRED } from '@/components/EloBadge';
 import { UserBadges } from '@/components/badges/UserBadges';
-import { CountryFlag } from '@/components/CountryFlag';
+import { PlayerFlag } from '@/components/PlayerFlag';
 import { EloHistoryChart } from '@/components/EloHistoryChart';
 import { DeckStatsPanel } from '@/components/profile/DeckStatsPanel';
 import { SeasonBadgesPanel } from '@/components/profile/SeasonBadgesPanel';
@@ -83,6 +83,7 @@ interface ProfileData {
   id: string;
   username: string;
   countryCode?: string | null;
+  selectedSeasonBadge?: string | null;
   elo: number;
   evolvingElo?: number;
   evolvingWins?: number;
@@ -492,7 +493,7 @@ export default function ProfilePage({
             </div>
 
             <div className="flex items-center gap-2 max-w-full mt-3">
-              <CountryFlag code={profile.countryCode} size={26} />
+              <PlayerFlag code={profile.countryCode} badge={profile.selectedSeasonBadge} size={26} />
               <h1
                 className="font-display text-lg sm:text-2xl leading-tight wrap-break-word"
                 style={{ color: 'var(--t-text)', letterSpacing: '0.04em', wordBreak: 'break-word' }}

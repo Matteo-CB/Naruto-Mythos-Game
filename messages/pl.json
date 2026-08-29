@@ -858,7 +858,8 @@
     "deckPublicHint": "Widoczny dla wszystkich",
     "deckPrivateHint": "Widoczny tylko dla ciebie",
     "rankDivision": "{name} {level}",
-    "mode_highlander": "Highlander"
+    "mode_highlander": "Highlander",
+    "leagueTooltip": "{name}. Poziomy: {paliers}."
   },
   "friends": {
     "title": "Znajomi",
@@ -4103,6 +4104,23 @@
       "top-10": "Top 10",
       "top-50": "Top 50",
       "top-100": "Top 100"
+    },
+    "pickerLabel": "Odznaka obok twojej flagi",
+    "pickerHint": "Ta odznaka towarzyszy ci wszędzie tam, gdzie pojawia się twoja flaga. Możesz wybrać tylko zdobyte.",
+    "pickerNone": "Brak",
+    "pickerEmpty": "Nie zdobyto jeszcze żadnej odznaki sezonu.",
+    "close": "Zamknij",
+    "explication": {
+      "top-1": "Zakończył sezon {season} na pierwszym miejscu.",
+      "top-10": "Zakończył sezon {season} w pierwszej dziesiątce.",
+      "top-50": "Zakończył sezon {season} w pierwszej piecdziesiątce.",
+      "top-100": "Zakończył sezon {season} w pierwszej setce."
+    },
+    "description": {
+      "top-1": "Przyznawana graczowi z pierwszego miejsca w chwili zamknięcia sezonu {season}. Nosi ją tylko jeden gracz i zostaje na koncie na zawsze.",
+      "top-10": "Przyznawana dziesięciu najlepszym graczom w chwili zamknięcia sezonu {season}. Końcowy ranking jest zamrożony, a odznaka zostaje na zawsze.",
+      "top-50": "Przyznawana piecdziesięciu najlepszym graczom w chwili zamknięcia sezonu {season}. Końcowy ranking jest zamrożony, a odznaka zostaje na zawsze.",
+      "top-100": "Przyznawana stu najlepszym graczom w chwili zamknięcia sezonu {season}. Końcowy ranking jest zamrożony, a odznaka zostaje na zawsze."
     }
   }
 }

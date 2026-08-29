@@ -6,9 +6,9 @@ import { useTranslations } from 'next-intl';
 import { useGameStore } from '@/stores/gameStore';
 import { ChessClockDisplay } from '@/components/game/ChessClockDisplay';
 import { useGameScale } from './GameScaleContext';
-import { CountryFlag } from '@/components/CountryFlag';
+import { PlayerFlag } from '@/components/PlayerFlag';
 import { PlayerNameLink } from '@/components/social/PlayerNameLink';
-import { usePlayerFlag } from '@/lib/hooks/usePlayerFlags';
+import { usePlayerFlag, usePlayerBadge } from '@/lib/hooks/usePlayerFlags';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { ManualGuess } from './ManualGuess';
 import { useBoardPalette } from './BoardPaletteContext';
@@ -23,6 +23,7 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
   const playerDisplayNames = useGameStore((s) => s.playerDisplayNames);
   const myPlayerId = visibleState?.myPlayer;
   const flagCode = usePlayerFlag(myPlayerId ? playerDisplayNames[myPlayerId] : null);
+  const flagBadge = usePlayerBadge(myPlayerId ? playerDisplayNames[myPlayerId] : null);
 
   if (!visibleState) return null;
 
@@ -57,7 +58,7 @@ export const PlayerStatsBar = React.memo(function PlayerStatsBar() {
     >
       
       <span className="font-semibold shrink-0 flex items-center gap-1.5" style={{ fontSize: dims.isMobile ? '14px' : '12px', color: me.primary }}>
-        <CountryFlag code={flagCode} size={dims.isMobile ? 16 : 14} />
+        <PlayerFlag code={flagCode} badge={flagBadge} size={dims.isMobile ? 16 : 14} />
         <PlayerNameLink username={playerName} newTab disabled={!isOnlineGame} />
       </span>
 

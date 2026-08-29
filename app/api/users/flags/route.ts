@@ -10,23 +10,25 @@ export async function GET(request: NextRequest) {
     .slice(0, 4);
 
   if (names.length === 0) {
-    return NextResponse.json({ flags: {} }, { headers: { 'Cache-Control': 'public, s-maxage=300' } });
+    return NextResponse.json({ flags: {}, badges: {} }, { headers: { 'Cache-Control': 'public, s-maxage=300' } });
   }
 
   try {
     const users = await prisma.user.findMany({
       where: { OR: names.map((n) => ({ username: { equals: n, mode: 'insensitive' as const } })) },
-      select: { username: true, countryCode: true },
+      select: { username: true, countryCode: true, selectedSeasonBadge: true },
     });
 
     const flags: Record<string, string | null> = {};
+    const badges: Record<string, string | null> = {};
     for (const n of names) {
       const match = users.find((u) => u.username.toLowerCase() === n.toLowerCase());
       flags[n] = match?.countryCode ?? null;
+      badges[n] = match?.selectedSeasonBadge ?? null;
     }
 
-    return NextResponse.json({ flags }, { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' } });
+    return NextResponse.json({ flags, badges }, { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' } });
   } catch {
-    return NextResponse.json({ flags: {} }, { headers: { 'Cache-Control': 'public, s-maxage=60' } });
+    return NextResponse.json({ flags: {}, badges: {} }, { headers: { 'Cache-Control': 'public, s-maxage=60' } });
   }
 }

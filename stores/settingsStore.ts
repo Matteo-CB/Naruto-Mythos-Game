@@ -46,6 +46,8 @@ interface SettingsState {
   manualPowerMode: boolean;
   gamepadEnabled: boolean;
   countryCode: string | null;
+  selectedSeasonBadge: string | null;
+  setSelectedSeasonBadge: (valeur: string | null) => Promise<void>;
   gameBackground: string; // background DB id or "default"
   gameBackgroundUrl: string; // resolved URL for the background image
   boardPalette: StoredBoardPalette | null;
@@ -134,6 +136,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
   manualPowerMode: false,
   gamepadEnabled: true,
   countryCode: null,
+  selectedSeasonBadge: null,
   gameBackground: 'default',
   gameBackgroundUrl: DEFAULT_BG_URL,
   boardPalette: null,
@@ -181,6 +184,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
         manualPowerMode: prefs.manualPowerMode ?? false,
         gamepadEnabled: prefs.gamepadEnabled ?? true,
         countryCode: prefs.countryCode ?? null,
+        selectedSeasonBadge: prefs.selectedSeasonBadge ?? null,
         gameBackground: bgId,
         gameBackgroundUrl: bgUrl,
         boardPalette: readBoardPalette(prefs.boardPalette),
@@ -303,6 +307,21 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       if (!res.ok) throw new Error('Failed to save');
     } catch {
       set({ gamepadEnabled: prev });
+    }
+  },
+
+  setSelectedSeasonBadge: async (valeur: string | null) => {
+    const prev = get().selectedSeasonBadge;
+    set({ selectedSeasonBadge: valeur });
+    try {
+      const res = await fetch('/api/user/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ selectedSeasonBadge: valeur }),
+      });
+      if (!res.ok) throw new Error('Failed to save');
+    } catch {
+      set({ selectedSeasonBadge: prev });
     }
   },
 

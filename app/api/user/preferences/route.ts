@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { auth } from '@/lib/auth/authOptions';
 import { prisma } from '@/lib/db/prisma';
 import { COUNTRY_CODES } from '@/lib/data/countries';
+import { parseBadgeChoisi } from '@/lib/badges/badgeChoisi';
 import { refreshChatLock } from '@/lib/socket/chatLockBridge';
 import { normalizeChatVisibility } from '@/lib/chat/chatRules';
 import { validateStoredBoardPalette } from '@/lib/game/boardPalette';
@@ -45,7 +46,7 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { animationsEnabled: true, soundsEnabled: true, gameBackground: true, allowSpectatorHand: true, hideDeckBuilderVariants: true, manualPowerMode: true, gamepadEnabled: true, countryCode: true, chatVisibility: true, fastAnimations: true, allowNonFriendMessages: true, privateProfile: true, boardPalette: true, siteTheme: true },
+      select: { animationsEnabled: true, soundsEnabled: true, gameBackground: true, allowSpectatorHand: true, hideDeckBuilderVariants: true, manualPowerMode: true, gamepadEnabled: true, countryCode: true, selectedSeasonBadge: true, chatVisibility: true, fastAnimations: true, allowNonFriendMessages: true, privateProfile: true, boardPalette: true, siteTheme: true },
     });
 
     const deckPrefs = await readDeckPrefs(session.user.id);
@@ -60,6 +61,7 @@ export async function GET() {
       manualPowerMode: user?.manualPowerMode ?? false,
       gamepadEnabled: user?.gamepadEnabled ?? true,
       countryCode: user?.countryCode ?? null,
+      selectedSeasonBadge: user?.selectedSeasonBadge ?? null,
       chatVisibility: normalizeChatVisibility(user?.chatVisibility),
       fastAnimations: user?.fastAnimations ?? false,
       allowNonFriendMessages: user?.allowNonFriendMessages ?? true,
@@ -111,6 +113,21 @@ export async function PATCH(request: NextRequest) {
       update.countryCode = null;
     } else if (typeof body.countryCode === 'string' && COUNTRY_CODES.has(body.countryCode)) {
       update.countryCode = body.countryCode;
+    }
+    if (body.selectedSeasonBadge === null) {
+      update.selectedSeasonBadge = null;
+    } else if (typeof body.selectedSeasonBadge === 'string') {
+      const choix = parseBadgeChoisi(body.selectedSeasonBadge);
+      if (choix) {
+        const possede = await prisma.seasonRanking.findFirst({
+          where: { userId: session.user.id, seasonId: choix.seasonId, badge: choix.badge },
+          select: { id: true },
+        });
+        if (!possede) {
+          return NextResponse.json({ error: 'Badge not earned' }, { status: 403 });
+        }
+        update.selectedSeasonBadge = body.selectedSeasonBadge;
+      }
     }
     if (typeof body.chatVisibility === 'string' && ['everyone', 'friends', 'off'].includes(body.chatVisibility)) {
       update.chatVisibility = body.chatVisibility;
