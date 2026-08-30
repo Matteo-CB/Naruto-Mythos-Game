@@ -9,34 +9,42 @@
     {
       "date": "2026-08-30",
       "categories": [
+        "fix",
         "fix"
       ],
       "title_fr": "Mise à jour",
       "changes_fr": [
+        "OROCHIMARU 127 ne rend plus de Chakra quand il prend une cible dont la Puissance est descendue sous zéro: la prise est gratuite",
         "Le scellé est de nouveau ouvert à tout le monde"
       ],
       "title_en": "Update",
       "changes_en": [
+        "OROCHIMARU 127 no longer gives Chakra back when taking a target pushed below zero Power: the takeover is free",
         "Sealed is open to everyone again"
       ],
       "title_es": "Actualización",
       "changes_es": [
+        "OROCHIMARU 127 ya no devuelve Chakra al tomar un objetivo con Poder por debajo de cero: la toma es gratis",
         "El sellado vuelve a estar abierto para todos"
       ],
       "title_pt": "Atualização",
       "changes_pt": [
+        "OROCHIMARU 127 já não devolve Chakra ao tomar um alvo com Poder abaixo de zero: a tomada é grátis",
         "O selado está de novo aberto a todos"
       ],
       "title_it": "Aggiornamento",
       "changes_it": [
+        "OROCHIMARU 127 non restituisce più Chakra quando prende un bersaglio con Potenza sotto zero: la presa è gratuita",
         "Il sigillato è di nuovo aperto a tutti"
       ],
       "title_pl": "Aktualizacja",
       "changes_pl": [
+        "OROCHIMARU 127 nie oddaje już Chakry, gdy przejmuje cel o Sile poniżej zera: przejęcie jest darmowe",
         "Tryb sealed jest znowu otwarty dla wszystkich"
       ],
       "title_ja": "アップデート",
       "changes_ja": [
+        "オロチマル127は、パワーが0未満になった相手を奪ってもチャクラを戻さなくなり、奪取は無償になりました",
         "シールド戦がふたたび全員に開放されました"
       ]
     },

@@ -11,6 +11,10 @@ export const OROCHIMARU_127_ID = 'SS-127-R';
 export const OROCHIMARU_127_NAME = 'OROCHIMARU';
 export const OROCHIMARU_127_DUEL = 'DUEL Sasuke Uchiha';
 
+export function prixDuControle(state: GameState, cible: CharacterInPlay): number {
+  return Math.max(0, getEffectivePower(state, cible, cible.controlledBy));
+}
+
 export function affordableEnemiesIn(
   state: GameState,
   player: PlayerID,
@@ -21,7 +25,7 @@ export function affordableEnemiesIn(
   const chakra = state[player].chakra;
   return mission[sideKey(enemyOf(player))].filter((c) => {
     if (c.isHidden) return false;
-    return getEffectivePower(state, c, c.controlledBy) <= chakra;
+    return prixDuControle(state, c) <= chakra;
   });
 }
 

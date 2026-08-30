@@ -67,7 +67,7 @@ import { OROCHIMARU_130_ID, OROCHIMARU_130_NAME, leafEnemiesIn } from './handler
 import { KABUTO_139_ID, KABUTO_139_NAME } from './handlers/SS/kabuto139';
 import { KABUTO_053_REDUCTION } from './handlers/KS/uncommon/kabuto053';
 import { kabuto139PiocheEtDefausse } from './ContinuousEffects';
-import { OROCHIMARU_127_ID, OROCHIMARU_127_NAME } from './handlers/SS/orochimaru127';
+import { OROCHIMARU_127_ID, OROCHIMARU_127_NAME, prixDuControle } from './handlers/SS/orochimaru127';
 import { KIMIMARO_077_ID, KIMIMARO_077_NAME, kimimaro077Targets, costOfTarget, kimimaro077HasAffordableTarget } from './handlers/SS/kimimaro077';
 import { DOSU_125_ID, DOSU_125_NAME } from './handlers/SS/soundMoves';
 import { AUTO_CONFIRM_INSTANT, envelopperResultat } from './autoConfirm';
@@ -12749,7 +12749,7 @@ export class EffectEngine {
       case 'SS127_TAKE_CONTROL': {
         const ss127Found = EffectEngine.findCharByInstanceId(newState, targetId);
         if (!ss127Found) break;
-        const ss127Prix = getEffectivePower(newState, ss127Found.character, ss127Found.character.controlledBy);
+        const ss127Prix = prixDuControle(newState, ss127Found.character);
         const ss127Player = pendingEffect.sourcePlayer;
 
         if (newState[ss127Player].chakra < ss127Prix) {
