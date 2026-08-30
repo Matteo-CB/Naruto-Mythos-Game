@@ -7,6 +7,40 @@
   ],
   "entries": [
     {
+      "date": "2026-08-30",
+      "categories": [
+        "fix"
+      ],
+      "title_fr": "Mise à jour",
+      "changes_fr": [
+        "Le scellé est de nouveau ouvert à tout le monde"
+      ],
+      "title_en": "Update",
+      "changes_en": [
+        "Sealed is open to everyone again"
+      ],
+      "title_es": "Actualización",
+      "changes_es": [
+        "El sellado vuelve a estar abierto para todos"
+      ],
+      "title_pt": "Atualização",
+      "changes_pt": [
+        "O selado está de novo aberto a todos"
+      ],
+      "title_it": "Aggiornamento",
+      "changes_it": [
+        "Il sigillato è di nuovo aperto a tutti"
+      ],
+      "title_pl": "Aktualizacja",
+      "changes_pl": [
+        "Tryb sealed jest znowu otwarty dla wszystkich"
+      ],
+      "title_ja": "アップデート",
+      "changes_ja": [
+        "シールド戦がふたたび全員に開放されました"
+      ]
+    },
+    {
       "date": "2026-08-29",
       "categories": [
         "fix",

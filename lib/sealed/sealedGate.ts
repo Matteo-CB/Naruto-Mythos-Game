@@ -1,6 +1,6 @@
 import { isAdmin } from '@/lib/auth/admins';
 
-export const SEALED_TEMPORAIREMENT_FERME = true;
+export const SEALED_TEMPORAIREMENT_FERME = false;
 
 export function sealedOuvertPour(
   utilisateur: { username?: string | null; email?: string | null } | null | undefined,
