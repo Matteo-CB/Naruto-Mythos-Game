@@ -1,4 +1,5 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
+import { peutEtreJouee } from '@/lib/engine/rules/placement';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
 import { canAffordAsUpgrade } from '@/lib/effects/handlers/KS/shared/upgradeCheck';
@@ -16,13 +17,7 @@ function sakura109MainHandler(ctx: EffectContext): EffectResult {
     const card = playerState.discardPile[i];
     if (card.card_type === 'character' && card.group === 'Leaf Village') {
       
-      const canFreshFull = playerState.chakra >= card.chakra;
-      const canUpgradeFull = canAffordAsUpgrade(state, sourcePlayer, card as { name_fr: string; chakra: number }, 0);
-      
-      const freshCost2 = bestFreshPlayCost(state, sourcePlayer, card as never, 2);
-      const canFresh2 = playerState.chakra >= freshCost2;
-      const canUpgrade2 = canAffordAsUpgrade(state, sourcePlayer, card as { name_fr: string; chakra: number }, 2);
-      if (canFreshFull || canUpgradeFull || canFresh2 || canUpgrade2) {
+      if (peutEtreJouee(state, sourcePlayer, card as never, 0) || peutEtreJouee(state, sourcePlayer, card as never, 2)) {
         hasAffordable = true;
         break;
       }

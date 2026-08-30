@@ -16,6 +16,7 @@ import type {
   PendingEffect,
   EffectType,
 } from './types';
+import { peutEtreJouee } from '@/lib/engine/rules/placement';
 import {
   INITIAL_HAND_SIZE,
   TOTAL_TURNS,
@@ -1260,7 +1261,7 @@ export class GameEngine {
         const s109dPS = newState[effect.sourcePlayer];
         const s109dValidTargets = s109dPS.discardPile
           .map((c: any, i: number) => ({ c, i }))
-          .filter(({ c }: any) => c.card_type === 'character' && c.group === 'Leaf Village' && s109dPS.chakra >= (c.chakra ?? 0))
+          .filter(({ c }: any) => c.card_type === 'character' && c.group === 'Leaf Village' && peutEtreJouee(newState, effect.sourcePlayer, c as never, 0))
           .map(({ i }: any) => String(i));
         if (s109dValidTargets.length > 0) {
           const s109dEffId = generateInstanceId();

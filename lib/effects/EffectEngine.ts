@@ -96,108 +96,10 @@ import { annoncerJetonsRetires } from '@/lib/quests/jetonsRetires';
 import { annoncerDefaite } from '@/lib/quests/defaiteAnnoncee';
 import { annoncerEquipementDefausse, annoncerDefaiteParEquipement } from '@/lib/quests/equipementPose';
 import { hasFlexibleUpgradeRestriction, isRestrictedUpgradeTarget } from '@/lib/engine/rules/flexibleUpgradeRestriction';
+import { findUpgradeTargetIdx, hasSameNameConflict, isMissionValidForPlay, missionsJouablesPour, peutEtreJouee } from '@/lib/engine/rules/placement';
+export { missionsJouablesPour, peutEtreJouee } from '@/lib/engine/rules/placement';
 import { forestOfDeathActive, textIsBlanked, effetsActifsDe } from './handlers/SS/attachmentStatics';
 import { rememberPeek } from './handlers/SS/hiddenPeek';
-
-
-function findUpgradeTargetIdx(
-  chars: CharacterInPlay[],
-  card: { name_fr: string; chakra: number; set?: string; number?: number | string; effects?: Array<{ type: string; description: string }> },
-  excludeInstanceId?: string,
-): number {
-
-
-  const hasFlexibleRestriction = hasFlexibleUpgradeRestriction(card);
-
-
-  const sameNameIdx = chars.findIndex(c => {
-    if (c.isHidden) return false;
-    if (c.controlledBy !== c.originalOwner) return false;
-    if (excludeInstanceId && c.instanceId === excludeInstanceId) return false;
-    const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-
-    if (hasFlexibleRestriction && isRestrictedUpgradeTarget(topCard)) return false;
-    return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase()
-      && (card.chakra ?? 0) > (topCard.chakra ?? 0);
-  });
-  if (sameNameIdx >= 0) return sameNameIdx;
-
-
-  const flexIdx = chars.findIndex(c => {
-    if (c.isHidden) return false;
-    if (c.controlledBy !== c.originalOwner) return false;
-    if (excludeInstanceId && c.instanceId === excludeInstanceId) return false;
-    const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-    if (!checkFlexibleUpgrade(card as any, topCard) || (card.chakra ?? 0) <= (topCard.chakra ?? 0)) return false;
-    
-    
-    const wouldConflict = chars.some(other => {
-      if (other.instanceId === c.instanceId || other.isHidden) return false;
-      if (excludeInstanceId && other.instanceId === excludeInstanceId) return false;
-      const oTop = other.stack?.length > 0 ? other.stack[other.stack?.length - 1] : other.card;
-      return oTop.name_fr.toUpperCase() === card.name_fr.toUpperCase();
-    });
-    return !wouldConflict;
-  });
-  return flexIdx;
-}
-
-
-function hasSameNameConflict(
-  chars: CharacterInPlay[],
-  card: { name_fr: string; chakra: number },
-  excludeInstanceId?: string,
-): boolean {
-  return chars.some(c => {
-    if (c.isHidden) return false;
-    if (excludeInstanceId && c.instanceId === excludeInstanceId) return false;
-    const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-    return topCard.name_fr.toUpperCase() === card.name_fr.toUpperCase();
-  });
-}
-
-
-function isMissionValidForPlay(
-  state: GameState,
-  player: PlayerID,
-  missionIndex: number,
-  friendlySide: 'player1Characters' | 'player2Characters',
-  card: { id?: string; name_fr: string; chakra: number; number?: number; effects?: Array<{ type: string; description: string }>; keywords?: string[] },
-  availableChakra: number,
-  costReduction: number,
-  excludeInstanceId?: string,
-  noUpgrade = false,
-): boolean {
-  const mission = state.activeMissions[missionIndex];
-  if (!mission) return false;
-  const chars = mission[friendlySide];
-  const upgradeIdx = noUpgrade ? -1 : findUpgradeTargetIdx(chars, card, excludeInstanceId);
-
-  const baseEffectiveCost = calculateEffectiveCost(
-    state,
-    player,
-    card as never,
-    missionIndex,
-    false,
-  );
-
-  if (upgradeIdx >= 0) {
-    const existing = chars[upgradeIdx];
-    const existingTopCard = existing.stack?.length > 0 ? existing.stack[existing.stack?.length - 1] : existing.card;
-    const upgradeCost = Math.max(0, (baseEffectiveCost - (existingTopCard.chakra ?? 0)) - costReduction);
-    if (availableChakra >= upgradeCost) return true;
-
-  }
-
-
-  if (hasSameNameConflict(chars, card, excludeInstanceId)) {
-    return false; // Same name exists but can't upgrade (lower or equal cost)
-  }
-
-
-  const freshCost = Math.max(0, baseEffectiveCost - costReduction);
-  return availableChakra >= freshCost;
-}
 
 
 function isAmbushLinkedUpgrade(description: string): boolean {
@@ -11622,15 +11524,13 @@ export class EffectEngine {
           
           const s109HasAffordable = s109PS.discardPile.some((c) => {
             if (c.card_type !== 'character' || c.group !== 'Leaf Village') return false;
-            if (s109PS.chakra >= bestFreshPlayCost(newState, s109Player, c as never, 2)) return true;
-            return canAffordAsUpgrade(newState, s109Player, c as any, 2);
+            return peutEtreJouee(newState, s109Player, c as never, 2);
           });
           if (!s109HasAffordable) {
             
             const s109HasBase = s109PS.discardPile.some((c) => {
               if (c.card_type !== 'character' || c.group !== 'Leaf Village') return false;
-              if (s109PS.chakra >= (c.chakra ?? 0)) return true;
-              return canAffordAsUpgrade(newState, s109Player, c as any, 0);
+              return peutEtreJouee(newState, s109Player, c as never, 0);
             });
             if (!s109HasBase) {
               newState.log = logAction(newState.log, newState.turn, newState.phase, s109Player,
@@ -11671,10 +11571,7 @@ export class EffectEngine {
             .map((c, i) => ({ c, i }))
             .filter(({ c }) => {
               if (c.card_type !== 'character' || c.group !== 'Leaf Village') return false;
-              
-              if (s109PS.chakra >= (c.chakra ?? 0)) return true;
-              
-              return canAffordAsUpgrade(newState, s109Player, c as any, 0);
+              return peutEtreJouee(newState, s109Player, c as never, 0);
             })
             .map(({ i }) => String(i));
           if (s109ValidTargets.length === 0) {
@@ -11715,10 +11612,7 @@ export class EffectEngine {
           .map((c, i) => ({ c, i }))
           .filter(({ c }) => {
             if (c.card_type !== 'character' || c.group !== 'Leaf Village') return false;
-            
-            if (s109uPS.chakra >= bestFreshPlayCost(newState, s109uPlayer, c as never, 2)) return true;
-            
-            return canAffordAsUpgrade(newState, s109uPlayer, c as any, 2);
+            return peutEtreJouee(newState, s109uPlayer, c as never, 2);
           })
           .map(({ i }) => String(i));
         if (s109uValidTargets.length === 0) {
@@ -15690,9 +15584,7 @@ export class EffectEngine {
 
         const isCardPlayable = (card: typeof s135Top3[number]): boolean => {
           if (card.card_type !== 'character') return false;
-          const effectiveCost = Math.max(0, (card.chakra ?? 0) - s135CostReduction);
-          if (effectiveCost <= newState[s135Player].chakra) return true;
-          return canAffordAsUpgrade(newState, s135Player, card as any, s135CostReduction);
+          return peutEtreJouee(newState, s135Player, card as never, s135CostReduction);
         };
         const s135Available = s135Top3.filter(isCardPlayable);
 
@@ -21731,15 +21623,11 @@ export class EffectEngine {
     const friendlySide: 'player1Characters' | 'player2Characters' =
       player === 'player1' ? 'player1Characters' : 'player2Characters';
 
-    const validMissions: string[] = [];
-    for (let i = 0; i < newState.activeMissions.length; i++) {
-      const mission = newState.activeMissions[i];
-      if (forcedMission != null && i !== forcedMission) continue;
-      if (!missionAutorisee(i)) continue;
-      if (isMissionValidForPlay(newState, player, i, friendlySide, chosenCard, ps.chakra, reductionFor(i), undefined, noUpgrade)) {
-        validMissions.push(String(i));
-      }
-    }
+    const validMissions = missionsJouablesPour(newState, player, chosenCard, 0, {
+      noUpgrade,
+      missionAutorisee: (i) => (forcedMission == null || i === forcedMission) && missionAutorisee(i),
+      reductionPourMission: reductionFor,
+    }).map(String);
 
     if (validMissions.length === 0) {
       
@@ -23544,13 +23432,7 @@ export class EffectEngine {
     const friendlySide: 'player1Characters' | 'player2Characters' =
       player === 'player1' ? 'player1Characters' : 'player2Characters';
 
-    const validMissions: string[] = [];
-    for (let i = 0; i < newState.activeMissions.length; i++) {
-      const mission = newState.activeMissions[i];
-      if (isMissionValidForPlay(newState, player, i, friendlySide, chosenCard, ps.chakra, costReduction)) {
-        validMissions.push(String(i));
-      }
-    }
+    const validMissions = missionsJouablesPour(newState, player, chosenCard, costReduction).map(String);
 
     if (validMissions.length === 0) {
       
@@ -23702,13 +23584,7 @@ export class EffectEngine {
     const friendlySide: 'player1Characters' | 'player2Characters' =
       player === 'player1' ? 'player1Characters' : 'player2Characters';
 
-    const validMissions: string[] = [];
-    for (let i = 0; i < newState.activeMissions.length; i++) {
-      const mission = newState.activeMissions[i];
-      if (isMissionValidForPlay(newState, player, i, friendlySide, chosenCard, ps.chakra, costReduction)) {
-        validMissions.push(String(i));
-      }
-    }
+    const validMissions = missionsJouablesPour(newState, player, chosenCard, costReduction).map(String);
 
     if (validMissions.length === 0) {
       const friendlySideForDebug = friendlySide;

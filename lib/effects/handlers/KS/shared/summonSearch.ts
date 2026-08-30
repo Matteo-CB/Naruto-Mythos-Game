@@ -1,7 +1,7 @@
 import type { GameState, PlayerID, CharacterCard, CharacterInPlay } from '@/lib/engine/types';
-import { canAffordAsUpgrade } from './upgradeCheck';
 import { isHiddenRevealBlocked } from '@/lib/effects/ContinuousEffects';
 import { calculateEffectiveCost } from '@/lib/engine/rules/ChakraValidation';
+import { peutEtreJouee } from '@/lib/engine/rules/placement';
 import { canRevealHiddenCharacter, revealWouldViolateNameUniqueness } from '@/lib/effects/revealNameUniqueness';
 
 export interface HiddenCharTarget {
@@ -54,9 +54,7 @@ export function canAffordFromHand(
   card: CharacterCard,
   costReduction: number,
 ): boolean {
-  const ps = state[player];
-  if (ps.chakra >= bestFreshPlayCost(state, player, card, costReduction)) return true;
-  return canAffordAsUpgrade(state, player, card, costReduction);
+  return peutEtreJouee(state, player, card, costReduction);
 }
 
 export function canFreshPlayFromHand(

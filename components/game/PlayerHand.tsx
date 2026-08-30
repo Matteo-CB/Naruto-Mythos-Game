@@ -16,6 +16,8 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { ManualGuess } from './ManualGuess';
 import { useBoardPalette } from './BoardPaletteContext';
 import { ChakraIcon, PowerIcon, CHAKRA_COLOR, CHAKRA_COLOR_SOFT, POWER_COLOR } from '@/components/icons/GameIcons';
+import { coutMinimalPourPoser } from '@/lib/engine/rules/coutMinimal';
+import { canAffordAsUpgrade } from '@/lib/effects/handlers/KS/shared/upgradeCheck';
 
 interface PlayerHandProps {
   hand: CharacterCard[];
@@ -300,6 +302,13 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
     visibleState?.phase === 'action' &&
     !isProcessing;
 
+  const coutDePose = useCallback((card: CharacterCard): number => {
+    if (!visibleState?.myPlayer) return card.chakra;
+    const frais = coutMinimalPourPoser(visibleState, visibleState.myPlayer, card);
+    if (frais <= chakra) return frais;
+    return canAffordAsUpgrade(visibleState as never, visibleState.myPlayer, card, 0) ? chakra : frais;
+  }, [visibleState, chakra]);
+
   const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);
 
   const prevHandRef = useRef<CharacterCard[]>(hand);
@@ -424,7 +433,7 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
         style={{ height: dims.handContainerH + 'px', minWidth: dims.handMinW + 'px' }}
       >
         {displayHand.map(({ card, originalIndex }, displayIdx) => {
-          const canAffordVisible = chakra >= card.chakra;
+          const canAffordVisible = chakra >= coutDePose(card);
           const canAffordHidden = chakra >= 1;
           const canAfford = canAffordVisible || canAffordHidden;
 

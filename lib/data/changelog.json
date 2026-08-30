@@ -10,40 +10,56 @@
       "date": "2026-08-30",
       "categories": [
         "fix",
+        "fix",
+        "fix",
         "fix"
       ],
       "title_fr": "Mise à jour",
       "changes_fr": [
+        "SAKURA HARUNO 135 ne propose plus une carte qui finirait à la défausse: seules les cartes vraiment posables sont offertes",
+        "Les cartes grisées en main tiennent compte des réductions de coût: une carte tombée à zéro reste jouable sans Chakra",
         "OROCHIMARU 127 ne rend plus de Chakra quand il prend une cible dont la Puissance est descendue sous zéro: la prise est gratuite",
         "Le scellé est de nouveau ouvert à tout le monde"
       ],
       "title_en": "Update",
       "changes_en": [
+        "SAKURA HARUNO 135 no longer offers a card that would end up discarded: only truly playable cards are shown",
+        "Greyed-out cards in hand now account for cost reductions: a card down to zero stays playable with no Chakra",
         "OROCHIMARU 127 no longer gives Chakra back when taking a target pushed below zero Power: the takeover is free",
         "Sealed is open to everyone again"
       ],
       "title_es": "Actualización",
       "changes_es": [
+        "SAKURA HARUNO 135 ya no ofrece una carta que acabaría en el descarte: solo se muestran las jugables de verdad",
+        "Las cartas atenuadas en la mano tienen en cuenta las reducciones de coste: una carta a cero sigue siendo jugable sin Chakra",
         "OROCHIMARU 127 ya no devuelve Chakra al tomar un objetivo con Poder por debajo de cero: la toma es gratis",
         "El sellado vuelve a estar abierto para todos"
       ],
       "title_pt": "Atualização",
       "changes_pt": [
+        "SAKURA HARUNO 135 já não oferece uma carta que acabaria no descarte: só aparecem as realmente jogáveis",
+        "As cartas esbatidas na mão terão em conta as reduções de custo: uma carta a zero continua jogável sem Chakra",
         "OROCHIMARU 127 já não devolve Chakra ao tomar um alvo com Poder abaixo de zero: a tomada é grátis",
         "O selado está de novo aberto a todos"
       ],
       "title_it": "Aggiornamento",
       "changes_it": [
+        "SAKURA HARUNO 135 non propone piu una carta che finirebbe negli scarti: appaiono solo quelle davvero giocabili",
+        "Le carte in grigio nella mano tengono conto delle riduzioni di costo: una carta a zero resta giocabile senza Chakra",
         "OROCHIMARU 127 non restituisce più Chakra quando prende un bersaglio con Potenza sotto zero: la presa è gratuita",
         "Il sigillato è di nuovo aperto a tutti"
       ],
       "title_pl": "Aktualizacja",
       "changes_pl": [
+        "SAKURA HARUNO 135 nie proponuje już karty, która trafiłaby na stos odrzuconych: widoczne są tylko naprawdę grywalne",
+        "Wyszarzone karty w ręce uwzględniają obniżki kosztu: karta za zero wciąż jest grywalna bez Chakry",
         "OROCHIMARU 127 nie oddaje już Chakry, gdy przejmuje cel o Sile poniżej zera: przejęcie jest darmowe",
         "Tryb sealed jest znowu otwarty dla wszystkich"
       ],
       "title_ja": "アップデート",
       "changes_ja": [
+        "春野サクラ135は捨て札に行くだけのカードを提示しなくなり、本当に出せるカードだけが並びます",
+        "手札で暗く表示されるカードがコスト軽減を反映するようになり、0になったカードはチャクラなしでも出せます",
         "オロチマル127は、パワーが0未満になった相手を奪ってもチャクラを戻さなくなり、奪取は無償になりました",
         "シールド戦がふたたび全員に開放されました"
       ]
