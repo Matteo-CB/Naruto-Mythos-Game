@@ -77,7 +77,9 @@ export function PublicRevealOverlay() {
           className="font-display text-[11px] uppercase tracking-[0.22em] text-center"
           style={{ color: 'var(--t-accent)' }}
         >
-          {t('game.publicReveal.title', { card: nomSource })}
+          {affichee.motif === 'regard'
+            ? t('game.publicReveal.regardTitle', { card: nomSource })
+            : t('game.publicReveal.title', { card: nomSource })}
         </span>
 
         <div className="flex flex-wrap gap-2 justify-center">

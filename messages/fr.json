@@ -1760,7 +1760,8 @@
     "edgeToken": "Jeton Edge",
     "edgeLocked": "Verrouillé",
     "publicReveal": {
-      "title": "{card} révèle"
+      "title": "{card} révèle",
+      "regardTitle": "{card}: l'adversaire a regardé cette carte"
     }
   },
   "collection": {

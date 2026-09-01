@@ -3842,7 +3842,8 @@
     "edgeToken": "Ficha de Vantagem",
     "edgeLocked": "Bloqueado",
     "publicReveal": {
-      "title": "{card} revela"
+      "title": "{card} revela",
+      "regardTitle": "{card}: o teu adversário olhou para esta carta"
     }
   },
   "adminReveal": {

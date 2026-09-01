@@ -1758,7 +1758,8 @@
     "edgeToken": "主導権トークン",
     "edgeLocked": "固定",
     "publicReveal": {
-      "title": "{card} が公開"
+      "title": "{card} が公開",
+      "regardTitle": "{card}: 相手がこのカードを見ました"
     }
   },
   "collection": {

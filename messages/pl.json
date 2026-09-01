@@ -3842,7 +3842,8 @@
     "edgeToken": "Żeton Przewagi",
     "edgeLocked": "Zablokowany",
     "publicReveal": {
-      "title": "{card} odsłania"
+      "title": "{card} odsłania",
+      "regardTitle": "{card}: przeciwnik podejrzał tę kartę"
     }
   },
   "adminReveal": {

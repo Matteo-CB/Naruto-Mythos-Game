@@ -15,6 +15,7 @@ import type {
   TurnNumber,
   PendingEffect,
   EffectType,
+  PublicReveal,
 } from './types';
 import { peutEtreJouee } from '@/lib/engine/rules/placement';
 import {
@@ -1951,11 +1952,20 @@ export class GameEngine {
       effectOrderResolved: (state as any).effectOrderResolved ?? false,
       forfeitedBy: state.forfeitedBy,
       firstStrike: state.firstStrike,
-      publicReveal: state.publicReveal ?? null,
+      publicReveal: GameEngine.revelationVisiblePour(state.publicReveal, player),
     };
   }
 
   
+  static revelationVisiblePour(
+    revelation: PublicReveal | null | undefined,
+    player: PlayerID,
+  ): PublicReveal | null {
+    if (!revelation) return null;
+    if (revelation.destinataire && revelation.destinataire !== player) return null;
+    return revelation;
+  }
+
   static getWinner(state: GameState): PlayerID | null {
     if (state.phase !== 'gameOver') return null;
 

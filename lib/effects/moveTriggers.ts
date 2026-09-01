@@ -1,5 +1,6 @@
 import type { GameState, PlayerID, CharacterInPlay, PendingEffect, PendingAction } from '../engine/types';
 import { effetsActifsDe } from '@/lib/effects/handlers/SS/attachmentStatics';
+import { annoncerRegardIndiscret } from '@/lib/effects/publicReveal';
 import { logAction } from '../engine/utils/gameLog';
 import { generateInstanceId } from '../engine/utils/id';
 import { canBeHiddenByEnemy } from './ContinuousEffects';
@@ -101,6 +102,7 @@ export function checkNinjaHoundsTrigger(
         'game.log.effect.lookAtHidden',
         { card: 'Chiens Ninjas', id: 'KS-100-C', target: target.card.name_fr },
       ),
+      publicReveal: annoncerRegardIndiscret(state, player, target, 'KS-100-C').publicReveal ?? null,
     };
   }
 

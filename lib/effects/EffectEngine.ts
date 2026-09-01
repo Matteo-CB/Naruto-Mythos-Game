@@ -86,7 +86,7 @@ import { canAffordAsUpgrade } from './handlers/KS/shared/upgradeCheck';
 import { moveCharTo, getValidMissions, applyUpgradePowerup } from './handlers/KS/rare/sasuke107';
 import { findAffordableSummonsInHand, findHiddenSummonsOnBoard, findHiddenLeafOnBoard, findHiddenSoundVillageOnBoard, findAffordableSoundVillageInHand, bestFreshPlayCost, effectiveRevealCost } from './handlers/KS/shared/summonSearch';
 import { isCharacterCopyable, isCopyableCharacter, isCopyableEffect } from './handlers/KS/shared/copyExclusions';
-import { annoncerRevelationPublique, annoncerRevelationSs002, apercuRevele } from './publicReveal';
+import { annoncerRevelationPublique, annoncerRevelationSs002, apercuRevele, annoncerRegardIndiscret } from './publicReveal';
 import { emitEngineQuestEvent } from '@/lib/quests/engineEmit';
 import { resoudreEffetAvecQuete } from './resolutionEffet';
 import { avecSource } from '@/lib/quests/sourceCourante';
@@ -7408,6 +7408,7 @@ export class EffectEngine {
           'Reconnaissance (SS-002): looked at a hidden character.',
           'game.log.effect.ssMss02Looked',
           { card: 'Reconnaissance', id: 'SS-002-MMS' });
+        newState = annoncerRegardIndiscret(newState, m2Player, m2Located.character, 'SS-002-MMS');
 
         const m2RevealEffId = generateInstanceId();
         const m2RevealActId = generateInstanceId();
@@ -13081,6 +13082,7 @@ export class EffectEngine {
         const vu = EffectEngine.findCharByInstanceId(newState, targetId);
         if (!vu) break;
         newState = rememberPeek(newState, pendingEffect.sourcePlayer, targetId);
+        newState = annoncerRegardIndiscret(newState, pendingEffect.sourcePlayer, vu.character, infos.sourceId ?? pendingEffect.sourceCardId);
         const carteVue = vu.character.stack?.length > 0 ? vu.character.stack[vu.character.stack.length - 1] : vu.character.card;
         newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
           'EFFECT', 'Peek at a hidden character.',
@@ -13668,6 +13670,7 @@ export class EffectEngine {
           : trouve014.character.card;
         const cout014 = (carte014 as unknown as CardData).chakra ?? 0;
         newState = rememberPeek(newState, pendingEffect.sourcePlayer, targetId);
+        newState = annoncerRegardIndiscret(newState, pendingEffect.sourcePlayer, trouve014.character, KIBA_014);
         newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
           'EFFECT', `Kiba Inuzuka (014): looked at a hidden enemy (cost ${cout014}).`,
           'game.log.effect.ss014Peeked',
@@ -20134,6 +20137,7 @@ export class EffectEngine {
             'game.log.effect.lookAtHidden',
             { card: 'Chiens Ninjas', id: 'KS-100-C', target: hiddenInDest.card.name_fr },
           );
+          Object.assign(newState, annoncerRegardIndiscret(newState, charResult.player, hiddenInDest, 'KS-100-C'));
         }
       }
     }
@@ -20312,6 +20316,7 @@ export class EffectEngine {
       'game.log.effect.lookAtHidden',
       { card: 'Orochimaru', id: pending.sourceCardId, target: targetChar.card.name_fr },
     );
+    Object.assign(newState, annoncerRegardIndiscret(newState, pending.sourcePlayer, targetChar, pending.sourceCardId));
 
     
     const revealEffectId = generateInstanceId();
@@ -20503,6 +20508,7 @@ export class EffectEngine {
       'game.log.effect.lookAtHidden',
       { card: 'DOSU KINUTA', id: pending.sourceCardId, target: targetChar.card.name_fr },
     );
+    Object.assign(newState, annoncerRegardIndiscret(newState, pending.sourcePlayer, targetChar, pending.sourceCardId));
 
     
     const revealEffectId = generateInstanceId();
@@ -20567,6 +20573,7 @@ export class EffectEngine {
       'game.log.effect.lookAtHidden',
       { card: 'Chiens Ninjas', id: 'KS-100-C', target: targetChar.card.name_fr },
     );
+    Object.assign(newState, annoncerRegardIndiscret(newState, pending.sourcePlayer, targetChar, 'KS-100-C'));
 
     
     const revealEffectId = generateInstanceId();

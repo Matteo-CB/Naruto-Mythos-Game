@@ -1754,7 +1754,8 @@
     "edgeToken": "Edge Token",
     "edgeLocked": "Locked",
     "publicReveal": {
-      "title": "{card} reveals"
+      "title": "{card} reveals",
+      "regardTitle": "{card}: your opponent looked at this card"
     }
   },
   "collection": {

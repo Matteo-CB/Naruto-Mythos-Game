@@ -1,4 +1,4 @@
-import type { CardData, GameState, PlayerID, PublicReveal, RevealedCardPreview } from '@/lib/engine/types';
+import type { CardData, CharacterInPlay, GameState, PlayerID, PublicReveal, RevealedCardPreview } from '@/lib/engine/types';
 import { generateInstanceId } from '@/lib/engine/utils/id';
 
 export function apercuRevele(card: CardData, isMatch = false): RevealedCardPreview {
@@ -45,4 +45,27 @@ export function annoncerRevelationSs002(state: GameState, player: PlayerID, payl
     image_file: meta.cardImageFile,
     isMatch: true,
   }]);
+}
+
+export function annoncerRegardIndiscret(
+  state: GameState,
+  observateur: PlayerID,
+  regardee: CharacterInPlay,
+  sourceCardId: string,
+): GameState {
+  const proprietaire = regardee.originalOwner;
+  if (!proprietaire || proprietaire === observateur) return state;
+
+  const haut = regardee.stack?.length > 0 ? regardee.stack[regardee.stack.length - 1] : regardee.card;
+  if (!haut) return state;
+
+  const revelation: PublicReveal = {
+    id: generateInstanceId(),
+    player: observateur,
+    sourceCardId,
+    cards: [apercuRevele(haut as CardData, true)],
+    destinataire: proprietaire,
+    motif: 'regard',
+  };
+  return { ...state, publicReveal: revelation };
 }

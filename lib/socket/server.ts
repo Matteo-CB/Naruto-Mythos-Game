@@ -2698,6 +2698,7 @@ function buildSpectatorState(room: RoomData, hiddenIds: Set<string>): VisibleGam
       hand: [],
       handSize: room.gameState!.player2.hand.length,
     },
+    publicReveal: p1State.publicReveal?.destinataire ? null : p1State.publicReveal,
   } as VisibleGameState;
   return stateForViewer(spectatorState, false, hiddenIds);
 }

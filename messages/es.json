@@ -1759,7 +1759,8 @@
     "edgeToken": "Ficha de Ventaja",
     "edgeLocked": "Bloqueado",
     "publicReveal": {
-      "title": "{card} revela"
+      "title": "{card} revela",
+      "regardTitle": "{card}: tu rival ha mirado esta carta"
     }
   },
   "collection": {
