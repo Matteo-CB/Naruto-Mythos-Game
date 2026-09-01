@@ -1,4 +1,4 @@
-import { getPlayableCharacters, getPlayableMissions } from '@/lib/data/cardLoader';
+import { getPlayableCharacters, getPlayableMissions, getPlayableAttachments } from '@/lib/data/cardLoader';
 import { getSealedSetIds } from '@/lib/data/sets/registry';
 import type { CharacterCard, MissionCard, CardData } from '@/lib/engine/types';
 import { isVariantRarity } from '@/lib/variants/constants';
@@ -52,8 +52,8 @@ function toBoosterCard(card: CardData): BoosterCard {
 }
 
 interface RarityBuckets {
-  commons: CharacterCard[];
-  uncommons: CharacterCard[];
+  commons: CardData[];
+  uncommons: CardData[];
   rares: CharacterCard[];
   rareArts: CharacterCard[];
   secrets: CharacterCard[];
@@ -67,9 +67,11 @@ interface RarityBuckets {
 function buildRarityBuckets(setId: string): RarityBuckets {
   const allChars = getPlayableCharacters().filter((c) => c.set === setId);
   const allMissions = getPlayableMissions().filter((m) => m.set === setId);
+  const allAttachments = getPlayableAttachments().filter((a) => a.set === setId);
+  const ordinaires: CardData[] = [...allChars, ...allAttachments];
   return {
-    commons: allChars.filter((c) => c.rarity === 'C'),
-    uncommons: allChars.filter((c) => c.rarity === 'UC'),
+    commons: ordinaires.filter((c) => c.rarity === 'C'),
+    uncommons: ordinaires.filter((c) => c.rarity === 'UC'),
     rares: allChars.filter((c) => c.rarity === 'R'),
     rareArts: allChars.filter((c) => c.rarity === 'RA'),
     secrets: allChars.filter((c) => c.rarity === 'S'),
@@ -209,7 +211,7 @@ export function separateSealedPool(pool: SealedPool): {
   characters: BoosterCard[];
   missions: BoosterCard[];
 } {
-  const characters = pool.allCards.filter((c) => c.card_type === 'character');
+  const characters = pool.allCards.filter((c) => c.card_type !== 'mission');
   const missions = pool.allCards.filter((c) => c.card_type === 'mission');
   return { characters, missions };
 }

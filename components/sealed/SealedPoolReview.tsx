@@ -57,7 +57,7 @@ export function SealedPoolReview({ cards, onContinue }: SealedPoolReviewProps) {
     [cards],
   );
 
-  const characters = sortedCards.filter((c) => c.card_type === 'character');
+  const characters = sortedCards.filter((c) => c.card_type !== 'mission');
   const missions = sortedCards.filter((c) => c.card_type === 'mission');
 
   const rarityCounts = useMemo(() => {

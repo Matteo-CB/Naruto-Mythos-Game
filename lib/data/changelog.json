@@ -9,41 +9,49 @@
     {
       "date": "2026-09-01",
       "categories": [
+        "fix",
         "feature",
         "fix"
       ],
       "title_fr": "Mise à jour",
       "changes_fr": [
+        "Les équipements sortent enfin des boosters du scellé: ils sont Common et Uncommon, donc environ une carte sur cinq du pool",
         "Quand l'adversaire regarde une de tes cartes cachées, une fenêtre te montre laquelle, comme pour une révélation",
         "Un effet voit désormais le renfort reçu en arrivant: EBISU 046 pioche bien quand la mission Renforts vient de le gonfler"
       ],
       "title_en": "Update",
       "changes_en": [
+        "Attachments finally come out of sealed boosters: they are Common and Uncommon, so roughly one card in five of the pool",
         "When your opponent looks at one of your hidden cards, a window shows you which one, like for a reveal",
         "An effect now sees the boost it just received on arrival: EBISU 046 draws when the New Forces mission has just buffed it"
       ],
       "title_es": "Actualización",
       "changes_es": [
+        "Los equipos por fin salen en los sobres del sellado: son Common y Uncommon, casi una carta de cada cinco",
         "Cuando tu rival mira una de tus cartas ocultas, una ventana te muestra cuál, igual que en una revelación",
         "Un efecto ya ve el refuerzo recibido al llegar: EBISU 046 roba cuando la misión Refuerzos acaba de potenciarlo"
       ],
       "title_pt": "Atualização",
       "changes_pt": [
+        "Os equipamentos saem finalmente nos boosters do selado: são Common e Uncommon, cerca de uma carta em cada cinco",
         "Quando o teu adversario olha para uma das tuas cartas escondidas, uma janela mostra-te qual, como numa revelação",
         "Um efeito passa a ver o reforço recebido ao chegar: EBISU 046 compra quando a missão Reforços acabou de o reforçar"
       ],
       "title_it": "Aggiornamento",
       "changes_it": [
+        "Gli equipaggiamenti escono finalmente dalle buste del sigillato: sono Common e Uncommon, circa una carta su cinque",
         "Quando l avversario guarda una delle tue carte coperte, una finestra ti mostra quale, come per una rivelazione",
         "Un effetto vede ora il potenziamento ricevuto all arrivo: EBISU 046 pesca quando la missione Rinforzi lo ha appena potenziato"
       ],
       "title_pl": "Aktualizacja",
       "changes_pl": [
+        "Ekwipunek wreszcie wypada z boosterów w trybie sealed: to karty Common i Uncommon, mniej więcej co piąta karta puli",
         "Gdy przeciwnik podejrzy jedną z twoich zakrytych kart, okno pokazuje którą, tak jak przy odkryciu",
         "Efekt widzi teraz wzmocnienie otrzymane przy wejściu: EBISU 046 dobiera, gdy misja Posiłki właśnie go wzmocniła"
       ],
       "title_ja": "アップデート",
       "changes_ja": [
+        "シールド戦のブースターから装備カードが出るようになりました。CとUCなので、プールのおよそ5枚に1枚です",
         "相手が伏せたカードを見たとき、公開時と同じようにどのカードかを知らせる画面が出ます",
         "効果が登場時に受けた強化を見るようになり、援軍ミッションで強化された直後のエビス046がきちんとドローします"
       ]

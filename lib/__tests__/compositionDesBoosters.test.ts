@@ -110,8 +110,8 @@ describe('un booster de Shinobi Shiren garde sa propre table', () => {
     const packs = Array.from({ length: 40 }, (_, i) => generateBooster(i, 'SS'));
     for (const pack of packs) {
       const chasse = pack.cards.filter((c) => CHASSE_SS.includes(c.rarity)).length;
-      const personnages = pack.cards.filter((c) => c.card_type === 'character').length;
-      expect(personnages, 'neuf personnages quoi qu il arrive').toBe(9);
+      const jouables = pack.cards.filter((c) => c.card_type !== 'mission').length;
+      expect(jouables, 'neuf cartes de deck quoi qu il arrive, equipements compris').toBe(9);
       expect(chasse, 'au plus une carte de chasse').toBeLessThanOrEqual(1);
     }
   });
