@@ -11,11 +11,13 @@
       "categories": [
         "fix",
         "fix",
+        "fix",
         "feature",
         "fix"
       ],
       "title_fr": "Mise à jour",
       "changes_fr": [
+        "SHINIGAMI 057 peut viser une carte face cachée: son texte ne l'interdisait pas",
         "Le scellé en ligne ne reste plus bloqué en attente de l'adversaire: une coupure ne fait plus perdre ta place ni ton deck",
         "Les équipements sortent enfin des boosters du scellé: ils sont Common et Uncommon, donc environ une carte sur cinq du pool",
         "Quand l'adversaire regarde une de tes cartes cachées, une fenêtre te montre laquelle, comme pour une révélation",
@@ -23,6 +25,7 @@
       ],
       "title_en": "Update",
       "changes_en": [
+        "SHINIGAMI 057 can target a face-down card: its text never forbade it",
         "Online sealed no longer hangs waiting for the opponent: a brief disconnect no longer costs you your seat or your deck",
         "Attachments finally come out of sealed boosters: they are Common and Uncommon, so roughly one card in five of the pool",
         "When your opponent looks at one of your hidden cards, a window shows you which one, like for a reveal",
@@ -30,6 +33,7 @@
       ],
       "title_es": "Actualización",
       "changes_es": [
+        "SHINIGAMI 057 puede apuntar a una carta boca abajo: su texto nunca lo prohibia",
         "El sellado en linea ya no se queda esperando al rival: un corte breve ya no te hace perder tu puesto ni tu mazo",
         "Los equipos por fin salen en los sobres del sellado: son Common y Uncommon, casi una carta de cada cinco",
         "Cuando tu rival mira una de tus cartas ocultas, una ventana te muestra cuál, igual que en una revelación",
@@ -37,6 +41,7 @@
       ],
       "title_pt": "Atualização",
       "changes_pt": [
+        "SHINIGAMI 057 pode visar uma carta virada para baixo: o texto nunca o proibiu",
         "O selado online já nao fica preso a espera do adversario: uma quebra breve nao te faz perder o lugar nem o baralho",
         "Os equipamentos saem finalmente nos boosters do selado: são Common e Uncommon, cerca de uma carta em cada cinco",
         "Quando o teu adversario olha para uma das tuas cartas escondidas, uma janela mostra-te qual, como numa revelação",
@@ -44,6 +49,7 @@
       ],
       "title_it": "Aggiornamento",
       "changes_it": [
+        "SHINIGAMI 057 puo colpire una carta coperta: il suo testo non lo vietava",
         "Il sigillato online non resta piu bloccato in attesa dell avversario: una disconnessione breve non ti fa perdere posto ne mazzo",
         "Gli equipaggiamenti escono finalmente dalle buste del sigillato: sono Common e Uncommon, circa una carta su cinque",
         "Quando l avversario guarda una delle tue carte coperte, una finestra ti mostra quale, come per una rivelazione",
@@ -51,6 +57,7 @@
       ],
       "title_pl": "Aktualizacja",
       "changes_pl": [
+        "SHINIGAMI 057 może zaatakować zakrytą kartę: jego tekst nigdy tego nie zabraniał",
         "Sealed online nie zawiesza się już w oczekiwaniu na przeciwnika: krótka przerwa nie odbiera ci miejsca ani talii",
         "Ekwipunek wreszcie wypada z boosterów w trybie sealed: to karty Common i Uncommon, mniej więcej co piąta karta puli",
         "Gdy przeciwnik podejrzy jedną z twoich zakrytych kart, okno pokazuje którą, tak jak przy odkryciu",
@@ -58,6 +65,7 @@
       ],
       "title_ja": "アップデート",
       "changes_ja": [
+        "シニガミ057が伏せカードを対象にできるようになりました。テキストは禁じていませんでした",
         "オンラインのシールド戦が相手待ちで止まらなくなりました。短い切断で席やデッキを失わなくなります",
         "シールド戦のブースターから装備カードが出るようになりました。CとUCなので、プールのおよそ5枚に1枚です",
         "相手が伏せたカードを見たとき、公開時と同じようにどのカードかを知らせる画面が出ます",

@@ -33,13 +33,13 @@ export function shinigami057BeforePower(state: GameState): GameState {
         newState = { ...newState, missionPhaseShinigamiIds: [...traites] };
 
         const ennemiSide = controleur === 'player1' ? 'player2Characters' : 'player1Characters';
-        const cibles = newState.activeMissions[mIdx][ennemiSide].filter((c) => !c.isHidden);
+        const cibles = newState.activeMissions[mIdx][ennemiSide];
 
         if (cibles.length === 0) {
           newState = {
             ...newState,
             log: logAction(newState.log, newState.turn, 'mission', controleur, 'EFFECT_NO_TARGET',
-              'Shinigami (057): no non-hidden enemy character in this mission.',
+              'Shinigami (057): no enemy character in this mission.',
               'game.log.effect.noTarget', { card: SHINIGAMI_057_NAME, id: SHINIGAMI_057_ID }),
           };
           continue;
