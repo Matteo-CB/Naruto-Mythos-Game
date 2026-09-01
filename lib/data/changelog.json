@@ -13,11 +13,13 @@
         "fix",
         "fix",
         "fix",
+        "fix",
         "feature",
         "fix"
       ],
       "title_fr": "Mise à jour",
       "changes_fr": [
+        "KIMIMARO 031 choisit ses défausses dans la main qu'il avait en arrivant: une carte piochée par Sakon n'est plus défaussable",
         "Une carte touchée par la Bombe aveuglante ne donne plus ni Chakra ni jetons: JIRAIYA, SAKURA 123, HIRUZEN 133, GATO, KABUTO 139 et TENTEN 022",
         "SHINIGAMI 057 peut viser une carte face cachée: son texte ne l'interdisait pas",
         "Le scellé en ligne ne reste plus bloqué en attente de l'adversaire: une coupure ne fait plus perdre ta place ni ton deck",
@@ -27,6 +29,7 @@
       ],
       "title_en": "Update",
       "changes_en": [
+        "KIMIMARO 031 picks its discards from the hand it had on arrival: a card drawn by Sakon can no longer be discarded",
         "A card hit by Flash Bomb no longer grants Chakra or tokens: JIRAIYA, SAKURA 123, HIRUZEN 133, GATO, KABUTO 139 and TENTEN 022",
         "SHINIGAMI 057 can target a face-down card: its text never forbade it",
         "Online sealed no longer hangs waiting for the opponent: a brief disconnect no longer costs you your seat or your deck",
@@ -36,6 +39,7 @@
       ],
       "title_es": "Actualización",
       "changes_es": [
+        "KIMIMARO 031 elige sus descartes de la mano que tenia al llegar: una carta robada por Sakon ya no se puede descartar",
         "Una carta alcanzada por la Bomba cegadora ya no da Chakra ni fichas: JIRAIYA, SAKURA 123, HIRUZEN 133, GATO, KABUTO 139 y TENTEN 022",
         "SHINIGAMI 057 puede apuntar a una carta boca abajo: su texto nunca lo prohibia",
         "El sellado en linea ya no se queda esperando al rival: un corte breve ya no te hace perder tu puesto ni tu mazo",
@@ -45,6 +49,7 @@
       ],
       "title_pt": "Atualização",
       "changes_pt": [
+        "KIMIMARO 031 escolhe os descartes da mao que tinha ao chegar: uma carta comprada por Sakon já nao pode ser descartada",
         "Uma carta atingida pela Bomba de luz já nao da Chakra nem fichas: JIRAIYA, SAKURA 123, HIRUZEN 133, GATO, KABUTO 139 e TENTEN 022",
         "SHINIGAMI 057 pode visar uma carta virada para baixo: o texto nunca o proibiu",
         "O selado online já nao fica preso a espera do adversario: uma quebra breve nao te faz perder o lugar nem o baralho",
@@ -54,6 +59,7 @@
       ],
       "title_it": "Aggiornamento",
       "changes_it": [
+        "KIMIMARO 031 sceglie gli scarti dalla mano che aveva all arrivo: una carta pescata da Sakon non e piu scartabile",
         "Una carta colpita dalla Bomba accecante non da piu Chakra ne segnalini: JIRAIYA, SAKURA 123, HIRUZEN 133, GATO, KABUTO 139 e TENTEN 022",
         "SHINIGAMI 057 puo colpire una carta coperta: il suo testo non lo vietava",
         "Il sigillato online non resta piu bloccato in attesa dell avversario: una disconnessione breve non ti fa perdere posto ne mazzo",
@@ -63,6 +69,7 @@
       ],
       "title_pl": "Aktualizacja",
       "changes_pl": [
+        "KIMIMARO 031 wybiera odrzucenia z ręki, którą miał przy wejściu: karta dobrana przez Sakona nie jest już do odrzucenia",
         "Karta trafiona Bombą olśniewającą nie daje już Chakry ani żetonów: JIRAIYA, SAKURA 123, HIRUZEN 133, GATO, KABUTO 139 i TENTEN 022",
         "SHINIGAMI 057 może zaatakować zakrytą kartę: jego tekst nigdy tego nie zabraniał",
         "Sealed online nie zawiesza się już w oczekiwaniu na przeciwnika: krótka przerwa nie odbiera ci miejsca ani talii",
@@ -72,6 +79,7 @@
       ],
       "title_ja": "アップデート",
       "changes_ja": [
+        "キミマロ031は登場時の手札から捨てるカードを選びます。左近で引いたカードは捨てられません",
         "閃光弾を受けたカードはチャクラもトークンも与えなくなりました",
         "シニガミ057が伏せカードを対象にできるようになりました。テキストは禁じていませんでした",
         "オンラインのシールド戦が相手待ちで止まらなくなりました。短い切断で席やデッキを失わなくなります",

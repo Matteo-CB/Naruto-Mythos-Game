@@ -29,17 +29,32 @@ export function discardableSoundFour(
   state: GameState,
   player: PlayerID,
   alreadyUsed: ReadonlyArray<SoundFourName>,
+  nomsDeDepart?: ReadonlyArray<SoundFourName>,
 ): DiscardChoice[] {
   const used = new Set(alreadyUsed);
+  const autorises = nomsDeDepart ? new Set(nomsDeDepart) : null;
   const choices: DiscardChoice[] = [];
 
   state[player].hand.forEach((card, handIndex) => {
     const name = soundFourNameOf(card);
     if (!name || used.has(name)) return;
+    if (autorises && !autorises.has(name)) return;
     choices.push({ handIndex, name });
   });
 
   return choices;
+}
+
+export function nomsPresentsALaPose(
+  state: GameState,
+  player: PlayerID,
+): SoundFourName[] {
+  const noms = new Set<SoundFourName>();
+  for (const card of state[player].hand) {
+    const name = soundFourNameOf(card);
+    if (name) noms.add(name);
+  }
+  return SOUND_FOUR_ORDER.filter((n) => noms.has(n));
 }
 
 export function friendlyCharactersToMove(

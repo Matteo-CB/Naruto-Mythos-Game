@@ -21,7 +21,7 @@ import { ss000DeckHounds, ss000FinalizeSearch, ss000HoundChoicePayload, SS000_NI
 import { topmostHinataIndexInDiscard } from './handlers/SS/shinobi';
 import { envoyerLesCartesRegardeesAuFond } from './deckBottom';
 import { missionCarries, SS_MISSION_LOW_PROFILE } from './missions/ssMissions';
-import { discardableSoundFour, soundFourNameOf, friendlyCharactersToMove, KIMIMARO_031_ID, KIMIMARO_031_NAME, type SoundFourName } from './handlers/SS/kimimaro031';
+import { discardableSoundFour, nomsPresentsALaPose, soundFourNameOf, friendlyCharactersToMove, KIMIMARO_031_ID, KIMIMARO_031_NAME, type SoundFourName } from './handlers/SS/kimimaro031';
 import { hiddenCharactersInPlay, attachmentsInPlay } from './handlers/SS/missions/ssMissionHandlers';
 import { NARUTO_005_ID, NARUTO_005_NAME } from './handlers/SS/naruto005';
 import { KAKASHI_008_ID, KAKASHI_008_NAME, KAKASHI_008_CATEGORY, KAKASHI_008_REDUCTION } from './handlers/SS/kakashi008';
@@ -239,6 +239,7 @@ function ss031QueueDiscardChoice(
   player: PlayerID,
   used: SoundFourName[],
   choices: Array<{ handIndex: number }>,
+  nomsDeDepart: SoundFourName[],
 ): GameState {
   const effectId = generateInstanceId();
   const actionId = generateInstanceId();
@@ -250,7 +251,7 @@ function ss031QueueDiscardChoice(
     sourceInstanceId: pendingEffect.sourceInstanceId,
     sourceMissionIndex: pendingEffect.sourceMissionIndex,
     effectType: pendingEffect.effectType,
-    effectDescription: JSON.stringify({ used }),
+    effectDescription: JSON.stringify({ used, nomsDeDepart }),
     targetSelectionType: 'SS031_CHOOSE_DISCARD',
     sourcePlayer: player,
     requiresTargetSelection: true,
@@ -7262,9 +7263,10 @@ export class EffectEngine {
 
       case 'SS031_CONFIRM_MAIN': {
         const k31Player = pendingEffect.sourcePlayer;
-        const k31Choices = discardableSoundFour(newState, k31Player, []);
+        const k31Depart = nomsPresentsALaPose(newState, k31Player);
+        const k31Choices = discardableSoundFour(newState, k31Player, [], k31Depart);
         if (k31Choices.length === 0) break;
-        newState = ss031QueueDiscardChoice(newState, pendingEffect, k31Player, [], k31Choices);
+        newState = ss031QueueDiscardChoice(newState, pendingEffect, k31Player, [], k31Choices, k31Depart);
         break;
       }
 
@@ -7275,7 +7277,12 @@ export class EffectEngine {
         if (Number.isNaN(k31dIndex)) break;
 
         let k31dUsed: SoundFourName[] = [];
-        try { k31dUsed = JSON.parse(pendingEffect.effectDescription).used ?? []; } catch { /* fresh chain */ }
+        let k31dDepart: SoundFourName[] = [];
+        try {
+          const k31dPayload = JSON.parse(pendingEffect.effectDescription);
+          k31dUsed = k31dPayload.used ?? [];
+          k31dDepart = k31dPayload.nomsDeDepart ?? [];
+        } catch { /* fresh chain */ }
 
         const k31dOwner = { ...newState[k31dPlayer] };
         const k31dCard = k31dOwner.hand[k31dIndex];
@@ -7305,7 +7312,7 @@ export class EffectEngine {
               sourceInstanceId: pendingEffect.sourceInstanceId,
               sourceMissionIndex: pendingEffect.sourceMissionIndex,
               effectType: pendingEffect.effectType,
-              effectDescription: JSON.stringify({ used: k31dNextUsed }),
+              effectDescription: JSON.stringify({ used: k31dNextUsed, nomsDeDepart: k31dDepart }),
               targetSelectionType: 'SS031_MOVE_CHARACTER',
               sourcePlayer: k31dPlayer, requiresTargetSelection: true,
               validTargets: k31dMovable, isOptional: false, isMandatory: true,
@@ -7326,9 +7333,9 @@ export class EffectEngine {
           newState = ss031ApplyDiscardReward(newState, pendingEffect, k31dPlayer, k31dName);
         }
 
-        const k31dRemaining = discardableSoundFour(newState, k31dPlayer, k31dNextUsed);
+        const k31dRemaining = discardableSoundFour(newState, k31dPlayer, k31dNextUsed, k31dDepart);
         if (k31dRemaining.length > 0) {
-          newState = ss031QueueDiscardChoice(newState, pendingEffect, k31dPlayer, k31dNextUsed, k31dRemaining);
+          newState = ss031QueueDiscardChoice(newState, pendingEffect, k31dPlayer, k31dNextUsed, k31dRemaining, k31dDepart);
         }
         break;
       }
@@ -7380,10 +7387,15 @@ export class EffectEngine {
         }
 
         let k31zUsed: SoundFourName[] = [];
-        try { k31zUsed = JSON.parse(pendingEffect.effectDescription).used ?? []; } catch { /* fresh chain */ }
-        const k31zRemaining = discardableSoundFour(newState, k31zPlayer, k31zUsed);
+        let k31zDepart: SoundFourName[] = [];
+        try {
+          const k31zPayload = JSON.parse(pendingEffect.effectDescription);
+          k31zUsed = k31zPayload.used ?? [];
+          k31zDepart = k31zPayload.nomsDeDepart ?? [];
+        } catch { /* fresh chain */ }
+        const k31zRemaining = discardableSoundFour(newState, k31zPlayer, k31zUsed, k31zDepart);
         if (k31zRemaining.length > 0) {
-          newState = ss031QueueDiscardChoice(newState, pendingEffect, k31zPlayer, k31zUsed, k31zRemaining);
+          newState = ss031QueueDiscardChoice(newState, pendingEffect, k31zPlayer, k31zUsed, k31zRemaining, k31zDepart);
         }
         break;
       }
