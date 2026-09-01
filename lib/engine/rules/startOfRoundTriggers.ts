@@ -2,6 +2,7 @@ import type { GameState, PlayerID, CharacterInPlay } from '../types';
 import { logAction } from '../utils/gameLog';
 import { generateInstanceId } from '../utils/id';
 import { weightsPowerupTargets } from '../../effects/handlers/SS/attachmentStatics';
+import { textIsBlanked } from '../../effects/handlers/SS/attachmentStatics';
 import { amplifiedPowerup } from '../../effects/ContinuousEffects';
 
 export const SAKURA_007_ID = 'SS-007-C';
@@ -68,7 +69,7 @@ function applyForPlayer(state: GameState, player: PlayerID): GameState {
 
   for (let missionIndex = 0; missionIndex < newState.activeMissions.length; missionIndex++) {
     const sources = newState.activeMissions[missionIndex][side].filter(
-      (char) => !char.isHidden && topCardOf(char).id === SAKURA_007_ID,
+      (char) => !char.isHidden && !textIsBlanked(char) && topCardOf(char).id === SAKURA_007_ID,
     );
 
     for (const source of sources) {
@@ -179,7 +180,7 @@ function applyMightGuy116(state: GameState, player: PlayerID): GameState {
 
   for (const mission of newState.activeMissions) {
     for (const source of mission[side]) {
-      if (source.isHidden || !isMightGuy116(source)) continue;
+      if (source.isHidden || textIsBlanked(source) || !isMightGuy116(source)) continue;
 
       const cibles = mightGuy116Targets(newState, player);
       if (cibles.length === 0) {

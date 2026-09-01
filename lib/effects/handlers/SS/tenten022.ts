@@ -1,4 +1,5 @@
 import type { EffectContext, EffectResult } from '@/lib/effects/EffectTypes';
+import { textIsBlanked } from './attachmentStatics';
 import type { CardData, CharacterInPlay, GameState, PlayerID } from '@/lib/engine/types';
 import { registerEffect } from '@/lib/effects/EffectRegistry';
 import { logAction } from '@/lib/engine/utils/gameLog';
@@ -26,7 +27,7 @@ export function bonusArmeSurTenten(
   card: CardData | null | undefined,
 ): number {
   if (!estTenten022(host) || !card) return 0;
-  if (host!.isHidden) return 0;
+  if (host!.isHidden || textIsBlanked(host!)) return 0;
   return (card.keywords ?? []).includes(WEAPON_KEYWORD) ? TENTEN_022_WEAPON_BONUS : 0;
 }
 

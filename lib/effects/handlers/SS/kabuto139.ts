@@ -1,4 +1,5 @@
 import type { CharacterInPlay, GameState, PlayerID } from '@/lib/engine/types';
+import { textIsBlanked } from './attachmentStatics';
 import { characterHasGroup } from '@/lib/effects/groupUtils';
 
 export const KABUTO_139_ID = 'SS-139-R';
@@ -13,7 +14,7 @@ export function kabuto139Watchers(state: GameState, player: PlayerID): Character
   const trouves: CharacterInPlay[] = [];
   for (const mission of state.activeMissions) {
     for (const char of mission[side]) {
-      if (char.isHidden) continue;
+      if (char.isHidden || textIsBlanked(char)) continue;
       if (topOf(char).id === KABUTO_139_ID) trouves.push(char);
     }
   }

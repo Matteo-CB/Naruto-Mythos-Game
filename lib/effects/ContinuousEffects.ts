@@ -669,7 +669,7 @@ function applyHiruzen133Powerup(
     player === 'player1' ? 'player1Characters' : 'player2Characters';
 
   const sources = mission[side].filter((c) => {
-    if (c.isHidden) return false;
+    if (c.isHidden || textIsBlanked(c)) return false;
     if (c.instanceId === playedInstanceId) return false;
     const top = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
     return String(top.set) === 'SS' && Number(top.number) === 133;
@@ -858,7 +858,7 @@ function applyGato075Reward(
   if (!(joueTop.keywords ?? []).includes('Rogue Ninja')) return state;
 
   const gatos = mission[side].filter((c) => {
-    if (c.isHidden || c.instanceId === playedInstanceId) return false;
+    if (c.isHidden || textIsBlanked(c) || c.instanceId === playedInstanceId) return false;
     const top = c.stack?.length > 0 ? c.stack[c.stack.length - 1] : c.card;
     return String(top.set) === 'SS' && Number(top.number) === 75;
   });
@@ -1200,6 +1200,7 @@ export function powerupAmplifierBonus(
   if (!mission) return 0;
   return mission[sideOfPlayer(controller)].reduce((bonus, char) => {
     if (char.isHidden) return bonus;
+    if (textIsBlanked(char)) return bonus;
     if (targetInstanceId && char.instanceId === targetInstanceId) return bonus;
     const top = char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
     return isPowerupAmplifier(top) ? bonus + 1 : bonus;

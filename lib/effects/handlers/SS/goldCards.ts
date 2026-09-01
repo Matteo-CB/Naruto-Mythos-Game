@@ -1,5 +1,6 @@
 import type { CardData, CharacterInPlay, GameState, PlayerID } from '@/lib/engine/types';
 import { shuffle } from '@/lib/engine/utils/shuffle';
+import { textIsBlanked } from './attachmentStatics';
 
 export const TSUNADE_GOLD_ID = 'SS-999-L';
 export const TSUNADE_GOLD_NAME = 'TSUNADE';
@@ -73,6 +74,7 @@ export function jiraiyaGoldSources(state: GameState, player: PlayerID): Characte
   for (const mission of state.activeMissions) {
     for (const char of mission[sideOf(player)]) {
       if (char.isHidden) continue;
+      if (textIsBlanked(char)) continue;
       const top = topCardOf(char);
       if (JIRAIYA_SANNIN_PRINTINGS.includes(String(top.cardId ?? top.id))) sources.push(char);
     }
