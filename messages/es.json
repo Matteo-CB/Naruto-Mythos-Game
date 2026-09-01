@@ -395,7 +395,9 @@
       "retry": "Reintentar"
     },
     "ok": "OK",
-    "revealing": "Revelándose"
+    "revealing": "Revelándose",
+    "retry": "Reintentar",
+    "errorOccurred": "Se ha producido un error"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -2387,7 +2389,9 @@
     "error": {
       "evolvingNoDeck": "Necesitas un mazo Evolving para este modo.",
       "highlanderNoDeck": "Necesitas un mazo Highlander para este modo.",
-      "highlanderDeckInvalid": "Este mazo no cumple las reglas Highlander."
+      "highlanderDeckInvalid": "Este mazo no cumple las reglas Highlander.",
+      "roomGone": "Esta sala ya no existe",
+      "seatGone": "No se encuentra tu puesto en esta sala"
     }
   },
   "auth": {
@@ -2808,7 +2812,8 @@
     "continueToFinish": "Toca para terminar la apertura",
     "timeJustNow": "ahora mismo",
     "timeMinutesAgo": "hace {minutes} min",
-    "temporarilyClosed": "El modo sellado esta cerrado temporalmente mientras terminamos los ultimos ajustes. Vuelve muy pronto."
+    "temporarilyClosed": "El modo sellado esta cerrado temporalmente mientras terminamos los ultimos ajustes. Vuelve muy pronto.",
+    "deckSent": "Tu mazo se ha recibido, esperando al rival"
   },
   "tournament": {
     "launchMatch": "Iniciar la partida",

@@ -2836,6 +2836,24 @@ function resolveRoomSeatForSocket(
   return { code, room, seat };
 }
 
+function placeAvantPartiePourIdentite(
+  socket: Socket,
+  io: SocketIOServer,
+): ResolvedRoomSeat | null {
+  const userId = socketUserId(socket);
+  if (!userId) return null;
+  for (const [code, room] of rooms) {
+    if (room.gameState) continue;
+    const seat: Seat | null = room.hostId === userId ? 'player1' : room.guestId === userId ? 'player2' : null;
+    if (!seat) continue;
+    console.warn(`[Socket] siege ${seat} retrouve par identite dans la salle ${code} pour le socket ${socket.id}`);
+    markSeatPresent(room, seat, socket.id, io);
+    socket.join(code);
+    return { code, room, seat };
+  }
+  return null;
+}
+
 function seatIsBound(room: RoomData, seat: Seat, io: SocketIOServer | null): boolean {
   return seatLiveness(room, seat, io).seatSocketAlive;
 }
@@ -3785,10 +3803,16 @@ export function setupSocketHandlers(io: SocketIOServer) {
       missions: MissionCard[];
       deckId?: string;
     }) => {
-      const code = playerRooms.get(socket.id);
-      if (!code) return;
-      const room = rooms.get(code);
-      if (!room) return;
+      const place = resolveRoomSeatForSocket(socket, io) ?? placeAvantPartiePourIdentite(socket, io);
+      const code = place?.code ?? playerRooms.get(socket.id);
+      const room = place?.room ?? (code ? rooms.get(code) : undefined);
+      if (!code || !room) {
+        console.warn(`[Socket] room:select-deck refuse pour ${socket.id}: aucune salle ne correspond a ce joueur`);
+        socket.emit('room:error', { message: 'Room no longer exists', errorKey: 'room.error.roomGone' });
+        return;
+      }
+      const siegeDuJoueur: Seat | null = place?.seat
+        ?? (socket.id === room.hostSocket ? 'player1' : socket.id === room.guestSocket ? 'player2' : null);
 
       if (room.gameState && room.gameState.phase !== 'gameOver' && !room.finalized) {
         const seatOfSender = socket.id === room.hostSocket ? 'player1' : socket.id === room.guestSocket ? 'player2' : null;
@@ -3969,12 +3993,17 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
 
       const deckPoints = computeDeckEvolvingPoints(safeDeck.characters.map((c) => c.id));
-      const submittingUserId = socket.id === room.hostSocket ? room.hostId : (socket.id === room.guestSocket ? room.guestId : null);
-      if (socket.id === room.hostSocket) {
+      if (!siegeDuJoueur) {
+        console.warn(`[Socket] room:select-deck refuse dans ${code}: le siege de ${socket.id} est introuvable`);
+        socket.emit('room:error', { message: 'Your seat could not be found in this room', errorKey: 'room.error.seatGone' });
+        return;
+      }
+      const submittingUserId = siegeDuJoueur === 'player1' ? room.hostId : room.guestId;
+      if (siegeDuJoueur === 'player1') {
         room.hostDeck = safeDeck;
         room.hostEvolvingPoints = deckPoints;
         if (safeDeckId) room.hostDeckId = safeDeckId;
-      } else if (socket.id === room.guestSocket) {
+      } else {
         room.guestDeck = safeDeck;
         room.guestEvolvingPoints = deckPoints;
         if (safeDeckId) room.guestDeckId = safeDeckId;
@@ -5256,19 +5285,13 @@ export function setupSocketHandlers(io: SocketIOServer) {
               room.player2DisconnectedAt = disconnectedAt;
             }
           } else if (room.isSealed && room.guestId && !room.gameState) {
-            console.log(`[Socket] ${player} disconnected during sealed deck-building in room ${code}`);
-            if (isHost) {
-              if (room.sealedTimer) clearTimeout(room.sealedTimer);
-              clearChessClockTimers(room);
-              const wasPublic = !room.isPrivate;
-              rooms.delete(code);
-              if (wasPublic) broadcastRoomList(io);
-            } else {
-              room.guestId = null;
-              room.guestSocket = null;
-              room.guestDeck = null;
-              if (!room.isPrivate) broadcastRoomList(io);
-            }
+            console.log(`[Socket] ${player} disconnected during sealed deck-building in room ${code}, seat kept for rejoin`);
+            if (isHost) room.hostSocket = '';
+            else room.guestSocket = null;
+            playerRooms.delete(socket.id);
+            const sResult = removeSocketFromAll(socket.id);
+            if (sResult?.isLastSocket) userNames.delete(sResult.userId);
+            return;
           } else if (isHost) {
             
             if (!room.gameState) {

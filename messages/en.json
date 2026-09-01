@@ -390,7 +390,9 @@
       "retry": "Retry"
     },
     "ok": "OK",
-    "revealing": "Revealing"
+    "revealing": "Revealing",
+    "retry": "Retry",
+    "errorOccurred": "Something went wrong"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -2382,7 +2384,9 @@
     "error": {
       "evolvingNoDeck": "You need an Evolving deck for this mode.",
       "highlanderNoDeck": "You need a Highlander deck for this mode.",
-      "highlanderDeckInvalid": "This deck does not follow the Highlander rules."
+      "highlanderDeckInvalid": "This deck does not follow the Highlander rules.",
+      "roomGone": "This room no longer exists",
+      "seatGone": "Your seat in this room could not be found"
     }
   },
   "auth": {
@@ -2803,7 +2807,8 @@
     "continueToFinish": "Tap to finish opening",
     "timeJustNow": "just now",
     "timeMinutesAgo": "{minutes} min ago",
-    "temporarilyClosed": "Sealed mode is temporarily closed while we finish the last adjustments. It will be back very soon."
+    "temporarilyClosed": "Sealed mode is temporarily closed while we finish the last adjustments. It will be back very soon.",
+    "deckSent": "Your deck was received, waiting for your opponent"
   },
   "tournament": {
     "launchMatch": "Launch the match",

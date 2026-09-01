@@ -394,7 +394,9 @@
       "retry": "再試行"
     },
     "ok": "OK",
-    "revealing": "公開中"
+    "revealing": "公開中",
+    "retry": "再試行",
+    "errorOccurred": "エラーが発生しました"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -2386,7 +2388,9 @@
     "error": {
       "evolvingNoDeck": "このモードにはエボルビングデッキが必要です。",
       "highlanderNoDeck": "このモードにはハイランダーデッキが必要です。",
-      "highlanderDeckInvalid": "このデッキはハイランダーのルールを満たしていません。"
+      "highlanderDeckInvalid": "このデッキはハイランダーのルールを満たしていません。",
+      "roomGone": "この部屋はもう存在しません",
+      "seatGone": "この部屋にあなたの席が見つかりません"
     }
   },
   "auth": {
@@ -2807,7 +2811,8 @@
     "continueToFinish": "タップして開封を終える",
     "timeJustNow": "たった今",
     "timeMinutesAgo": "{minutes} 分前",
-    "temporarilyClosed": "シールド戦は最終調整のため一時的に閉じています。まもなく再開します。"
+    "temporarilyClosed": "シールド戦は最終調整のため一時的に閉じています。まもなく再開します。",
+    "deckSent": "デッキは受け取りました。相手を待っています"
   },
   "tournament": {
     "launchMatch": "試合を開始",

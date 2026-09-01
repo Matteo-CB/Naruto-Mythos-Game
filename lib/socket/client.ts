@@ -676,9 +676,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
       socket.on('room:deck-accepted', () => {
         console.log('[Socket] Deck accepted, waiting for opponent');
-        if (get().isSealedRoom) {
-          set({ sealedDeckSubmitted: true });
-        }
+        set({ sealedDeckSubmitted: true });
       });
 
       

@@ -124,7 +124,9 @@
       "retry": "Ponów"
     },
     "ok": "OK",
-    "revealing": "W trakcie ujawniania"
+    "revealing": "W trakcie ujawniania",
+    "retry": "Spróbuj ponownie",
+    "errorOccurred": "Wystąpił błąd"
   },
   "flag": {
     "none": "Brak flagi",
@@ -659,7 +661,9 @@
     "error": {
       "evolvingNoDeck": "Potrzebujesz talii Evolving do tego trybu.",
       "highlanderNoDeck": "Do tego trybu potrzebujesz talii Highlander.",
-      "highlanderDeckInvalid": "Ta talia nie spełnia zasad Highlander."
+      "highlanderDeckInvalid": "Ta talia nie spełnia zasad Highlander.",
+      "roomGone": "Ten pokój już nie istnieje",
+      "seatGone": "Nie znaleziono twojego miejsca w tym pokoju"
     }
   },
   "dm": {
@@ -986,7 +990,8 @@
     "continueToFinish": "Dotknij, aby zakończyć otwieranie",
     "timeJustNow": "przed chwilą",
     "timeMinutesAgo": "{minutes} min temu",
-    "temporarilyClosed": "Tryb zapieczetowany jest tymczasowo zamkniety, konczymy ostatnie poprawki. Wroci bardzo szybko."
+    "temporarilyClosed": "Tryb zapieczetowany jest tymczasowo zamkniety, konczymy ostatnie poprawki. Wroci bardzo szybko.",
+    "deckSent": "Twoja talia dotarła, czekamy na przeciwnika"
   },
   "online": {
     "title": "Graj Online",

@@ -124,7 +124,9 @@
       "retry": "Riprova"
     },
     "ok": "OK",
-    "revealing": "In rivelazione"
+    "revealing": "In rivelazione",
+    "retry": "Riprova",
+    "errorOccurred": "Si e verificato un errore"
   },
   "flag": {
     "none": "Nessuna bandiera",
@@ -659,7 +661,9 @@
     "error": {
       "evolvingNoDeck": "Ti serve un mazzo Evolving per questa modalità.",
       "highlanderNoDeck": "Ti serve un mazzo Highlander per questa modalità.",
-      "highlanderDeckInvalid": "Questo mazzo non rispetta le regole Highlander."
+      "highlanderDeckInvalid": "Questo mazzo non rispetta le regole Highlander.",
+      "roomGone": "Questa stanza non esiste piu",
+      "seatGone": "Il tuo posto in questa stanza non e stato trovato"
     }
   },
   "dm": {
@@ -986,7 +990,8 @@
     "continueToFinish": "Tocca per finire di aprire",
     "timeJustNow": "proprio ora",
     "timeMinutesAgo": "{minutes} min fa",
-    "temporarilyClosed": "La modalita sigillata e temporaneamente chiusa mentre completiamo gli ultimi ritocchi. Torna prestissimo."
+    "temporarilyClosed": "La modalita sigillata e temporaneamente chiusa mentre completiamo gli ultimi ritocchi. Torna prestissimo.",
+    "deckSent": "Il tuo mazzo e arrivato, in attesa dell avversario"
   },
   "online": {
     "title": "Gioca Online",

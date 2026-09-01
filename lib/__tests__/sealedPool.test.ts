@@ -26,12 +26,12 @@ describe('generateSealedPool — invariants', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('separateSealedPool divides correctly into characters and missions', () => {
+  it('separateSealedPool divides correctly into deck cards and missions', () => {
     const pool = generateSealedPool(5);
     const sep = separateSealedPool(pool);
     expect(sep.characters.length + sep.missions.length).toBe(pool.allCards.length);
     for (const c of sep.characters) {
-      expect(c.card_type).toBe('character');
+      expect(c.card_type, 'les equipements sont des cartes de deck, comme les personnages').not.toBe('mission');
     }
     for (const m of sep.missions) {
       expect(m.card_type).toBe('mission');

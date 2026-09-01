@@ -396,7 +396,9 @@
       "retry": "Réessayer"
     },
     "ok": "OK",
-    "revealing": "En cours de révélation"
+    "revealing": "En cours de révélation",
+    "retry": "Réessayer",
+    "errorOccurred": "Une erreur est survenue"
   },
   "home": {
     "title": "NARUTO MYTHOS",
@@ -2388,7 +2390,9 @@
     "error": {
       "evolvingNoDeck": "Il te faut un deck Evolving pour ce mode.",
       "highlanderNoDeck": "Il te faut un deck Highlander pour ce mode.",
-      "highlanderDeckInvalid": "Ce deck ne respecte pas les règles Highlander."
+      "highlanderDeckInvalid": "Ce deck ne respecte pas les règles Highlander.",
+      "roomGone": "La salle n'existe plus",
+      "seatGone": "Ta place dans cette salle est introuvable"
     }
   },
   "auth": {
@@ -2809,7 +2813,8 @@
     "continueToFinish": "Touchez pour terminer l'ouverture",
     "timeJustNow": "à l'instant",
     "timeMinutesAgo": "il y a {minutes} min",
-    "temporarilyClosed": "Le mode scellé est temporairement fermé le temps des derniers réglages. Il revient très vite."
+    "temporarilyClosed": "Le mode scellé est temporairement fermé le temps des derniers réglages. Il revient très vite.",
+    "deckSent": "Ton deck est bien parti, on attend l'adversaire"
   },
   "tournament": {
     "launchMatch": "Lancer le match",

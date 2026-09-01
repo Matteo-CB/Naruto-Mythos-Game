@@ -124,7 +124,9 @@
       "retry": "Tentar novamente"
     },
     "ok": "OK",
-    "revealing": "Em revelação"
+    "revealing": "Em revelação",
+    "retry": "Tentar de novo",
+    "errorOccurred": "Ocorreu um erro"
   },
   "flag": {
     "none": "Sem bandeira",
@@ -659,7 +661,9 @@
     "error": {
       "evolvingNoDeck": "Você precisa de um deck Evolving para este modo.",
       "highlanderNoDeck": "Precisas de um baralho Highlander para este modo.",
-      "highlanderDeckInvalid": "Este baralho não segue as regras Highlander."
+      "highlanderDeckInvalid": "Este baralho não segue as regras Highlander.",
+      "roomGone": "Esta sala já nao existe",
+      "seatGone": "O teu lugar nesta sala nao foi encontrado"
     }
   },
   "dm": {
@@ -986,7 +990,8 @@
     "continueToFinish": "Toque para terminar de abrir",
     "timeJustNow": "agora mesmo",
     "timeMinutesAgo": "há {minutes} min",
-    "temporarilyClosed": "O modo selado esta temporariamente fechado enquanto terminamos os ultimos ajustes. Volta muito em breve."
+    "temporarilyClosed": "O modo selado esta temporariamente fechado enquanto terminamos os ultimos ajustes. Volta muito em breve.",
+    "deckSent": "O teu baralho foi recebido, a aguardar o adversario"
   },
   "online": {
     "title": "Jogar Online",

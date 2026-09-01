@@ -54,6 +54,9 @@ export default function SealedPage() {
   const socketPlayerRole = useSocketStore((s) => s.playerRole);
   const socketPlayerNames = useSocketStore((s) => s.playerNames);
   const socketError = useSocketStore((s) => s.error);
+  const socketErrorKey = useSocketStore((s) => s.errorKey);
+  const sealedDeckSubmitted = useSocketStore((s) => s.sealedDeckSubmitted);
+  const dernierDeckEnvoye = useRef<{ characters: CharacterCard[]; missions: MissionCard[] } | null>(null);
   const socketDisconnect = useSocketStore((s) => s.disconnect);
   const publicRooms = useSocketStore((s) => s.publicRooms);
   const requestRoomList = useSocketStore((s) => s.requestRoomList);
@@ -315,6 +318,7 @@ export default function SealedPage() {
           characters.map((c) => c.id),
           missions.map((m) => m.id),
         );
+        dernierDeckEnvoye.current = { characters, missions };
         socketSelectDeck(characters, missions);
         setStep('starting');
       }
@@ -384,6 +388,14 @@ export default function SealedPage() {
     );
   }
 
+  const messageDErreur = socketError ?? (socketErrorKey ? tc('errorOccurred') : null);
+
+  const renvoyerLeDeck = useCallback(() => {
+    const deck = dernierDeckEnvoye.current;
+    if (!deck) { router.push('/play/online'); return; }
+    socketSelectDeck(deck.characters, deck.missions);
+  }, [socketSelectDeck, router]);
+
   if (step === 'starting') {
     return (
       <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--t-bg)' }}>
@@ -400,6 +412,34 @@ export default function SealedPage() {
           >
             {mode === 'online' ? t('waitingOpponent') : tc('loading')}
           </motion.span>
+
+          {mode === 'online' && sealedDeckSubmitted && !messageDErreur && (
+            <span className="text-xs" style={{ color: 'var(--t-muted)' }}>{t('deckSent')}</span>
+          )}
+
+          {mode === 'online' && messageDErreur && (
+            <div className="flex flex-col items-center gap-2 mt-2">
+              <span className="text-xs text-center max-w-xs" style={{ color: 'var(--t-danger)' }}>{messageDErreur}</span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={renvoyerLeDeck}
+                  className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider"
+                  style={{ backgroundColor: 'var(--t-accent)', color: 'var(--t-bg)' }}
+                >
+                  {tc('retry')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { socketDisconnect(); router.push('/play/online'); }}
+                  className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider"
+                  style={{ backgroundColor: 'var(--t-surface)', color: 'var(--t-text)' }}
+                >
+                  {tc('back')}
+                </button>
+              </div>
+            </div>
+          )}
         </motion.div>
       </main>
     );
