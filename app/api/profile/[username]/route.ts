@@ -228,7 +228,26 @@ export async function GET(
     const merged = [...pvpEntries, ...casualPvpEntries, ...aiEntries].sort(
       (a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime(),
     );
-    const totalGames = totalRanked + casualPvpEntries.length + aiGames.length;
+    const tousLesIdsClasses = (await prisma.eloHistory.findMany({
+      where: { userId: user.id, gameId: { not: null } },
+      select: { gameId: true },
+    })).map((r) => r.gameId).filter((x): x is string => !!x);
+
+    const [totalIA, totalAmicales] = await Promise.all([
+      prisma.game.count({
+        where: { OR: [{ player1Id: user.id }, { player2Id: user.id }], status: 'completed', isAiGame: true },
+      }),
+      prisma.game.count({
+        where: {
+          OR: [{ player1Id: user.id }, { player2Id: user.id }],
+          status: 'completed',
+          isAiGame: false,
+          ...(tousLesIdsClasses.length > 0 ? { id: { notIn: tousLesIdsClasses } } : {}),
+        },
+      }),
+    ]);
+
+    const totalGames = totalRanked + totalAmicales + totalIA;
     const recentGames = merged.slice((page - 1) * perPage, limit);
 
     const backfillDeckIds: string[] = [];
