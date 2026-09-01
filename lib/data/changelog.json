@@ -7,6 +7,40 @@
   ],
   "entries": [
     {
+      "date": "2026-09-01",
+      "categories": [
+        "fix"
+      ],
+      "title_fr": "Mise à jour",
+      "changes_fr": [
+        "Un effet voit désormais le renfort reçu en arrivant: EBISU 046 pioche bien quand la mission Renforts vient de le gonfler"
+      ],
+      "title_en": "Update",
+      "changes_en": [
+        "An effect now sees the boost it just received on arrival: EBISU 046 draws when the New Forces mission has just buffed it"
+      ],
+      "title_es": "Actualización",
+      "changes_es": [
+        "Un efecto ya ve el refuerzo recibido al llegar: EBISU 046 roba cuando la misión Refuerzos acaba de potenciarlo"
+      ],
+      "title_pt": "Atualização",
+      "changes_pt": [
+        "Um efeito passa a ver o reforço recebido ao chegar: EBISU 046 compra quando a missão Reforços acabou de o reforçar"
+      ],
+      "title_it": "Aggiornamento",
+      "changes_it": [
+        "Un effetto vede ora il potenziamento ricevuto all arrivo: EBISU 046 pesca quando la missione Rinforzi lo ha appena potenziato"
+      ],
+      "title_pl": "Aktualizacja",
+      "changes_pl": [
+        "Efekt widzi teraz wzmocnienie otrzymane przy wejściu: EBISU 046 dobiera, gdy misja Posiłki właśnie go wzmocniła"
+      ],
+      "title_ja": "アップデート",
+      "changes_ja": [
+        "効果が登場時に受けた強化を見るようになり、援軍ミッションで強化された直後のエビス046がきちんとドローします"
+      ]
+    },
+    {
       "date": "2026-08-30",
       "categories": [
         "fix",

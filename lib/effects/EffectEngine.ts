@@ -468,7 +468,7 @@ export class EffectEngine {
 
       try {
 
-        const charResult = i > 0 ? EffectEngine.findCharByInstanceId(newState, character.instanceId) : null;
+        const charResult = EffectEngine.findCharByInstanceId(newState, character.instanceId);
         const currentChar = charResult?.character ?? character;
         const currentMissionIndex = charResult?.missionIndex ?? missionIndex;
 
@@ -622,11 +622,12 @@ export class EffectEngine {
       }
 
       try {
+        const charActuel = EffectEngine.findCharByInstanceId(newState, character.instanceId);
         const ctx: EffectContext = {
           state: newState,
           sourcePlayer: player,
-          sourceCard: character,
-          sourceMissionIndex: missionIndex,
+          sourceCard: charActuel?.character ?? character,
+          sourceMissionIndex: charActuel?.missionIndex ?? missionIndex,
           triggerType: effectType,
           isUpgrade: true,
           wasRevealed: true,
@@ -714,11 +715,12 @@ export class EffectEngine {
       const handler = getEffectHandler(topCard.id, 'MAIN');
       if (handler) {
         try {
+          const charActuelMain = EffectEngine.findCharByInstanceId(newState, character.instanceId);
           const ctx: EffectContext = {
             state: newState,
             sourcePlayer: player,
-            sourceCard: character,
-            sourceMissionIndex: missionIndex,
+            sourceCard: charActuelMain?.character ?? character,
+            sourceMissionIndex: charActuelMain?.missionIndex ?? missionIndex,
             triggerType: 'MAIN',
             isUpgrade: false,
             wasRevealed: true,
