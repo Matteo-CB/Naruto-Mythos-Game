@@ -10,6 +10,7 @@ import { parseSearchQuery, normalizeStr, type SearchFilter } from "@/lib/deckSea
 import { validateDeck } from "@/lib/engine/rules/DeckValidation";
 import { compareBySetOrder, rarityRank } from "@/lib/cards/order";
 import { useDeckBuilderStore } from "@/stores/deckBuilderStore";
+import { useToastStore } from "@/stores/toastStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useUnlockedVariants } from "@/lib/hooks/useUnlockedVariants";
 import { isVariantCard, isLockedVariantCard, baseCardIdFor } from "@/lib/variants/isVariant";
@@ -459,6 +460,9 @@ export default function DeckBuilderPage() {
   const clearAddError = useDeckBuilderStore((s) => s.clearAddError);
   const sortCharsByCost = useDeckBuilderStore((s) => s.sortCharsByCost);
   const sortCharsByName = useDeckBuilderStore((s) => s.sortCharsByName);
+  const basculerTousLesHolos = useDeckBuilderStore((s) => s.basculerTousLesHolos);
+  const holosDisponiblesDansLeDeck = useDeckBuilderStore((s) => s.holosDisponiblesDansLeDeck);
+  const showToast = useToastStore((s) => s.showToast);
   const setUnlockedVariantIds = useDeckBuilderStore((s) => s.setUnlockedVariantIds);
   const { bannedIds } = useBannedCards();
   const { unlockedIds: unlockedVariantIds, loading: variantsLoading } = useUnlockedVariants();
@@ -642,6 +646,12 @@ export default function DeckBuilderPage() {
   const deckCardCount = deckChars.length;
 
   const validation = useMemo(() => validateDeck(deckChars, deckMissions), [deckChars, deckMissions]);
+
+  const holoDuDeck = useMemo(
+    () => holosDisponiblesDansLeDeck(),
+    [holosDisponiblesDansLeDeck, deckChars, unlockedVariantIds],
+  );
+  const holoTousPoses = holoDuDeck.total > 0 && holoDuDeck.poses === holoDuDeck.total;
 
   const lockedVariantsInDeck = useMemo(() => {
     if (variantsLoading) return [];
@@ -1367,6 +1377,34 @@ export default function DeckBuilderPage() {
           }}>
           {t("deckBuilder.sortByName")}
         </button>
+        {holoDuDeck.total > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              const changees = basculerTousLesHolos();
+              if (changees > 0) {
+                showToast({
+                  type: 'success',
+                  message: holoTousPoses
+                    ? t('deckBuilder.holoAllRemoved', { count: changees })
+                    : t('deckBuilder.holoAllApplied', { count: changees }),
+                  dedupeKey: 'holo-tout',
+                  durationMs: 2500,
+                });
+              }
+            }}
+            className="px-2 py-0.5 text-[9px] uppercase font-bold"
+            title={holoTousPoses ? t('deckBuilder.holoRemoveAll') : t('deckBuilder.holoApplyAll')}
+            style={{
+              backgroundColor: holoTousPoses ? 'rgba(196,163,90,0.92)' : 'var(--t-accent-tint)',
+              color: holoTousPoses ? 'var(--t-bg)' : 'var(--t-accent)',
+            }}
+          >
+            {holoTousPoses
+              ? t('deckBuilder.holoRemoveAll')
+              : t('deckBuilder.holoApplyAll', { count: holoDuDeck.total - holoDuDeck.poses })}
+          </button>
+        )}
         <div className="h-3 w-px" style={{ backgroundColor: 'var(--t-divider)' }} />
         
         {(['grid', 'rows'] as DeckViewMode[]).map((m) => (

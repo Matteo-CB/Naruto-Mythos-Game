@@ -1919,7 +1919,11 @@
       "continuous": "Continuo"
     },
     "exportAsPdf": "Esporta in PDF",
-    "exportPdfDesc": "Il PDF stampa le carte a grandezza reale, 9 per foglio A4, attaccate tra loro per ritagliarle facilmente."
+    "exportPdfDesc": "Il PDF stampa le carte a grandezza reale, 9 per foglio A4, attaccate tra loro per ritagliarle facilmente.",
+    "holoApplyAll": "Tutto in holo ({count})",
+    "holoRemoveAll": "Togli gli holo",
+    "holoAllApplied": "{count} carte passate a holo",
+    "holoAllRemoved": "{count} carte tornate normali"
   },
   "seoPages": {
     "collection": {

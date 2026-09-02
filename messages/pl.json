@@ -1919,7 +1919,11 @@
       "continuous": "Ciągłe"
     },
     "exportAsPdf": "Eksportuj do PDF",
-    "exportPdfDesc": "PDF drukuje karty w rzeczywistym rozmiarze, 9 na arkusz A4, jedna przy drugiej, aby ułatwić wycinanie."
+    "exportPdfDesc": "PDF drukuje karty w rzeczywistym rozmiarze, 9 na arkusz A4, jedna przy drugiej, aby ułatwić wycinanie.",
+    "holoApplyAll": "Wszystko na holo ({count})",
+    "holoRemoveAll": "Usuń holo",
+    "holoAllApplied": "{count} kart zmieniono na holo",
+    "holoAllRemoved": "{count} kart wróciło do zwykłych"
   },
   "seoPages": {
     "collection": {

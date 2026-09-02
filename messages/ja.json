@@ -2021,7 +2021,11 @@
       "continuous": "継続"
     },
     "exportAsPdf": "PDF で書き出す",
-    "exportPdfDesc": "PDF はカードを実寸で、A4 一枚に 9 枚、切り取りやすいように隙間なく並べて印刷します。"
+    "exportPdfDesc": "PDF はカードを実寸で、A4 一枚に 9 枚、切り取りやすいように隙間なく並べて印刷します。",
+    "holoApplyAll": "すべてホロに ({count})",
+    "holoRemoveAll": "ホロを解除",
+    "holoAllApplied": "{count}枚をホロにしました",
+    "holoAllRemoved": "{count}枚を通常に戻しました"
   },
   "discord": {
     "linkDiscord": "Discordを連携",

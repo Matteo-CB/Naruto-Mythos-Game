@@ -58,6 +58,8 @@ interface DeckBuilderStore {
   removeChar: (index: number) => void;
   toggleCharHolo: (index: number) => void;
   canUseHolo: (card: CharacterCard) => boolean;
+  holosDisponiblesDansLeDeck: () => { total: number; poses: number };
+  basculerTousLesHolos: () => number;
   removeLockedVariants: () => number;
   addMission: (card: MissionCard) => void;
   removeMission: (index: number) => void;
@@ -218,6 +220,38 @@ export const useDeckBuilderStore = create<DeckBuilderStore>((set, get) => ({
     const updated = [...deckChars];
     updated[index] = { ...card, isHolo: true };
     set({ deckChars: updated, isDirty: true });
+  },
+
+  holosDisponiblesDansLeDeck: () => {
+    const { deckChars } = get();
+    const utilisable = get().canUseHolo;
+    let total = 0;
+    let poses = 0;
+    for (const carte of deckChars) {
+      if (!utilisable(carte)) continue;
+      total += 1;
+      if (carte.isHolo) poses += 1;
+    }
+    return { total, poses };
+  },
+
+  basculerTousLesHolos: () => {
+    const { deckChars } = get();
+    const utilisable = get().canUseHolo;
+    const { total, poses } = get().holosDisponiblesDansLeDeck();
+    if (total === 0) return 0;
+
+    const versHolo = poses < total;
+    let changees = 0;
+    const misAJour = deckChars.map((carte) => {
+      if (!utilisable(carte)) return carte;
+      if (!!carte.isHolo === versHolo) return carte;
+      changees += 1;
+      return { ...carte, isHolo: versHolo };
+    });
+
+    if (changees > 0) set({ deckChars: misAJour, isDirty: true });
+    return changees;
   },
 
   removeLockedVariants: () => {

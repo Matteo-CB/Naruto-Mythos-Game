@@ -2023,7 +2023,11 @@
       "continuous": "Continu"
     },
     "exportAsPdf": "Exporter en PDF",
-    "exportPdfDesc": "Le PDF imprime les cartes à leur taille réelle, 9 par page A4, collées les unes aux autres pour faciliter la découpe."
+    "exportPdfDesc": "Le PDF imprime les cartes à leur taille réelle, 9 par page A4, collées les unes aux autres pour faciliter la découpe.",
+    "holoApplyAll": "Tout en holo ({count})",
+    "holoRemoveAll": "Retirer les holos",
+    "holoAllApplied": "{count} cartes passées en holo",
+    "holoAllRemoved": "{count} cartes repassées en normal"
   },
   "discord": {
     "linkDiscord": "Lier Discord",

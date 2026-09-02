@@ -2017,7 +2017,11 @@
       "continuous": "Ongoing"
     },
     "exportAsPdf": "Export as PDF",
-    "exportPdfDesc": "The PDF prints the cards at their real size, 9 per A4 sheet, edge to edge so they are easy to cut out."
+    "exportPdfDesc": "The PDF prints the cards at their real size, 9 per A4 sheet, edge to edge so they are easy to cut out.",
+    "holoApplyAll": "All holo ({count})",
+    "holoRemoveAll": "Remove holos",
+    "holoAllApplied": "{count} cards turned holo",
+    "holoAllRemoved": "{count} cards back to normal"
   },
   "discord": {
     "linkDiscord": "Link Discord",

@@ -1919,7 +1919,11 @@
       "continuous": "Contínuo"
     },
     "exportAsPdf": "Exportar em PDF",
-    "exportPdfDesc": "O PDF imprime as cartas no tamanho real, 9 por folha A4, encostadas umas às outras para facilitar o recorte."
+    "exportPdfDesc": "O PDF imprime as cartas no tamanho real, 9 por folha A4, encostadas umas às outras para facilitar o recorte.",
+    "holoApplyAll": "Tudo em holo ({count})",
+    "holoRemoveAll": "Remover os holos",
+    "holoAllApplied": "{count} cartas passadas a holo",
+    "holoAllRemoved": "{count} cartas de volta ao normal"
   },
   "seoPages": {
     "collection": {
