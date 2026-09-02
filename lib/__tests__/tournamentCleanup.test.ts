@@ -17,6 +17,11 @@ vi.mock('@/lib/db/prisma', () => ({
   },
 }));
 
+const graverAvantPurge = vi.fn();
+vi.mock('@/lib/tournament/nwlTiers', () => ({
+  graverAvantPurge: (...a: unknown[]) => graverAvantPurge(...a),
+}));
+
 import { cleanupOldTournaments, TOURNAMENT_RETENTION_MS } from '@/lib/tournament/cleanupOldTournaments';
 
 beforeEach(() => {
@@ -24,6 +29,8 @@ beforeEach(() => {
   deleteMany.mockReset();
   matchDeleteMany.mockReset();
   participantDeleteMany.mockReset();
+  graverAvantPurge.mockReset();
+  graverAvantPurge.mockResolvedValue(0);
   matchDeleteMany.mockResolvedValue({ count: 0 });
   participantDeleteMany.mockResolvedValue({ count: 0 });
 });
@@ -112,6 +119,31 @@ describe('cleanupOldTournaments', () => {
     const inscritArg = participantDeleteMany.mock.calls[0][0] as { where: { tournamentId: { in: string[] } } };
     expect(matchArg.where.tournamentId.in, 'les matchs partent avec leur tournoi').toEqual(['a', 'b', 'c', 'd', 'e']);
     expect(inscritArg.where.tournamentId.in, 'les inscrits aussi').toEqual(['a', 'b', 'c', 'd', 'e']);
+  });
+
+  it('le classement partenaire est grave avant que quoi que ce soit ne soit efface', async () => {
+    findMany.mockResolvedValue([{ id: 'a', status: 'completed' }]);
+    deleteMany.mockResolvedValue({ count: 1 });
+    const ordre: string[] = [];
+    graverAvantPurge.mockImplementation(async () => { ordre.push('gravure'); return 1; });
+    matchDeleteMany.mockImplementation(async () => { ordre.push('suppression'); return { count: 0 }; });
+
+    const r = await cleanupOldTournaments(NOW);
+
+    expect(graverAvantPurge).toHaveBeenCalledWith(['a']);
+    expect(ordre[0], 'graver puis supprimer, jamais l inverse').toBe('gravure');
+    expect(r.classementsGraves).toBe(1);
+  });
+
+  it('une gravure impossible annule la purge au lieu de perdre les resultats', async () => {
+    findMany.mockResolvedValue([{ id: 'a', status: 'completed' }]);
+    deleteMany.mockResolvedValue({ count: 1 });
+    graverAvantPurge.mockRejectedValue(new Error('base injoignable'));
+
+    const r = await cleanupOldTournaments(NOW);
+
+    expect(r.deleted, 'rien n est efface').toBe(0);
+    expect(deleteMany, 'la suppression n a meme pas ete tentee').not.toHaveBeenCalled();
   });
 
   it('uses Date.now() when no argument is passed', async () => {

@@ -5,8 +5,9 @@ import { retryPendingNwlPrizes } from '@/lib/tournament/nwlPrize';
 import {
   createNwlChuninTournamentIfNeeded,
   createNwlKageTournamentIfNeeded,
-  diffuserCodeChunin,
-  diffuserCodeKage,
+  diffuserCodeSiNecessaire,
+  NWL_CHUNIN_PARTNER_KEY,
+  NWL_KAGE_PARTNER_KEY,
   annoncerOuvertureGenin,
   publierClassementChunin,
   synchroniserRoleJonin,
@@ -45,15 +46,15 @@ async function handle(request: NextRequest) {
     }
 
     const chunin = await createNwlChuninTournamentIfNeeded();
-    if (chunin.created && chunin.joinCode) {
-      const diffusion = await diffuserCodeChunin(chunin.joinCode);
-      console.log(`[Cron] Chunin tournament created, code sent to ${diffusion.mp} player(s), channel: ${diffusion.salon}`);
+    const diffusionChunin = await diffuserCodeSiNecessaire(chunin, NWL_CHUNIN_PARTNER_KEY);
+    if (diffusionChunin.diffuse) {
+      console.log(`[Cron] Chunin code sent to ${diffusionChunin.mp} player(s), channel: ${diffusionChunin.salon}`);
     }
 
     const kage = await createNwlKageTournamentIfNeeded();
-    if (kage.created && kage.joinCode) {
-      const diffusion = await diffuserCodeKage(kage.joinCode);
-      console.log(`[Cron] Kage tournament created, code sent to ${diffusion.mp} player(s), channel: ${diffusion.salon}`);
+    const diffusionKage = await diffuserCodeSiNecessaire(kage, NWL_KAGE_PARTNER_KEY);
+    if (diffusionKage.diffuse) {
+      console.log(`[Cron] Kage code sent to ${diffusionKage.mp} player(s), channel: ${diffusionKage.salon}`);
     }
 
     const rappels = await rappelerLesTournoisProches(new Date());
@@ -68,7 +69,10 @@ async function handle(request: NextRequest) {
       console.log(`[Cron] Chunin standings published: ${classement.publie}, Jonin role sync: ${JSON.stringify(roleJonin)}, top 8 reminder: ${topHuit.envoye}`);
     }
 
-    return NextResponse.json({ daily, nwl, nwlPrizeRetry, chuninReset, chunin, kage, classement, roleJonin, rappels, topHuit });
+    return NextResponse.json({
+      daily, nwl, nwlPrizeRetry, chuninReset, chunin, kage,
+      diffusionChunin, diffusionKage, classement, roleJonin, rappels, topHuit,
+    });
   } catch (err) {
     console.error('[Cron] daily-tournament error:', err instanceof Error ? err.message : err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });

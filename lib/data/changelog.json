@@ -9,34 +9,50 @@
     {
       "date": "2026-09-02",
       "categories": [
+        "fix",
+        "fix",
         "fix"
       ],
       "title_fr": "Mise à jour",
       "changes_fr": [
+        "Les résultats d'un tournoi du samedi ne peuvent plus disparaître, même si le tournoi se termine mal",
+        "Le code d'un tournoi privé est renvoyé tout seul tant qu'il n'a atteint personne",
         "Le classement mensuel des tournois partenaires ne s'efface plus avec les tournois: les qualifiés au Kage sont à nouveau au complet"
       ],
       "title_en": "Update",
       "changes_en": [
+        "Saturday tournament results can no longer vanish, even when the tournament ends badly",
+        "The join code of a private tournament is sent again on its own until it reaches someone",
         "The monthly partner tournament standings no longer vanish with the tournaments: the Kage qualifiers are complete again"
       ],
       "title_es": "Actualización",
       "changes_es": [
+        "Los resultados de un torneo del sabado ya no pueden desaparecer, incluso si el torneo termina mal",
+        "El codigo de un torneo privado se vuelve a enviar solo hasta que llegue a alguien",
         "La clasificacion mensual de los torneos asociados ya no desaparece con los torneos: los clasificados al Kage vuelven a estar completos"
       ],
       "title_pt": "Atualização",
       "changes_pt": [
+        "Os resultados de um torneio de sabado ja nao podem desaparecer, mesmo que o torneio acabe mal",
+        "O codigo de um torneio privado e reenviado sozinho ate chegar a alguem",
         "A classificacao mensal dos torneios parceiros ja nao desaparece com os torneios: os apurados para o Kage estao completos de novo"
       ],
       "title_it": "Aggiornamento",
       "changes_it": [
+        "I risultati di un torneo del sabato non possono piu sparire, anche se il torneo finisce male",
+        "Il codice di un torneo privato viene inviato di nuovo da solo finche non raggiunge qualcuno",
         "La classifica mensile dei tornei partner non sparisce piu con i tornei: i qualificati al Kage sono di nuovo al completo"
       ],
       "title_pl": "Aktualizacja",
       "changes_pl": [
+        "Wyniki sobotniego turnieju nie moga juz zniknac, nawet jesli turniej skonczy sie zle",
+        "Kod prywatnego turnieju jest wysylany ponownie sam, dopoki kogos nie osiagnie",
         "Miesieczny ranking turniejow partnerskich nie znika juz razem z turniejami: zakwalifikowani do Kage sa znow w komplecie"
       ],
       "title_ja": "アップデート",
       "changes_ja": [
+        "土曜日の大会の結果が消えなくなりました。大会が途中で終わっても残ります",
+        "非公開大会の参加コードは、誰にも届かないかぎり自動で再送されます",
         "パートナー大会の月間ランキングが大会と一緒に消えなくなりました。影の大会の出場者が再びそろいます"
       ]
     },

@@ -296,7 +296,7 @@ export async function chuninStandings(debut: Date, fin: Date): Promise<NwlStandi
     where: {
       partner: NWL_CHUNIN_PARTNER_KEY,
       scheduledStartAt: { gte: debut, lt: fin },
-      partnerPrizeAwarded: false,
+      NOT: { partnerStandingsRecorded: true },
     },
     select: { id: true },
   });
@@ -457,6 +457,50 @@ export async function diffuserCodeChunin(code: string): Promise<{ mp: number; sa
   return { mp, salon: salon !== null };
 }
 
+export async function diffuserCodeSiNecessaire(
+  creation: NwlTierCreation,
+  partnerKey: string,
+  now: Date = new Date(),
+): Promise<{ diffuse: boolean; mp: number; salon: boolean }> {
+  const id = creation.tournamentId;
+  const code = creation.joinCode;
+  const rien = { diffuse: false, mp: 0, salon: false };
+  if (!id || !code) return rien;
+
+  const tournoi = await prisma.tournament.findUnique({
+    where: { id },
+    select: { status: true, partnerCodeSentAt: true },
+  });
+  if (!tournoi || tournoi.partnerCodeSentAt) return rien;
+  if (tournoi.status !== 'registration' && tournoi.status !== 'pending') return rien;
+
+  const reserve = await prisma.tournament.updateMany({
+    where: { id, OR: [{ partnerCodeSentAt: null }, { partnerCodeSentAt: { isSet: false } }] },
+    data: { partnerCodeSentAt: now },
+  });
+  if (reserve.count !== 1) return rien;
+
+  const relacher = async () => {
+    await prisma.tournament.updateMany({ where: { id }, data: { partnerCodeSentAt: null } });
+  };
+
+  try {
+    const envoi = partnerKey === NWL_KAGE_PARTNER_KEY
+      ? await diffuserCodeKage(code, now)
+      : await diffuserCodeChunin(code);
+    if (envoi.mp === 0 && !envoi.salon) {
+      await relacher();
+      console.warn(`[NWL] code du tournoi ${id} non delivre, une nouvelle tentative aura lieu au prochain passage`);
+      return rien;
+    }
+    return { diffuse: true, mp: envoi.mp, salon: envoi.salon };
+  } catch (err) {
+    await relacher();
+    console.error(`[NWL] diffusion du code de ${id} interrompue:`, err instanceof Error ? err.message : err);
+    return rien;
+  }
+}
+
 function salonDuPalier(partner: string | null | undefined): string {
   return partner === NWL_CHUNIN_PARTNER_KEY ? NWL_CHUNIN_ANNOUNCE_CHANNEL_ID : NWL_ANNOUNCE_CHANNEL_ID;
 }
@@ -464,8 +508,12 @@ function salonDuPalier(partner: string | null | undefined): string {
 export async function diffuserCodeKage(code: string, now: Date = new Date()): Promise<{ mp: number; salon: boolean }> {
   const qualifies = await kageQualifiers(now);
   let mp = 0;
+  const injoignables: string[] = [];
   for (const q of qualifies) {
-    if (!q.discordId) continue;
+    if (!q.discordId) {
+      injoignables.push(`${q.username} (no Discord account linked on the simulator)`);
+      continue;
+    }
     const ok = await nwlSendDirectMessage(
       q.discordId,
       texteCodeAcces(
@@ -475,6 +523,17 @@ You have made it in the Top ${NWL_KAGE_STANDINGS_SLOTS}.`,
       ),
     );
     if (ok) mp += 1;
+    else injoignables.push(`${q.username} (<@${q.discordId}>, direct messages closed)`);
+  }
+  if (injoignables.length > 0) {
+    await nwlPostMessage(
+      NWL_MOD_CHANNEL_ID,
+      [
+        `**${NWL_KAGE_TOURNAMENT_NAME}**: ${injoignables.length} qualified player(s) could not be reached in private.`,
+        'They are mentioned with the code in the announcement channel, but please make sure they see it:',
+        ...injoignables.map((l) => `- ${l}`),
+      ].join('\n'),
+    );
   }
   const mentions = qualifies.map((q) => q.discordId).filter((d): d is string => !!d);
   const entete = mentions.length > 0 ? `${mentions.map((d) => `<@${d}>`).join(' ')}\n` : '';
@@ -508,18 +567,33 @@ export function formaterClassement(entrees: NwlStandingEntry[], titre: string): 
   ].join('\n');
 }
 
-async function refLue(): Promise<NwlMessageRef | null> {
+type TableauDesRefs = Record<string, { channelId?: string; messageId?: string }>;
+
+async function refsLues(cleCourante: string): Promise<TableauDesRefs> {
   const reglages = await prisma.siteSettings.findUnique({
     where: { key: CLE_REGLAGES },
     select: { nwlLeaderboard: true },
   });
-  const brut = reglages?.nwlLeaderboard as { channelId?: string; messageId?: string } | null | undefined;
-  if (!brut?.channelId || !brut?.messageId) return null;
-  return { channelId: brut.channelId, messageId: brut.messageId };
+  const brut = reglages?.nwlLeaderboard as Record<string, unknown> | null | undefined;
+  if (!brut || typeof brut !== 'object') return {};
+  if (typeof brut.channelId === 'string' && typeof brut.messageId === 'string') {
+    return { [cleCourante]: { channelId: brut.channelId, messageId: brut.messageId } };
+  }
+  return brut as TableauDesRefs;
 }
 
-async function refEcrite(ref: NwlMessageRef): Promise<void> {
-  const valeur = { channelId: ref.channelId, messageId: ref.messageId };
+async function refLue(cle: string): Promise<NwlMessageRef | null> {
+  const entree = (await refsLues(cle))[cle];
+  if (!entree?.channelId || !entree?.messageId) return null;
+  return { channelId: entree.channelId, messageId: entree.messageId };
+}
+
+async function refEcrite(cle: string, ref: NwlMessageRef): Promise<void> {
+  const table = await refsLues(cle);
+  table[cle] = { channelId: ref.channelId, messageId: ref.messageId };
+  const cles = Object.keys(table).sort();
+  const valeur: TableauDesRefs = {};
+  for (const k of cles.slice(-24)) valeur[k] = table[k];
   await prisma.siteSettings.upsert({
     where: { key: CLE_REGLAGES },
     update: { nwlLeaderboard: valeur },
@@ -530,10 +604,10 @@ async function refEcrite(ref: NwlMessageRef): Promise<void> {
 export async function publierClassementChunin(now: Date = new Date()): Promise<{ publie: boolean; joueurs: number }> {
   const { debut, fin } = bornesDuMois(now);
   const entrees = await chuninStandings(debut, fin);
-  const p = parisDateParts(now);
-  const texte = formaterClassement(entrees, `Chunin standings ${p.year}-${String(p.month).padStart(2, '0')}`);
+  const cle = cleDuMois(now);
+  const texte = formaterClassement(entrees, `Chunin standings ${cle}`);
 
-  const existante = await refLue();
+  const existante = await refLue(cle);
   if (existante) {
     const modifie = await nwlEditMessage(existante, texte);
     if (modifie) return { publie: true, joueurs: entrees.length };
@@ -541,7 +615,7 @@ export async function publierClassementChunin(now: Date = new Date()): Promise<{
 
   const nouvelle = await nwlPostMessage(NWL_LEADERBOARD_CHANNEL_ID, texte);
   if (!nouvelle) return { publie: false, joueurs: entrees.length };
-  await refEcrite(nouvelle);
+  await refEcrite(cle, nouvelle);
   return { publie: true, joueurs: entrees.length };
 }
 
@@ -622,7 +696,28 @@ export async function standingsPourJonin(now: Date = new Date()): Promise<NwlSta
     .slice(0, NWL_KAGE_STANDINGS_SLOTS);
 }
 
+async function moisDesKagesJoues(): Promise<string[]> {
+  const reglages = await prisma.siteSettings.findUnique({
+    where: { key: CLE_REGLAGES },
+    select: { nwlKageJoues: true },
+  });
+  const brut = reglages?.nwlKageJoues as string[] | null | undefined;
+  return Array.isArray(brut) ? brut.filter((x) => typeof x === 'string') : [];
+}
+
+async function enregistrerKageJoue(cle: string): Promise<void> {
+  const connus = await moisDesKagesJoues();
+  if (connus.includes(cle)) return;
+  const suite = [...connus, cle].slice(-24);
+  await prisma.siteSettings.upsert({
+    where: { key: CLE_REGLAGES },
+    update: { nwlKageJoues: suite },
+    create: { key: CLE_REGLAGES, nwlKageJoues: suite },
+  });
+}
+
 async function kageDuMoisJoue(now: Date): Promise<boolean> {
+  if ((await moisDesKagesJoues()).includes(cleDuMois(now))) return true;
   const { debut, fin } = bornesDuMois(now);
   const kage = await prisma.tournament.findFirst({
     where: { partner: NWL_KAGE_PARTNER_KEY, scheduledStartAt: { gte: debut, lt: fin } },
@@ -687,16 +782,19 @@ export function championsApresVictoire(anciens: string[], vainqueur: string, max
 }
 
 export async function couronnerChampionKage(discordIdVainqueur: string | null): Promise<{ couronne: boolean; detrones: string[] }> {
-  if (!NWL_KAGE_ROLE_ID || !discordIdVainqueur) return { couronne: false, detrones: [] };
+  if (!discordIdVainqueur) return { couronne: false, detrones: [] };
   const anciens = await championsKage();
   const suivants = championsApresVictoire(anciens, discordIdVainqueur, NWL_KAGE_CHAMPIONS_MAX);
   const detrones = anciens.filter((d) => !suivants.includes(d));
+
+  await ecrireChampionsKage(suivants);
+
+  if (!NWL_KAGE_ROLE_ID) return { couronne: false, detrones };
 
   const couronne = (await grantNwlRole(discordIdVainqueur, NWL_KAGE_ROLE_ID)) === 'granted';
   for (const discordId of detrones) {
     await revokeNwlRole(discordId, NWL_KAGE_ROLE_ID);
   }
-  await ecrireChampionsKage(suivants);
   return { couronne, detrones };
 }
 
@@ -718,7 +816,61 @@ function texteVictoirePalier(nom: string, podium: NwlPodiumEntry[], recompense: 
   return lignes.join('\n');
 }
 
+async function reserverLaGravure(tournamentId: string): Promise<boolean> {
+  const reserve = await prisma.tournament.updateMany({
+    where: { id: tournamentId, NOT: { partnerStandingsRecorded: true } },
+    data: { partnerStandingsRecorded: true },
+  });
+  return reserve.count === 1;
+}
+
+async function relacherLaGravure(tournamentId: string): Promise<void> {
+  await prisma.tournament.updateMany({
+    where: { id: tournamentId },
+    data: { partnerStandingsRecorded: false },
+  });
+}
+
 export async function graverResultatsChuninDansLaGraine(
+  tournamentId: string,
+  matchs: ReadonlyArray<{ player1Id: string | null; player2Id: string | null; status: string; winnerId: string | null }>,
+): Promise<number> {
+  if (!(await reserverLaGravure(tournamentId))) return 0;
+  try {
+    return await ecrireLesResultatsDansLaGraine(tournamentId, matchs);
+  } catch (err) {
+    await relacherLaGravure(tournamentId);
+    throw err;
+  }
+}
+
+export async function graverAvantPurge(tournamentIds: readonly string[]): Promise<number> {
+  if (tournamentIds.length === 0) return 0;
+  const tournois = await prisma.tournament.findMany({
+    where: {
+      id: { in: [...tournamentIds] },
+      partner: NWL_CHUNIN_PARTNER_KEY,
+      NOT: { partnerStandingsRecorded: true },
+    },
+    select: { id: true },
+  });
+
+  let graves = 0;
+  for (const t of tournois) {
+    const matchs = await prisma.tournamentMatch.findMany({
+      where: { tournamentId: t.id },
+      select: { player1Id: true, player2Id: true, status: true, winnerId: true },
+    });
+    try {
+      if ((await graverResultatsChuninDansLaGraine(t.id, matchs)) > 0) graves += 1;
+    } catch (err) {
+      console.error(`[NWL] gravure impossible avant la purge de ${t.id}:`, err instanceof Error ? err.message : err);
+    }
+  }
+  return graves;
+}
+
+async function ecrireLesResultatsDansLaGraine(
   tournamentId: string,
   matchs: ReadonlyArray<{ player1Id: string | null; player2Id: string | null; status: string; winnerId: string | null }>,
 ): Promise<number> {
@@ -771,7 +923,10 @@ export async function graverResultatsChuninDansLaGraine(
 export async function cloturerPalierNwl(tournamentId: string): Promise<boolean> {
   const tournoi = await prisma.tournament.findUnique({
     where: { id: tournamentId },
-    select: { partner: true, name: true, status: true, winnerId: true, partnerPrizeAwarded: true },
+    select: {
+      partner: true, name: true, status: true, winnerId: true,
+      partnerPrizeAwarded: true, scheduledStartAt: true, createdAt: true,
+    },
   });
   if (!tournoi || !estPalierNwl(tournoi.partner)) return false;
   if (tournoi.status !== 'completed' || !tournoi.winnerId) return false;
@@ -834,6 +989,7 @@ export async function cloturerPalierNwl(tournamentId: string): Promise<boolean> 
     );
   }
   if (!estChunin) {
+    await enregistrerKageJoue(cleDuMois(tournoi.scheduledStartAt ?? tournoi.createdAt));
     await couronnerChampionKage(vainqueur?.discordId ?? null);
   }
 

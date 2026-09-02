@@ -371,6 +371,7 @@ model SiteSettings {
   nwlKageChampions       Json?
   nwlChuninEarned        Json?
   nwlJoninGranted        Json?
+  nwlKageJoues           Json?
   nwlTopEightWeek        String?
 }
 
@@ -424,6 +425,8 @@ model Tournament {
   partnerPrizeAwarded Boolean                 @default(false)
   bestOf              Int?                    @default(1)
   partnerAnnounced    Boolean                 @default(false)
+  partnerStandingsRecorded Boolean            @default(false)
+  partnerCodeSentAt   DateTime?
   awardsPrizes        Boolean                 @default(true)
   chuninResetAt       DateTime?
   reminderSentAt      DateTime?

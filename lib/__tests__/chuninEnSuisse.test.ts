@@ -88,7 +88,7 @@ describe('le podium des recompenses suit le format du tournoi', () => {
   });
 
   it('la cloture d un palier attend que plus aucun match ne soit ouvert', () => {
-    const corps = bloc(TIERS, 'export async function cloturerPalierNwl', 1400);
+    const corps = bloc(TIERS, 'export async function cloturerPalierNwl', 2200);
     expect(corps, 'aucune annonce avant la fin reelle du tournoi').toContain('matchsEncoreOuverts');
     expect(corps, 'le podium suit le format').toContain('podiumDesRecompenses');
   });
