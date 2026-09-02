@@ -42,7 +42,11 @@ export async function cleanupOldTournaments(now: number = Date.now()): Promise<C
   }
 
   const ids = candidates.map((c) => c.id);
-  const result = await prisma.tournament.deleteMany({ where: { id: { in: ids } } });
+  const [, , result] = await prisma.$transaction([
+    prisma.tournamentMatch.deleteMany({ where: { tournamentId: { in: ids } } }),
+    prisma.tournamentParticipant.deleteMany({ where: { tournamentId: { in: ids } } }),
+    prisma.tournament.deleteMany({ where: { id: { in: ids } } }),
+  ]);
 
   return { deleted: result.count, byStatus };
 }

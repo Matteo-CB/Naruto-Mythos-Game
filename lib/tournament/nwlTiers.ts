@@ -293,7 +293,11 @@ export async function chuninStandings(debut: Date, fin: Date): Promise<NwlStandi
   }
 
   const tournois = await prisma.tournament.findMany({
-    where: { partner: NWL_CHUNIN_PARTNER_KEY, scheduledStartAt: { gte: debut, lt: fin } },
+    where: {
+      partner: NWL_CHUNIN_PARTNER_KEY,
+      scheduledStartAt: { gte: debut, lt: fin },
+      partnerPrizeAwarded: false,
+    },
     select: { id: true },
   });
 
@@ -691,6 +695,56 @@ function texteVictoirePalier(nom: string, podium: NwlPodiumEntry[], recompense: 
   return lignes.join('\n');
 }
 
+export async function graverResultatsChuninDansLaGraine(
+  tournamentId: string,
+  matchs: ReadonlyArray<{ player1Id: string | null; player2Id: string | null; status: string; winnerId: string | null }>,
+): Promise<number> {
+  const tournoi = await prisma.tournament.findUnique({
+    where: { id: tournamentId },
+    select: { scheduledStartAt: true, createdAt: true },
+  });
+  const quand = tournoi?.scheduledStartAt ?? tournoi?.createdAt ?? new Date();
+  const cle = cleDuMois(quand);
+
+  const joues = new Map<string, { wins: number; losses: number }>();
+  const ajoute = (userId: string | null | undefined, gagne: boolean) => {
+    if (!userId) return;
+    const c = joues.get(userId) ?? { wins: 0, losses: 0 };
+    if (gagne) c.wins += 1; else c.losses += 1;
+    joues.set(userId, c);
+  };
+  for (const m of matchs) {
+    if (m.status !== 'completed' || !m.winnerId) continue;
+    ajoute(m.player1Id, m.player1Id === m.winnerId);
+    ajoute(m.player2Id, m.player2Id === m.winnerId);
+  }
+  if (joues.size === 0) return 0;
+
+  const joueurs = await prisma.user.findMany({
+    where: { id: { in: [...joues.keys()] } },
+    select: { id: true, username: true, discordId: true },
+  });
+
+  const existantes = await lireGraineChunin(cle);
+  const parId = new Map(existantes.map((e) => [e.userId ?? `nom:${e.username.toLowerCase()}`, { ...e }]));
+
+  for (const u of joueurs) {
+    const c = joues.get(u.id)!;
+    const precedent = parId.get(u.id);
+    parId.set(u.id, {
+      userId: u.id,
+      username: u.username,
+      discordId: u.discordId ?? null,
+      wins: (precedent?.wins ?? 0) + c.wins,
+      losses: (precedent?.losses ?? 0) + c.losses,
+    });
+  }
+
+  await ecrireGraineChunin(cle, [...parId.values()]);
+  console.log(`[NWL] classement Chunin ${cle} grave: ${joues.size} joueur(s) du tournoi ${tournamentId}`);
+  return joues.size;
+}
+
 export async function cloturerPalierNwl(tournamentId: string): Promise<boolean> {
   const tournoi = await prisma.tournament.findUnique({
     where: { id: tournamentId },
@@ -715,6 +769,14 @@ export async function cloturerPalierNwl(tournamentId: string): Promise<boolean> 
     data: { partnerPrizeAwarded: true },
   });
   if (reserve.count !== 1) return false;
+
+  if (tournoi.partner === NWL_CHUNIN_PARTNER_KEY) {
+    try {
+      await graverResultatsChuninDansLaGraine(tournamentId, matchs);
+    } catch (err) {
+      console.error(`[NWL] classement Chunin non grave pour ${tournamentId}, il sera perdu a la purge:`, err);
+    }
+  }
 
   const places = await podiumDesRecompenses(tournamentId);
   const joueurs = await prisma.user.findMany({

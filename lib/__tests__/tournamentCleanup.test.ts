@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const findMany = vi.fn();
 const deleteMany = vi.fn();
+const matchDeleteMany = vi.fn();
+const participantDeleteMany = vi.fn();
 
 vi.mock('@/lib/db/prisma', () => ({
   prisma: {
@@ -9,6 +11,9 @@ vi.mock('@/lib/db/prisma', () => ({
       findMany: (...a: unknown[]) => findMany(...a),
       deleteMany: (...a: unknown[]) => deleteMany(...a),
     },
+    tournamentMatch: { deleteMany: (...a: unknown[]) => matchDeleteMany(...a) },
+    tournamentParticipant: { deleteMany: (...a: unknown[]) => participantDeleteMany(...a) },
+    $transaction: (operations: unknown[]) => Promise.all(operations as Promise<unknown>[]),
   },
 }));
 
@@ -17,6 +22,10 @@ import { cleanupOldTournaments, TOURNAMENT_RETENTION_MS } from '@/lib/tournament
 beforeEach(() => {
   findMany.mockReset();
   deleteMany.mockReset();
+  matchDeleteMany.mockReset();
+  participantDeleteMany.mockReset();
+  matchDeleteMany.mockResolvedValue({ count: 0 });
+  participantDeleteMany.mockResolvedValue({ count: 0 });
 });
 
 const NOW = Date.UTC(2026, 5, 3, 12, 0, 0);
@@ -98,6 +107,11 @@ describe('cleanupOldTournaments', () => {
     });
     const delArg = deleteMany.mock.calls[0][0] as { where: { id: { in: string[] } } };
     expect(delArg.where.id.in).toEqual(['a', 'b', 'c', 'd', 'e']);
+
+    const matchArg = matchDeleteMany.mock.calls[0][0] as { where: { tournamentId: { in: string[] } } };
+    const inscritArg = participantDeleteMany.mock.calls[0][0] as { where: { tournamentId: { in: string[] } } };
+    expect(matchArg.where.tournamentId.in, 'les matchs partent avec leur tournoi').toEqual(['a', 'b', 'c', 'd', 'e']);
+    expect(inscritArg.where.tournamentId.in, 'les inscrits aussi').toEqual(['a', 'b', 'c', 'd', 'e']);
   });
 
   it('uses Date.now() when no argument is passed', async () => {
