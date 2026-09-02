@@ -81,6 +81,7 @@ function packVisibleCharacter(vc: VisibleCharacter): unknown {
     ...vc,
     card: packCard(vc.card),
     topCard: packCard(vc.topCard),
+    stack: packCards(vc.stack),
     attachments: packAttachments(vc.attachments),
   };
 }
@@ -90,6 +91,7 @@ function unpackVisibleCharacter(vc: VisibleCharacter & { card: MaybePacked<Chara
     ...vc,
     card: unpackCard(vc.card) as CharacterCard | undefined,
     topCard: unpackCard(vc.topCard) as CharacterCard | undefined,
+    stack: unpackCards(vc.stack as never) as CharacterCard[] | undefined,
     attachments: unpackAttachments(vc.attachments),
   };
 }

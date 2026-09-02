@@ -2675,7 +2675,7 @@ function broadcastTournamentLiveMatches(io: SocketIOServer, tournamentId: string
 function buildSpectatorState(room: RoomData, hiddenIds: Set<string>): VisibleGameState {
   const p1State = GameEngine.getVisibleStateForTransport(room.gameState!, 'player1');
   const maskHidden = (chars: VisibleCharacter[]): VisibleCharacter[] => chars.map(
-    (c) => (c.isHidden && !c.wasRevealedAtLeastOnce ? { ...c, card: undefined, topCard: undefined, isOwn: false } : c),
+    (c) => (c.isHidden && !c.wasRevealedAtLeastOnce ? { ...c, card: undefined, topCard: undefined, stack: undefined, isOwn: false } : c),
   );
   const spectatorState = {
     ...p1State,

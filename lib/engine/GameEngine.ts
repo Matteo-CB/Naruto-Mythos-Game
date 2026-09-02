@@ -1902,6 +1902,7 @@ export class GameEngine {
             isOwn,
             card: canSee ? c.card : undefined,
             topCard: canSee ? topCard : undefined,
+            stack: canSee && (c.stack?.length ?? 0) > 1 ? c.stack : undefined,
             powerTokens: tokensZeroed ? 0 : c.powerTokens,
             controlledBy: c.controlledBy,
             originalOwner: c.originalOwner,

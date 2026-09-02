@@ -303,10 +303,14 @@ export const PlayerHand = React.memo(function PlayerHand({ hand, chakra, isSpect
     !isProcessing;
 
   const coutDePose = useCallback((card: CharacterCard): number => {
-    if (!visibleState?.myPlayer) return card.chakra;
-    const frais = coutMinimalPourPoser(visibleState, visibleState.myPlayer, card);
-    if (frais <= chakra) return frais;
-    return canAffordAsUpgrade(visibleState as never, visibleState.myPlayer, card, 0) ? chakra : frais;
+    try {
+      if (!visibleState?.myPlayer) return card.chakra;
+      const frais = coutMinimalPourPoser(visibleState, visibleState.myPlayer, card);
+      if (frais <= chakra) return frais;
+      return canAffordAsUpgrade(visibleState as never, visibleState.myPlayer, card, 0, chakra) ? chakra : frais;
+    } catch {
+      return card.chakra;
+    }
   }, [visibleState, chakra]);
 
   const effectPopupMinimized = useUIStore((s) => s.effectPopupMinimized);

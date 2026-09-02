@@ -455,6 +455,7 @@ export interface VisibleCharacter {
   isOwn: boolean; // Can the viewing player see this card?
   card?: CharacterCard; // Only present if visible to the viewer
   topCard?: CharacterCard; // Top of the evolution stack (differs from card when upgraded)
+  stack?: CharacterCard[]; // Only sent when the stack holds more than one card, so client reads resolve the same top as the server
   powerTokens: number;
   controlledBy: PlayerID;
   originalOwner: PlayerID;

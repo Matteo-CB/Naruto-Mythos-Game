@@ -3,8 +3,9 @@ import { isUpgradeNameLegal } from '@/lib/engine/rules/PlayValidation';
 import { calculateEffectiveCost, hasKurenai034CostReduction } from '@/lib/engine/rules/ChakraValidation';
 
 
-function topCardOf(char: CharacterInPlay): CharacterCard {
-  return char.stack?.length > 0 ? char.stack[char.stack.length - 1] : char.card;
+function topCardOf(char: CharacterInPlay): CharacterCard | undefined {
+  if (char.stack?.length > 0) return char.stack[char.stack.length - 1];
+  return (char as unknown as { topCard?: CharacterCard }).topCard ?? char.card;
 }
 
 function visibleSameNameElsewhere(
@@ -15,7 +16,9 @@ function visibleSameNameElsewhere(
   return chars.some((c) => {
     if (c.instanceId === upgradeTargetInstanceId) return false;
     if (c.isHidden) return false;
-    return topCardOf(c).name_fr.toUpperCase() === card.name_fr.toUpperCase();
+    const haut = topCardOf(c);
+    if (!haut?.name_fr) return false;
+    return haut.name_fr.toUpperCase() === card.name_fr.toUpperCase();
   });
 }
 
@@ -24,18 +27,22 @@ export function canAffordAsUpgrade(
   player: PlayerID,
   card: { name_fr: string; chakra: number; set?: string; number?: number; effects?: Array<{ type: string; description: string }> },
   costReduction: number,
+  chakraDisponible?: number,
 ): boolean {
-  const ps = state[player];
+  const missions = state?.activeMissions;
+  const chakra = chakraDisponible ?? state?.[player]?.chakra;
+  if (typeof chakra !== 'number' || !Array.isArray(missions)) return false;
   const friendlySide = player === 'player1' ? 'player1Characters' : 'player2Characters';
 
-  for (let missionIndex = 0; missionIndex < state.activeMissions.length; missionIndex++) {
-    const mission = state.activeMissions[missionIndex];
-    for (const char of mission[friendlySide]) {
+  for (let missionIndex = 0; missionIndex < missions.length; missionIndex++) {
+    const mission = missions[missionIndex];
+    for (const char of mission[friendlySide] ?? []) {
       if (char.isHidden) continue;
       if (char.controlledBy !== player) continue;
       if (char.controlledBy !== char.originalOwner) continue;
 
       const topCard = topCardOf(char);
+      if (!topCard?.name_fr) continue;
       if (card.chakra <= (topCard.chakra ?? 0)) continue;
 
       if (!isUpgradeNameLegal(card as CharacterCard, topCard, state, missionIndex)) continue;
@@ -48,7 +55,7 @@ export function canAffordAsUpgrade(
       if (hasKurenai034CostReduction(state, player, card as CharacterCard, missionIndex) && upgradeCost < 1) {
         upgradeCost = 1;
       }
-      if (ps.chakra >= upgradeCost) {
+      if (chakra >= upgradeCost) {
         return true;
       }
     }
