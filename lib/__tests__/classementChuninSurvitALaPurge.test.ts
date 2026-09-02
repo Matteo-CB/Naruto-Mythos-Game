@@ -71,6 +71,34 @@ describe('le classement mensuel Chunin survit a la purge des tournois', () => {
     ).toBe(NWL_KAGE_MAX_PLAYERS);
   });
 
+  it('le champion en titre survit lui aussi a la purge du tournoi Kage', () => {
+    const champion = bloc(TIERS, 'export async function championKageEnTitre', 'export async function kageQualifiers');
+    expect(champion, 'le tournoi reste la source principale').toContain('partner: NWL_KAGE_PARTNER_KEY');
+    expect(champion, 'a defaut, la liste persistee des couronnes prend le relais').toContain('await championsKage()');
+    expect(champion, 'le dernier couronne est le tenant du titre').toContain('couronnes[couronnes.length - 1]');
+  });
+
+  it('le champion ne prend pas une place de Jonin, elle descend au suivant', () => {
+    const jonin = bloc(TIERS, 'export async function standingsPourJonin', 'async function kageDuMoisJoue');
+    expect(jonin, 'le champion est ecarte de la liste des Jonin').toContain('e.userId !== champion.userId');
+    expect(jonin, 'sept places restent a pourvoir').toContain('NWL_KAGE_STANDINGS_SLOTS');
+    expect(
+      jonin.indexOf('.filter((e) => e.userId !== champion.userId)') < jonin.lastIndexOf('.slice(0, NWL_KAGE_STANDINGS_SLOTS)'),
+      'on ecarte avant de couper, sinon la septieme place est perdue',
+    ).toBe(true);
+    expect(
+      jonin,
+      'sans champion, le classement fournit seul les sept places',
+    ).toContain('if (!champion) return classement.slice(0, NWL_KAGE_STANDINGS_SLOTS);');
+  });
+
+  it('le role Jonin designe exactement ceux qui rejoignent le champion', () => {
+    const sync = bloc(TIERS, 'export async function synchroniserRoleJonin', 'async function championsKage');
+    expect(sync, 'la liste vient de la meme source que le Kage').toContain('standingsPourJonin(now)');
+    expect(sync, 'les porteurs indus sont retires').toContain('revokeNwlRole');
+    expect(sync, 'les manquants sont ajoutes').toContain('grantNwlRole');
+  });
+
   it('sans champion en titre, le classement fournit seul les huit places', () => {
     const qualif = bloc(TIERS, 'export async function kageQualifiers', 'export async function grainePourKage');
     expect(qualif, 'aucun champion, on prend le haut du classement').toContain('return complet.slice(0, NWL_KAGE_MAX_PLAYERS)');

@@ -7,6 +7,40 @@
   ],
   "entries": [
     {
+      "date": "2026-09-02",
+      "categories": [
+        "fix"
+      ],
+      "title_fr": "Mise à jour",
+      "changes_fr": [
+        "Le classement mensuel des tournois partenaires ne s'efface plus avec les tournois: les qualifiés au Kage sont à nouveau au complet"
+      ],
+      "title_en": "Update",
+      "changes_en": [
+        "The monthly partner tournament standings no longer vanish with the tournaments: the Kage qualifiers are complete again"
+      ],
+      "title_es": "Actualización",
+      "changes_es": [
+        "La clasificacion mensual de los torneos asociados ya no desaparece con los torneos: los clasificados al Kage vuelven a estar completos"
+      ],
+      "title_pt": "Atualização",
+      "changes_pt": [
+        "A classificacao mensal dos torneios parceiros ja nao desaparece com os torneios: os apurados para o Kage estao completos de novo"
+      ],
+      "title_it": "Aggiornamento",
+      "changes_it": [
+        "La classifica mensile dei tornei partner non sparisce piu con i tornei: i qualificati al Kage sono di nuovo al completo"
+      ],
+      "title_pl": "Aktualizacja",
+      "changes_pl": [
+        "Miesieczny ranking turniejow partnerskich nie znika juz razem z turniejami: zakwalifikowani do Kage sa znow w komplecie"
+      ],
+      "title_ja": "アップデート",
+      "changes_ja": [
+        "パートナー大会の月間ランキングが大会と一緒に消えなくなりました。影の大会の出場者が再びそろいます"
+      ]
+    },
+    {
       "date": "2026-09-01",
       "categories": [
         "feature",

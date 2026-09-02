@@ -355,6 +355,15 @@ export async function chuninStandings(debut: Date, fin: Date): Promise<NwlStandi
   return entrees;
 }
 
+async function championsKage(): Promise<string[]> {
+  const reglages = await prisma.siteSettings.findUnique({
+    where: { key: CLE_REGLAGES },
+    select: { nwlKageChampions: true },
+  });
+  const brut = reglages?.nwlKageChampions as string[] | null | undefined;
+  return Array.isArray(brut) ? brut.filter((x) => typeof x === 'string') : [];
+}
+
 export async function championKageEnTitre(now: Date = new Date()): Promise<NwlStandingEntry | null> {
   const dernier = await prisma.tournament.findFirst({
     where: {
@@ -366,18 +375,37 @@ export async function championKageEnTitre(now: Date = new Date()): Promise<NwlSt
     orderBy: { scheduledStartAt: 'desc' },
     select: { winnerId: true, winnerUsername: true },
   });
-  if (!dernier?.winnerId) return null;
+  if (dernier?.winnerId) {
+    const joueur = await prisma.user.findUnique({
+      where: { id: dernier.winnerId },
+      select: { id: true, username: true, discordId: true },
+    });
+    if (joueur) {
+      return {
+        userId: joueur.id,
+        username: joueur.username || dernier.winnerUsername || '?',
+        discordId: joueur.discordId ?? null,
+        wins: 0,
+        losses: 0,
+        points: 0,
+      };
+    }
+  }
 
-  const joueur = await prisma.user.findUnique({
-    where: { id: dernier.winnerId },
+  const couronnes = await championsKage();
+  const dernierCouronne = couronnes[couronnes.length - 1];
+  if (!dernierCouronne) return null;
+
+  const tenant = await prisma.user.findFirst({
+    where: { discordId: dernierCouronne },
     select: { id: true, username: true, discordId: true },
   });
-  if (!joueur) return null;
+  if (!tenant) return null;
 
   return {
-    userId: joueur.id,
-    username: joueur.username || dernier.winnerUsername || '?',
-    discordId: joueur.discordId ?? null,
+    userId: tenant.id,
+    username: tenant.username,
+    discordId: tenant.discordId ?? null,
     wins: 0,
     losses: 0,
     points: 0,
@@ -587,7 +615,11 @@ export async function standingsPourJonin(now: Date = new Date()): Promise<NwlSta
   const kageDejaJoue = await kageDuMoisJoue(now);
   const bornes = kageDejaJoue ? bornesDuMois(now) : bornesDuMoisPrecedent(now);
   const classement = await chuninStandings(bornes.debut, bornes.fin);
-  return classement.slice(0, NWL_KAGE_STANDINGS_SLOTS);
+  const champion = kageDejaJoue ? null : await championKageEnTitre(now);
+  if (!champion) return classement.slice(0, NWL_KAGE_STANDINGS_SLOTS);
+  return classement
+    .filter((e) => e.userId !== champion.userId)
+    .slice(0, NWL_KAGE_STANDINGS_SLOTS);
 }
 
 async function kageDuMoisJoue(now: Date): Promise<boolean> {
@@ -639,15 +671,6 @@ export async function synchroniserRoleJonin(now: Date = new Date()): Promise<{ a
 
   await ecrireJoninAccordes(tenus);
   return { ajoutes, retires };
-}
-
-async function championsKage(): Promise<string[]> {
-  const reglages = await prisma.siteSettings.findUnique({
-    where: { key: CLE_REGLAGES },
-    select: { nwlKageChampions: true },
-  });
-  const brut = reglages?.nwlKageChampions as string[] | null | undefined;
-  return Array.isArray(brut) ? brut.filter((x) => typeof x === 'string') : [];
 }
 
 async function ecrireChampionsKage(liste: string[]): Promise<void> {
