@@ -11,14 +11,21 @@ export interface SelectableMatch {
 
 const OPEN_STATUSES = new Set(['pending', 'ready', 'in_progress']);
 
+export const FORMAT_A_RONDES = 'elimination';
+
+export function verrouDeRondeActif(format?: string | null): boolean {
+  return format === FORMAT_A_RONDES;
+}
+
 export function isOpenForUser(
   match: SelectableMatch,
   userId: string,
   currentRound?: number | null,
+  format?: string | null,
 ): boolean {
   if (!OPEN_STATUSES.has(match.status)) return false;
   if (match.isBye === true) return false;
-  if (typeof currentRound === 'number' && match.round > currentRound) return false;
+  if (verrouDeRondeActif(format) && typeof currentRound === 'number' && match.round > currentRound) return false;
   return match.player1Id === userId || match.player2Id === userId;
 }
 
@@ -26,9 +33,11 @@ export function attendLOuvertureDeSaRonde(
   matches: readonly SelectableMatch[],
   userId: string | undefined | null,
   currentRound: number | null | undefined,
+  format?: string | null,
 ): boolean {
   if (!userId || typeof currentRound !== 'number') return false;
-  if (selectCurrentMatchForUser(matches, userId, currentRound)) return false;
+  if (!verrouDeRondeActif(format)) return false;
+  if (selectCurrentMatchForUser(matches, userId, currentRound, format)) return false;
   return matches.some(
     (m) => m.round > currentRound
       && m.isBye !== true
@@ -41,9 +50,10 @@ export function selectCurrentMatchForUser(
   matches: readonly SelectableMatch[],
   userId: string | undefined | null,
   currentRound: number | null | undefined,
+  format?: string | null,
 ): SelectableMatch | undefined {
   if (!userId) return undefined;
-  const open = matches.filter((m) => isOpenForUser(m, userId, currentRound));
+  const open = matches.filter((m) => isOpenForUser(m, userId, currentRound, format));
   if (open.length === 0) return undefined;
 
   const ranked = [...open].sort((a, b) => {

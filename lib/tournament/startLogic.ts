@@ -278,7 +278,9 @@ export async function executeTournamentStart(tournamentId: string): Promise<Star
           winnerId: m.winnerId,
           winnerUsername: m.winnerUsername,
           isBye: m.isBye,
-          status: m.status === 'ready' ? 'ready' : m.status === 'completed' ? 'completed' : 'pending',
+          status: m.status === 'completed' ? 'completed'
+            : (m.status === 'ready' && m.round <= 1) ? 'ready'
+            : 'pending',
         },
       });
 

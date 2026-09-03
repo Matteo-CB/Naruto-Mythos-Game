@@ -1096,7 +1096,7 @@ export async function rattraperLesRondesBloquees(io: Server): Promise<number> {
           console.warn(`[Tournament] ${t.id}: ronde ${t.currentRound} etait terminee sans avoir bascule, rattrapee`);
           continue;
         }
-        const ouverts = await ouvrirLaRonde(io, t.id, t.currentRound);
+        const { ouverts } = await ouvrirLaRonde(io, t.id, t.currentRound);
         if (ouverts > 0) {
           rattrapees += 1;
           console.warn(`[Tournament] ${t.id}: ${ouverts} match(s) de la ronde ${t.currentRound} etaient restes fermes, ouverts`);
@@ -2241,9 +2241,14 @@ export async function advanceMatchWinner(
   await basculerSiRondeTerminee(io, tournamentId, match.round);
 }
 
-export async function ouvrirLaRonde(io: Server | null, tournamentId: string, round: number): Promise<number> {
+export async function ouvrirLaRonde(
+  io: Server | null,
+  tournamentId: string,
+  round: number,
+): Promise<{ ouverts: number; jouables: number }> {
   const matchsDeLaRonde = await prisma.tournamentMatch.findMany({ where: { tournamentId, round } });
 
+  let ouverts = 0;
   let jouables = 0;
   for (const m of matchsDeLaRonde) {
     if (m.round !== round) continue;
@@ -2258,6 +2263,7 @@ export async function ouvrirLaRonde(io: Server | null, tournamentId: string, rou
     if (m.gameId || m.roomCode) continue;
 
     await prisma.tournamentMatch.update({ where: { id: m.id }, data: { status: 'ready' } });
+    ouverts += 1;
     jouables += 1;
     io?.to(`tournament:${tournamentId}`).emit('tournament:match-updated', {
       matchId: m.id,
@@ -2270,7 +2276,7 @@ export async function ouvrirLaRonde(io: Server | null, tournamentId: string, rou
   }
 
   if (io && jouables > 0) await startInitialRoundAbsenceTimers(io, tournamentId);
-  return jouables;
+  return { ouverts, jouables };
 }
 
 export async function basculerSiRondeTerminee(
@@ -2305,9 +2311,9 @@ export async function basculerSiRondeTerminee(
       completedRound: round,
       nextRound: suivante,
     });
-    const ouverts = await ouvrirLaRonde(io, tournamentId, suivante);
-    console.log(`[Tournament] ${tournamentId}: ronde ${round} terminee, ronde ${suivante} ouverte (${ouverts} match(s))`);
-    if (ouverts === 0) besoinDeCascader = suivante;
+    const { ouverts, jouables } = await ouvrirLaRonde(io, tournamentId, suivante);
+    console.log(`[Tournament] ${tournamentId}: ronde ${round} terminee, ronde ${suivante} ouverte (${ouverts} ouvert(s), ${jouables} jouable(s))`);
+    if (jouables === 0) besoinDeCascader = suivante;
     return true;
   });
 
@@ -2590,7 +2596,9 @@ export async function advanceMatchWinnerDoubleElim(
     await prisma.tournament.update({
       where: { id: tournamentId },
       data: { currentRound: maxOngoing },
-    }).catch(() => {});
+    }).catch((err) => {
+      console.error(`[Tournament] ${tournamentId}: currentRound non mis a jour (${maxOngoing}):`, err instanceof Error ? err.message : err);
+    });
   }
 }
 

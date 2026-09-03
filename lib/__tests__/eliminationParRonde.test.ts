@@ -123,7 +123,7 @@ describe('un tournoi a elimination avance par ronde entiere', () => {
     ]);
     const { io, emissions } = fauxIo();
 
-    const ouverts = await ouvrirLaRonde(io as never, 't1', 2);
+    const { ouverts } = await ouvrirLaRonde(io as never, 't1', 2);
     expect(ouverts, 'seul le match dont les deux joueurs sont connus s ouvre').toBe(1);
     expect(p.tournamentMatch.update).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: 'm3' }, data: { status: 'ready' } }),
@@ -139,7 +139,7 @@ describe('un tournoi a elimination avance par ronde entiere', () => {
     ]);
     const { io } = fauxIo();
 
-    expect(await ouvrirLaRonde(io as never, 't1', 2), 'la partie en cours compte comme jouable').toBe(1);
+    expect((await ouvrirLaRonde(io as never, 't1', 2)).jouables, 'la partie en cours compte comme jouable').toBe(1);
     expect(p.tournamentMatch.update, 'mais rien n est ecrit dessus').not.toHaveBeenCalled();
   });
 
@@ -151,7 +151,7 @@ describe('un tournoi a elimination avance par ronde entiere', () => {
     ]);
     const { io } = fauxIo();
 
-    const jouables = await ouvrirLaRonde(io as never, 't1', 2);
+    const { jouables } = await ouvrirLaRonde(io as never, 't1', 2);
     expect(jouables, 'les deux comptent, sinon aucun chrono ne serait arme').toBe(2);
     expect(p.tournamentMatch.update, 'celui en attente est bien ouvert').toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: 'a-ouvrir' }, data: { status: 'ready' } }),
@@ -261,18 +261,45 @@ describe('le serveur est la seule barriere, et le client ne propose rien d impos
       { id: 'r1', round: 1, matchIndex: 0, status: 'completed', player1Id: 'moi', player2Id: 'x' },
       { id: 'r2', round: 2, matchIndex: 0, status: 'pending', player1Id: 'moi', player2Id: 'y' },
     ];
-    expect(selectCurrentMatchForUser(matchs, 'moi', 1), 'rien a lancer').toBeUndefined();
-    expect(attendLOuvertureDeSaRonde(matchs, 'moi', 1), 'mais on lui dit qu il attend').toBe(true);
+    expect(selectCurrentMatchForUser(matchs, 'moi', 1, 'elimination'), 'rien a lancer').toBeUndefined();
+    expect(attendLOuvertureDeSaRonde(matchs, 'moi', 1, 'elimination'), 'mais on lui dit qu il attend').toBe(true);
 
-    expect(selectCurrentMatchForUser(matchs, 'moi', 2)?.id, 'ronde ouverte, le match apparait').toBe('r2');
-    expect(attendLOuvertureDeSaRonde(matchs, 'moi', 2)).toBe(false);
+    expect(selectCurrentMatchForUser(matchs, 'moi', 2, 'elimination')?.id, 'ronde ouverte, le match apparait').toBe('r2');
+    expect(attendLOuvertureDeSaRonde(matchs, 'moi', 2, 'elimination')).toBe(false);
   });
 
   it('sans ronde connue le comportement d avant est conserve', () => {
     const m = { id: 'r2', round: 2, matchIndex: 0, status: 'pending', player1Id: 'moi', player2Id: 'y' };
     expect(isOpenForUser(m, 'moi'), 'appel a deux arguments inchange').toBe(true);
-    expect(isOpenForUser(m, 'moi', 1)).toBe(false);
-    expect(attendLOuvertureDeSaRonde([m], 'moi', null)).toBe(false);
+    expect(isOpenForUser(m, 'moi', 1, 'elimination')).toBe(false);
+    expect(attendLOuvertureDeSaRonde([m], 'moi', null, 'elimination')).toBe(false);
+  });
+
+  it('les autres formats ne sont jamais bloques par le verrou de ronde', () => {
+    const grandeFinaleReset = {
+      id: 'reset', round: 2, matchIndex: 0, status: 'ready', player1Id: 'moi', player2Id: 'y',
+    };
+    for (const format of ['double_elimination', 'swiss', undefined, null]) {
+      expect(
+        isOpenForUser(grandeFinaleReset, 'moi', 1, format),
+        `${format}: seule l elimination simple avance par ronde`,
+      ).toBe(true);
+      expect(
+        selectCurrentMatchForUser([grandeFinaleReset], 'moi', 1, format)?.id,
+        `${format}: le match reste proposable`,
+      ).toBe('reset');
+      expect(attendLOuvertureDeSaRonde([grandeFinaleReset], 'moi', 1, format)).toBe(false);
+    }
+    expect(
+      isOpenForUser(grandeFinaleReset, 'moi', 1, 'elimination'),
+      'en elimination simple le verrou joue',
+    ).toBe(false);
+  });
+
+  it('la page transmet bien le format, sinon le verrou fuiterait sur les autres formats', () => {
+    const page = readFileSync(join(RACINE, 'app/[locale]/tournaments/[id]/page.tsx'), 'utf8');
+    const bloc = page.slice(page.indexOf('selectCurrentMatchForUser('), page.indexOf('useEffect(() => { if (status'));
+    expect(bloc.split('activeTournament?.format').length - 1, 'les deux appels recoivent le format').toBe(2);
   });
 
   it('le message d attente existe dans les sept langues', () => {

@@ -109,12 +109,14 @@ export default function TournamentDetailPage() {
     (activeTournament?.matches ?? []) as unknown as Array<{ id: string; round: number; matchIndex: number; status: string; roomCode?: string | null; player1Id?: string | null; player2Id?: string | null; isBye?: boolean }>,
     userId,
     activeTournament?.currentRound,
+    activeTournament?.format,
   ) as unknown as TournamentMatch | undefined;
   const myAbsenceDeadline = myMatch?.absenceDeadline ? myMatch.absenceDeadline : null;
   const attendLaRonde = attendLOuvertureDeSaRonde(
     (activeTournament?.matches ?? []) as unknown as Array<{ id: string; round: number; matchIndex: number; status: string; roomCode?: string | null; player1Id?: string | null; player2Id?: string | null; isBye?: boolean }>,
     userId,
     activeTournament?.currentRound,
+    activeTournament?.format,
   );
 
   useEffect(() => { if (status === 'unauthenticated') router.replace('/login'); }, [status, router]);
