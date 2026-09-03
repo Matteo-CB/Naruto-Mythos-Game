@@ -3181,7 +3181,9 @@
       "ready": "Listo"
     },
     "deckMissingTitle": "Ningún mazo seleccionado",
-    "deckMissingBody": "Estás inscrito, pero mientras no elijas un mazo serás retirado del cuadro cuando empiece el torneo. Elige tu mazo más abajo en esta página."
+    "deckMissingBody": "Estás inscrito, pero mientras no elijas un mazo serás retirado del cuadro cuando empiece el torneo. Elige tu mazo más abajo en esta página.",
+    "roundWaitTitle": "Ronda en curso",
+    "roundWaitHint": "Tu proximo combate empieza cuando todos los combates de la ronda actual hayan terminado."
   },
   "playHub": {
     "title": "Jugar",

@@ -3176,7 +3176,9 @@
       "ready": "Ready"
     },
     "deckMissingTitle": "No deck selected",
-    "deckMissingBody": "You are registered, but as long as no deck is chosen you will be removed from the bracket when the tournament starts. Pick your deck further down this page."
+    "deckMissingBody": "You are registered, but as long as no deck is chosen you will be removed from the bracket when the tournament starts. Pick your deck further down this page.",
+    "roundWaitTitle": "Round in progress",
+    "roundWaitHint": "Your next match starts once every match of the current round is over."
   },
   "playHub": {
     "title": "Play",

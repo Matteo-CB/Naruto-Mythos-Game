@@ -7,6 +7,48 @@
   ],
   "entries": [
     {
+      "date": "2026-09-03",
+      "title_fr": "Mise à jour",
+      "title_en": "Update",
+      "title_es": "Actualización",
+      "title_pt": "Atualização",
+      "title_it": "Aggiornamento",
+      "title_pl": "Aktualizacja",
+      "title_ja": "アップデート",
+      "categories": [
+        "feature",
+        "feature"
+      ],
+      "changes_fr": [
+        "Les tournois à élimination directe se jouent par ronde: le tour suivant démarre quand tous les matchs du tour sont finis",
+        "Le tournoi automatique du jeudi devient un tournoi à élimination directe"
+      ],
+      "changes_en": [
+        "Single elimination tournaments now play round by round: the next round starts once every match of the round is over",
+        "The automatic Thursday tournament becomes a single elimination tournament"
+      ],
+      "changes_es": [
+        "Los torneos de eliminacion directa se juegan ahora por rondas: la siguiente ronda empieza cuando todos los combates han terminado",
+        "El torneo automatico del jueves pasa a ser de eliminacion directa"
+      ],
+      "changes_pt": [
+        "Os torneios de eliminacao direta jogam-se agora por rondas: a ronda seguinte comeca quando todos os combates terminarem",
+        "O torneio automatico de quinta-feira passa a ser de eliminacao direta"
+      ],
+      "changes_it": [
+        "I tornei a eliminazione diretta si giocano ora per turni: il turno successivo inizia quando tutti gli incontri sono finiti",
+        "Il torneo automatico del giovedi diventa a eliminazione diretta"
+      ],
+      "changes_pl": [
+        "Turnieje pucharowe rozgrywane sa teraz rundami: kolejna runda zaczyna sie, gdy wszystkie mecze dobiegna konca",
+        "Automatyczny turniej czwartkowy staje sie turniejem pucharowym"
+      ],
+      "changes_ja": [
+        "勝ち抜き大会がラウンド制になりました。そのラウンドの全試合が終わってから次のラウンドが始まります",
+        "木曜の自動大会が勝ち抜き形式になりました"
+      ]
+    },
+    {
       "date": "2026-09-02",
       "categories": [
         "fix",

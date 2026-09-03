@@ -2643,7 +2643,9 @@
       "ready": "Pronto"
     },
     "deckMissingTitle": "Nenhum baralho selecionado",
-    "deckMissingBody": "Você está inscrito, mas enquanto não escolher um baralho será retirado da chave quando o torneio começar. Escolha seu baralho mais abaixo nesta página."
+    "deckMissingBody": "Você está inscrito, mas enquanto não escolher um baralho será retirado da chave quando o torneio começar. Escolha seu baralho mais abaixo nesta página.",
+    "roundWaitTitle": "Ronda a decorrer",
+    "roundWaitHint": "O teu proximo combate comeca assim que todos os combates da ronda atual terminarem."
   },
   "game": {
     "turn": "Turno {turn}",

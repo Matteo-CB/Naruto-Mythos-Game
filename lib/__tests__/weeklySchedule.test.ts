@@ -53,9 +53,17 @@ describe('weekly tournament schedule', () => {
     expect(specForWeekday(3)).toMatchObject({ kind: 'sealed', gameMode: 'sealed' });
   });
 
-  it('Thursday, Saturday and Sunday are classic swiss', () => {
-    for (const wd of [4, 6, 0]) {
+  it('Saturday and Sunday are classic swiss', () => {
+    for (const wd of [6, 0]) {
       expect(specForWeekday(wd)).toMatchObject({ kind: 'classic', format: 'swiss', gameMode: 'classic', useBanList: true });
+    }
+  });
+
+  it('Tuesday and Thursday are the two single elimination days', () => {
+    for (const wd of [2, 4]) {
+      expect(specForWeekday(wd)).toMatchObject({
+        kind: 'elimination', format: 'elimination', gameMode: 'classic', useBanList: true,
+      });
     }
   });
 

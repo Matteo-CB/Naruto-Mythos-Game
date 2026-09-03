@@ -3182,7 +3182,9 @@
       "ready": "Prêt"
     },
     "deckMissingTitle": "Aucun deck sélectionné",
-    "deckMissingBody": "Tu es inscrit, mais tant qu'aucun deck n'est choisi tu seras retiré du tableau au lancement du tournoi. Choisis ton deck plus bas sur cette page."
+    "deckMissingBody": "Tu es inscrit, mais tant qu'aucun deck n'est choisi tu seras retiré du tableau au lancement du tournoi. Choisis ton deck plus bas sur cette page.",
+    "roundWaitTitle": "Ronde en cours",
+    "roundWaitHint": "Ton prochain match démarre dès que tous les matchs de la ronde en cours sont terminés."
   },
   "playHub": {
     "title": "Jouer",

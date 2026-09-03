@@ -33,7 +33,7 @@ export const WEEKLY_SCHEDULE: Record<number, WeeklyDaySpec | null> = {
   1: { kind: 'open', format: 'swiss', gameMode: 'classic', useBanList: false },
   2: { kind: 'elimination', format: 'elimination', gameMode: 'classic', useBanList: true },
   3: { kind: 'sealed', format: 'swiss', gameMode: 'sealed', useBanList: true },
-  4: { kind: 'classic', format: 'swiss', gameMode: 'classic', useBanList: true },
+  4: { kind: 'elimination', format: 'elimination', gameMode: 'classic', useBanList: true },
   5: {
     kind: 'partner',
     format: 'elimination',

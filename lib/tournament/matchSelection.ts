@@ -11,10 +11,30 @@ export interface SelectableMatch {
 
 const OPEN_STATUSES = new Set(['pending', 'ready', 'in_progress']);
 
-export function isOpenForUser(match: SelectableMatch, userId: string): boolean {
+export function isOpenForUser(
+  match: SelectableMatch,
+  userId: string,
+  currentRound?: number | null,
+): boolean {
   if (!OPEN_STATUSES.has(match.status)) return false;
   if (match.isBye === true) return false;
+  if (typeof currentRound === 'number' && match.round > currentRound) return false;
   return match.player1Id === userId || match.player2Id === userId;
+}
+
+export function attendLOuvertureDeSaRonde(
+  matches: readonly SelectableMatch[],
+  userId: string | undefined | null,
+  currentRound: number | null | undefined,
+): boolean {
+  if (!userId || typeof currentRound !== 'number') return false;
+  if (selectCurrentMatchForUser(matches, userId, currentRound)) return false;
+  return matches.some(
+    (m) => m.round > currentRound
+      && m.isBye !== true
+      && OPEN_STATUSES.has(m.status)
+      && (m.player1Id === userId || m.player2Id === userId),
+  );
 }
 
 export function selectCurrentMatchForUser(
@@ -23,7 +43,7 @@ export function selectCurrentMatchForUser(
   currentRound: number | null | undefined,
 ): SelectableMatch | undefined {
   if (!userId) return undefined;
-  const open = matches.filter((m) => isOpenForUser(m, userId));
+  const open = matches.filter((m) => isOpenForUser(m, userId, currentRound));
   if (open.length === 0) return undefined;
 
   const ranked = [...open].sort((a, b) => {

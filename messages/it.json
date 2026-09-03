@@ -2643,7 +2643,9 @@
       "ready": "Pronto"
     },
     "deckMissingTitle": "Nessun mazzo selezionato",
-    "deckMissingBody": "Sei iscritto, ma finché non scegli un mazzo verrai rimosso dal tabellone all'inizio del torneo. Scegli il tuo mazzo più in basso in questa pagina."
+    "deckMissingBody": "Sei iscritto, ma finché non scegli un mazzo verrai rimosso dal tabellone all'inizio del torneo. Scegli il tuo mazzo più in basso in questa pagina.",
+    "roundWaitTitle": "Turno in corso",
+    "roundWaitHint": "Il tuo prossimo incontro inizia quando tutti gli incontri del turno attuale sono finiti."
   },
   "game": {
     "turn": "Turno {turn}",

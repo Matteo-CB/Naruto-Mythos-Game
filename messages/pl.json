@@ -2643,7 +2643,9 @@
       "ready": "Gotowy"
     },
     "deckMissingTitle": "Nie wybrano talii",
-    "deckMissingBody": "Jesteś zapisany, ale dopóki nie wybierzesz talii, zostaniesz usunięty z drabinki w chwili startu turnieju. Wybierz talię niżej na tej stronie."
+    "deckMissingBody": "Jesteś zapisany, ale dopóki nie wybierzesz talii, zostaniesz usunięty z drabinki w chwili startu turnieju. Wybierz talię niżej na tej stronie.",
+    "roundWaitTitle": "Runda w toku",
+    "roundWaitHint": "Twoj nastepny mecz zacznie sie, gdy wszystkie mecze biezacej rundy dobiegna konca."
   },
   "game": {
     "turn": "Tura {turn}",

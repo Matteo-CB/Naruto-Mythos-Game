@@ -127,6 +127,15 @@ async function isWinnerDeckMonoVillage(tournamentId: string, winnerUserId: strin
 const swissRoundLocks = new Map<string, Promise<void>>();
 const matchReadyLocks = new Map<string, Promise<void>>();
 
+export async function rondePasEncoreOuverte(tournamentId: string, round: number): Promise<boolean> {
+  const tournoi = await prisma.tournament.findUnique({
+    where: { id: tournamentId },
+    select: { format: true, currentRound: true },
+  });
+  if (!tournoi || tournoi.format !== 'elimination') return false;
+  return round > tournoi.currentRound;
+}
+
 async function withSwissRoundLock<T>(lockKey: string, fn: () => Promise<T>): Promise<T> {
   while (swissRoundLocks.has(lockKey)) {
     try { await swissRoundLocks.get(lockKey); } catch { /* ignore */ }
@@ -436,8 +445,17 @@ export async function fireAbsenceTimerCallback(
   try {
     const m = await prisma.tournamentMatch.findUnique({
       where: { id: matchId },
-      select: { roomCode: true, status: true, tournamentId: true, gameId: true },
+      select: { roomCode: true, status: true, tournamentId: true, gameId: true, round: true },
     });
+    if (m && await rondePasEncoreOuverte(m.tournamentId, m.round)) {
+      console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} attend l ouverture de sa ronde, aucun forfait`);
+      clearAbsenceTimer(matchId);
+      await prisma.tournamentMatch.updateMany({
+        where: { id: matchId },
+        data: { absenceDeadline: null, absentPlayerId: null },
+      });
+      return;
+    }
     if (m && (m.status === 'completed' || m.status === 'forfeit')) {
       console.log(`[Tournament] fireAbsenceTimerCallback: match ${matchId} already resolved (${m.status}), no-op`);
       return;
@@ -754,6 +772,11 @@ export function registerTournamentHandlers(io: Server, socket: Socket) {
 
       if (match.status !== 'ready' && match.status !== 'pending' && match.status !== 'in_progress') return;
 
+      if (await rondePasEncoreOuverte(tournamentId, match.round)) {
+        emitToUser(userId, 'tournament:round-not-open', { tournamentId, matchId, round: match.round });
+        return;
+      }
+
       if (!matchReadyPlayers.has(matchId)) matchReadyPlayers.set(matchId, new Set());
       const ready = matchReadyPlayers.get(matchId)!;
       ready.add(userId);
@@ -1059,7 +1082,37 @@ export async function reopenTournamentMatch(
   }
 }
 
+export async function rattraperLesRondesBloquees(io: Server): Promise<number> {
+  let rattrapees = 0;
+  try {
+    const tournois = await prisma.tournament.findMany({
+      where: { status: 'in_progress', format: 'elimination' },
+      select: { id: true, currentRound: true },
+    });
+    for (const t of tournois) {
+      try {
+        if (await basculerSiRondeTerminee(io, t.id, t.currentRound)) {
+          rattrapees += 1;
+          console.warn(`[Tournament] ${t.id}: ronde ${t.currentRound} etait terminee sans avoir bascule, rattrapee`);
+          continue;
+        }
+        const ouverts = await ouvrirLaRonde(io, t.id, t.currentRound);
+        if (ouverts > 0) {
+          rattrapees += 1;
+          console.warn(`[Tournament] ${t.id}: ${ouverts} match(s) de la ronde ${t.currentRound} etaient restes fermes, ouverts`);
+        }
+      } catch (err) {
+        console.error(`[Tournament] rattrapage de ronde impossible pour ${t.id}:`, err instanceof Error ? err.message : err);
+      }
+    }
+  } catch (err) {
+    console.error('[Tournament] rattraperLesRondesBloquees error:', err instanceof Error ? err.message : err);
+  }
+  return rattrapees;
+}
+
 export async function sweepOrphanTournamentMatches(io: Server): Promise<void> {
+  await rattraperLesRondesBloquees(io);
   try {
     const inProgress = await prisma.tournamentMatch.findMany({
       where: { status: 'in_progress' },
@@ -1456,6 +1509,10 @@ export async function startInitialRoundAbsenceTimers(io: Server, tournamentId: s
 
   for (const nm of initialMatches) {
     if (!nm.player1Id || !nm.player2Id) continue;
+    if (nm.status !== 'ready') continue;
+    if (nm.round !== round) continue;
+    if (nm.isBye) continue;
+    if (nm.absenceDeadline) continue;
     const matchId = nm.id;
     const p1 = nm.player1Id;
     const p2 = nm.player2Id;
@@ -2166,14 +2223,8 @@ export async function advanceMatchWinner(
       player1Username: winnerUsername,
       player2Username: null,
     } as never, winnerId, winnerUsername);
+    await basculerSiRondeTerminee(io, tournamentId, match.round);
     return;
-  }
-
-  const p1 = isTopSlot ? winnerId : updated.player1Id;
-  const p2 = isTopSlot ? updated.player2Id : winnerId;
-  if (p1 && p2) {
-    await prisma.tournamentMatch.update({ where: { id: nextMatch.id }, data: { status: 'ready' } });
-    if (io) await armReadyMatchAbsence(io, tournamentId, nextMatch.id, p1, p2);
   }
 
   io?.to(`tournament:${tournamentId}`).emit('tournament:match-updated', {
@@ -2182,18 +2233,88 @@ export async function advanceMatchWinner(
     player1Username: isTopSlot ? winnerUsername : updated.player1Username,
     player2Id: isTopSlot ? updated.player2Id : winnerId,
     player2Username: isTopSlot ? updated.player2Username : winnerUsername,
-    status: (p1 && p2) ? 'ready' : 'pending',
+    status: 'pending',
   });
 
   await routeSemifinalLoserToThirdPlace(io, tournamentId, match, winnerId);
 
-  const allRoundMatches = (await prisma.tournamentMatch.findMany({ where: { tournamentId, round: match.round } }))
-    .filter(m => (m.bracket ?? MAIN_BRACKET) === MAIN_BRACKET);
-  const roundComplete = allRoundMatches.every(m => m.status === 'completed' || m.status === 'forfeit');
-  if (roundComplete) {
-    await prisma.tournament.update({ where: { id: tournamentId }, data: { currentRound: nextRound } });
-    io?.to(`tournament:${tournamentId}`).emit('tournament:round-complete', { completedRound: match.round, nextRound });
+  await basculerSiRondeTerminee(io, tournamentId, match.round);
+}
+
+export async function ouvrirLaRonde(io: Server | null, tournamentId: string, round: number): Promise<number> {
+  const matchsDeLaRonde = await prisma.tournamentMatch.findMany({ where: { tournamentId, round } });
+
+  let jouables = 0;
+  for (const m of matchsDeLaRonde) {
+    if (m.round !== round) continue;
+    if (m.isBye) continue;
+    if (!m.player1Id || !m.player2Id) continue;
+
+    if (m.status === 'ready' || m.status === 'in_progress') {
+      jouables += 1;
+      continue;
+    }
+    if (m.status !== 'pending') continue;
+    if (m.gameId || m.roomCode) continue;
+
+    await prisma.tournamentMatch.update({ where: { id: m.id }, data: { status: 'ready' } });
+    jouables += 1;
+    io?.to(`tournament:${tournamentId}`).emit('tournament:match-updated', {
+      matchId: m.id,
+      player1Id: m.player1Id,
+      player1Username: m.player1Username,
+      player2Id: m.player2Id,
+      player2Username: m.player2Username,
+      status: 'ready',
+    });
   }
+
+  if (io && jouables > 0) await startInitialRoundAbsenceTimers(io, tournamentId);
+  return jouables;
+}
+
+export async function basculerSiRondeTerminee(
+  io: Server | null,
+  tournamentId: string,
+  round: number,
+): Promise<boolean> {
+  let besoinDeCascader: number | null = null;
+  const bascule = await withSwissRoundLock(`${tournamentId}:elim:${round}`, async () => {
+    const tournoi = await prisma.tournament.findUnique({
+      where: { id: tournamentId },
+      select: { status: true, currentRound: true, format: true },
+    });
+    if (!tournoi || tournoi.status === 'completed' || tournoi.status === 'cancelled') return false;
+    if (tournoi.format !== 'elimination') return false;
+    if (tournoi.currentRound > round) return false;
+
+    const matchsDeLaRonde = (await prisma.tournamentMatch.findMany({ where: { tournamentId, round } }))
+      .filter((m) => (m.bracket ?? MAIN_BRACKET) === MAIN_BRACKET);
+    if (matchsDeLaRonde.length === 0) return false;
+    const terminee = matchsDeLaRonde.every((m) => m.status === 'completed' || m.status === 'forfeit');
+    if (!terminee) return false;
+
+    const suivante = round + 1;
+    const resteAJouer = await prisma.tournamentMatch.count({
+      where: { tournamentId, round: suivante },
+    });
+    if (resteAJouer === 0) return false;
+
+    await prisma.tournament.update({ where: { id: tournamentId }, data: { currentRound: suivante } });
+    io?.to(`tournament:${tournamentId}`).emit('tournament:round-complete', {
+      completedRound: round,
+      nextRound: suivante,
+    });
+    const ouverts = await ouvrirLaRonde(io, tournamentId, suivante);
+    console.log(`[Tournament] ${tournamentId}: ronde ${round} terminee, ronde ${suivante} ouverte (${ouverts} match(s))`);
+    if (ouverts === 0) besoinDeCascader = suivante;
+    return true;
+  });
+
+  if (besoinDeCascader !== null) {
+    await basculerSiRondeTerminee(io, tournamentId, besoinDeCascader);
+  }
+  return bascule;
 }
 
 const eliminationResultsAnnounced = new Set<string>();

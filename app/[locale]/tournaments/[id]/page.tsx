@@ -24,7 +24,7 @@ import { EvolvingDeckHolo } from '@/components/evolving/EvolvingDeckHolo';
 import { EvolvingDeckBadge } from '@/components/evolving/EvolvingDeckBadge';
 import { useTournamentStore } from '@/stores/tournamentStore';
 import { useSocketStore, armReadiedMatch, isMatchReadied } from '@/lib/socket/client';
-import { selectCurrentMatchForUser } from '@/lib/tournament/matchSelection';
+import { selectCurrentMatchForUser, attendLOuvertureDeSaRonde } from '@/lib/tournament/matchSelection';
 import { useSettingsStore } from '@/stores/settingsStore';
 import type { TournamentMatch, TournamentData } from '@/stores/tournamentStore';
 import { computeStandings } from '@/lib/tournament/swissEngine';
@@ -111,6 +111,11 @@ export default function TournamentDetailPage() {
     activeTournament?.currentRound,
   ) as unknown as TournamentMatch | undefined;
   const myAbsenceDeadline = myMatch?.absenceDeadline ? myMatch.absenceDeadline : null;
+  const attendLaRonde = attendLOuvertureDeSaRonde(
+    (activeTournament?.matches ?? []) as unknown as Array<{ id: string; round: number; matchIndex: number; status: string; roomCode?: string | null; player1Id?: string | null; player2Id?: string | null; isBye?: boolean }>,
+    userId,
+    activeTournament?.currentRound,
+  );
 
   useEffect(() => { if (status === 'unauthenticated') router.replace('/login'); }, [status, router]);
   useEffect(() => {
@@ -438,6 +443,13 @@ export default function TournamentDetailPage() {
       ) : (
         <p className="text-sm text-center" style={{ color: 'var(--t-muted)' }}>{t('waitingOpponent')}</p>
       )}
+    </div>
+  ) : attendLaRonde ? (
+    <div className="p-4" style={{ backgroundColor: 'var(--t-surface)' }}>
+      <p className="font-display text-xs uppercase tracking-[0.2em] mb-2" style={{ color: 'var(--t-accent)' }}>
+        {t('roundWaitTitle')}
+      </p>
+      <p className="text-sm" style={{ color: 'var(--t-muted)' }}>{t('roundWaitHint')}</p>
     </div>
   ) : null;
 
