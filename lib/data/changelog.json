@@ -7,6 +7,48 @@
   ],
   "entries": [
     {
+      "date": "2026-09-04",
+      "title_fr": "Mise à jour",
+      "title_en": "Update",
+      "title_es": "Actualización",
+      "title_pt": "Atualização",
+      "title_it": "Aggiornamento",
+      "title_pl": "Aktualizacja",
+      "title_ja": "アップデート",
+      "categories": [
+        "fix",
+        "fix"
+      ],
+      "changes_fr": [
+        "Un personnage vaincu rejoint la défausse avec son équipement dessous, comme une amélioration",
+        "HASHIRAMA et TOBIRAMA peuvent à nouveau améliorer un autre nom quand une carte les fait entrer en jeu, pas seulement depuis la main"
+      ],
+      "changes_en": [
+        "A defeated character now goes to the discard pile with its equipment underneath, like an upgrade",
+        "HASHIRAMA and TOBIRAMA can upgrade over a different name again when played by a card effect, not only from hand"
+      ],
+      "changes_es": [
+        "Un personaje derrotado va ahora a la pila de descartes con su equipo debajo, como una mejora",
+        "HASHIRAMA y TOBIRAMA vuelven a poder mejorar sobre otro nombre cuando los juega un efecto, no solo desde la mano"
+      ],
+      "changes_pt": [
+        "Uma personagem derrotada vai agora para o descarte com o seu equipamento por baixo, como uma melhoria",
+        "HASHIRAMA e TOBIRAMA voltam a poder melhorar sobre outro nome quando jogados por um efeito, nao so da mao"
+      ],
+      "changes_it": [
+        "Un personaggio sconfitto va ora negli scarti con il suo equipaggiamento sotto, come un potenziamento",
+        "HASHIRAMA e TOBIRAMA possono di nuovo potenziare su un altro nome quando li gioca un effetto, non solo dalla mano"
+      ],
+      "changes_pl": [
+        "Pokonana postac trafia teraz na stos odrzuconych ze swoim ekwipunkiem pod spodem, jak przy ulepszeniu",
+        "HASHIRAMA i TOBIRAMA znow moga ulepszac na inne imie, gdy zagrywa je efekt, nie tylko z reki"
+      ],
+      "changes_ja": [
+        "敗北したキャラクターは、装備をその下に置いた状態で捨て札に行くようになりました。強化と同じ扱いです",
+        "柱間と扉間が、効果で場に出たときも別名の上に重ねられるようになりました。手札からのときだけではありません"
+      ]
+    },
+    {
       "date": "2026-09-03",
       "title_fr": "Mise à jour",
       "title_en": "Update",

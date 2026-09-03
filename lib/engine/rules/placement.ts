@@ -7,6 +7,8 @@ export function findUpgradeTargetIdx(
   chars: CharacterInPlay[],
   card: { name_fr: string; chakra: number; set?: string; number?: number | string; effects?: Array<{ type: string; description: string }> },
   excludeInstanceId?: string,
+  state?: GameState,
+  missionIndex?: number,
 ): number {
 
 
@@ -32,7 +34,7 @@ export function findUpgradeTargetIdx(
     if (excludeInstanceId && c.instanceId === excludeInstanceId) return false;
     const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (!checkFlexibleUpgrade(card as any, topCard) || (card.chakra ?? 0) <= (topCard.chakra ?? 0)) return false;
+    if (!checkFlexibleUpgrade(card as any, topCard, state, missionIndex) || (card.chakra ?? 0) <= (topCard.chakra ?? 0)) return false;
     
     
     const wouldConflict = chars.some(other => {
@@ -75,7 +77,7 @@ export function isMissionValidForPlay(
   const mission = state.activeMissions[missionIndex];
   if (!mission) return false;
   const chars = mission[friendlySide];
-  const upgradeIdx = noUpgrade ? -1 : findUpgradeTargetIdx(chars, card, excludeInstanceId);
+  const upgradeIdx = noUpgrade ? -1 : findUpgradeTargetIdx(chars, card, excludeInstanceId, state, missionIndex);
 
   const baseEffectiveCost = calculateEffectiveCost(
     state,

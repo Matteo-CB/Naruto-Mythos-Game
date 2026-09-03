@@ -99,7 +99,7 @@ function handleKabuto053Main(ctx: EffectContext): EffectResult {
       const tc = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       const isSameName = tc.name_fr.toUpperCase() === topCard.name_fr.toUpperCase()
         && (topCard.chakra ?? 0) > (tc.chakra ?? 0);
-      const isFlex = checkFlexibleUpgrade(topCard as any, tc)
+      const isFlex = checkFlexibleUpgrade(topCard as any, tc, state, mi)
         && (topCard.chakra ?? 0) > (tc.chakra ?? 0);
       if (!isSameName && !isFlex) return false;
       const upgradeCost = Math.max(0, (prixEffectif - (tc.chakra ?? 0)) - KABUTO_053_REDUCTION);

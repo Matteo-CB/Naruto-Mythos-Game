@@ -466,7 +466,7 @@ function countFiledCopies(state: GameState, owner: PlayerID, cardId: string): nu
   const ps = state[owner];
   let total = 0;
   for (const zone of [ps.discardPile, ps.hand, ps.deck] as ReadonlyArray<ReadonlyArray<{ id: string }>>) {
-    for (const c of zone) if (c.id === cardId) total += 1;
+    for (const c of zone) if (c?.id === cardId) total += 1;
   }
   return total;
 }
@@ -491,9 +491,31 @@ export function rescueOrphanedAttachments(before: GameState, after: GameState): 
     const filedByTheRemoval = countFiledCopies(after, owner, cardId) - countFiledCopies(before, owner, cardId);
     const missing = lost.length - Math.max(0, filedByTheRemoval);
     if (missing <= 0) continue;
-    next = discardAttachmentsOnLeave(next, { attachments: lost.slice(0, missing) } as unknown as CharacterInPlay);
+    next = glisserSousLesCartesDeLAction(
+      next,
+      owner,
+      before[owner].discardPile.length,
+      lost.slice(0, missing).map((att) => att.card),
+    );
   }
   return next;
+}
+
+export function glisserSousLesCartesDeLAction(
+  state: GameState,
+  owner: PlayerID,
+  hauteurAvantLAction: number,
+  cartes: ReadonlyArray<{ id: string }>,
+): GameState {
+  if (cartes.length === 0) return state;
+  const pile = state[owner].discardPile;
+  const point = Math.max(0, Math.min(hauteurAvantLAction, pile.length));
+  const suite = [
+    ...pile.slice(0, point),
+    ...(cartes as typeof pile),
+    ...pile.slice(point),
+  ];
+  return { ...state, [owner]: { ...state[owner], discardPile: suite } };
 }
 
 export function enforceAttachmentConditions(state: GameState): GameState {

@@ -5329,7 +5329,7 @@ export class EffectEngine {
             const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             const isSameName = cTop.name_fr.toUpperCase() === kb053mTopCard.name_fr.toUpperCase()
               && (kb053mTopCard.chakra ?? 0) > (cTop.chakra ?? 0);
-            const isFlex = checkFlexibleUpgrade(kb053mTopCard as any, cTop)
+            const isFlex = checkFlexibleUpgrade(kb053mTopCard as any, cTop, newState, i)
               && (kb053mTopCard.chakra ?? 0) > (cTop.chakra ?? 0);
             if (!isSameName && !isFlex) return false;
             
@@ -18354,7 +18354,7 @@ export class EffectEngine {
         
         if (upgradeTarget_k78) {
           const existingTC_k78 = upgradeTarget_k78.stack?.length > 0 ? upgradeTarget_k78.stack[upgradeTarget_k78.stack?.length - 1] : upgradeTarget_k78.card;
-          const isFlexUpgrade_k78 = checkFlexibleUpgrade(topCard_k78 as any, existingTC_k78);
+          const isFlexUpgrade_k78 = checkFlexibleUpgrade(topCard_k78 as any, existingTC_k78, newState, mIdx_k78);
           const hasNameConflict_k78 = m_k78_check[friendlySide_k78].some((c: CharacterInPlay) => {
             if (c.instanceId === targetId || c.isHidden) return false;
             const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
@@ -18369,7 +18369,7 @@ export class EffectEngine {
             if (c.controlledBy !== c.originalOwner) continue;
             const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
             const isSameName = cTop.name_fr.toUpperCase() === topCard_k78.name_fr.toUpperCase() && (topCard_k78.chakra ?? 0) > (cTop.chakra ?? 0);
-            const isFlex = checkFlexibleUpgrade(topCard_k78 as any, cTop) && (topCard_k78.chakra ?? 0) > (cTop.chakra ?? 0);
+            const isFlex = checkFlexibleUpgrade(topCard_k78 as any, cTop, newState, mIdx_k78) && (topCard_k78.chakra ?? 0) > (cTop.chakra ?? 0);
             if (isSameName || isFlex) {
               const upgCost = Math.max(0, ((topCard_k78.chakra ?? 0) - (cTop.chakra ?? 0)) - 1);
               if (newState[pendingEffect.sourcePlayer].chakra >= upgCost) upgradeTargetIds_k78.push(c.instanceId);
@@ -21737,7 +21737,7 @@ export class EffectEngine {
         if (c.controlledBy !== c.originalOwner) continue;
         const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
         const isSameName = cTop.name_fr.toUpperCase() === card.name_fr.toUpperCase() && (card.chakra ?? 0) > (cTop.chakra ?? 0);
-        const isFlex = checkFlexibleUpgrade(card as any, cTop) && (card.chakra ?? 0) > (cTop.chakra ?? 0);
+        const isFlex = checkFlexibleUpgrade(card as any, cTop, state, missionIndex) && (card.chakra ?? 0) > (cTop.chakra ?? 0);
         if (isSameName || isFlex) {
 
           if (isFlex) {
@@ -22527,7 +22527,7 @@ export class EffectEngine {
         if (c.controlledBy !== c.originalOwner) continue;
         const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
         const isSameName = cTop.name_fr.toUpperCase() === card.name_fr.toUpperCase() && (card.chakra ?? 0) > (cTop.chakra ?? 0);
-        const isFlex = checkFlexibleUpgrade(card as any, cTop) && (card.chakra ?? 0) > (cTop.chakra ?? 0);
+        const isFlex = checkFlexibleUpgrade(card as any, cTop, newState, missionIdx) && (card.chakra ?? 0) > (cTop.chakra ?? 0);
         if (isSameName || isFlex) {
 
           const upgCost = Math.max(0, (prixEffectifK053 - (cTop.chakra ?? 0)) - 3);
@@ -22715,7 +22715,7 @@ export class EffectEngine {
         if (c.controlledBy !== c.originalOwner) continue;
         const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
         const isSameName = cTop.name_fr.toUpperCase() === card.name_fr.toUpperCase() && (card.chakra ?? 0) > (cTop.chakra ?? 0);
-        const isFlex = checkFlexibleUpgrade(card as any, cTop) && (card.chakra ?? 0) > (cTop.chakra ?? 0);
+        const isFlex = checkFlexibleUpgrade(card as any, cTop, newState, missionIndex) && (card.chakra ?? 0) > (cTop.chakra ?? 0);
         if (isSameName || isFlex) {
 
           const upgCost = Math.max(0, ((card.chakra ?? 0) - (cTop.chakra ?? 0)) - 1);
@@ -24319,7 +24319,7 @@ export class EffectEngine {
       if (c.controlledBy !== c.originalOwner) continue;
       const cTop = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
       const isSameName = cTop.name_fr.toUpperCase() === topCard.name_fr.toUpperCase() && (topCard.chakra ?? 0) > (cTop.chakra ?? 0);
-      const isFlex = checkFlexibleUpgrade(topCard as any, cTop) && (topCard.chakra ?? 0) > (cTop.chakra ?? 0);
+      const isFlex = checkFlexibleUpgrade(topCard as any, cTop, newState, mIdx) && (topCard.chakra ?? 0) > (cTop.chakra ?? 0);
       if (isSameName || isFlex) {
         const upgCost = Math.max(0, (prixRevelationRhr - (cTop.chakra ?? 0)) - costReduction);
         if (ps.chakra >= upgCost) allUpgradeTargets.push(c.instanceId);
@@ -24556,7 +24556,8 @@ export class EffectEngine {
       const card = playerState.hand[i];
       if (card.group !== 'Leaf Village') continue;
       let canPlace = false;
-      for (const mission of newState.activeMissions) {
+      for (let missionIdxH2 = 0; missionIdxH2 < newState.activeMissions.length; missionIdxH2++) {
+        const mission = newState.activeMissions[missionIdxH2];
         const chars = mission[friendlySide];
         let upgradeTarget: CharacterInPlay | undefined;
         for (const c of chars) {
@@ -24572,7 +24573,7 @@ export class EffectEngine {
             if (c.isHidden) continue;
             if (c.controlledBy !== c.originalOwner) continue;
             const topCard = c.stack?.length > 0 ? c.stack[c.stack?.length - 1] : c.card;
-            if (checkFlexibleUpgrade(card as any, topCard) && (card.chakra ?? 0) > (topCard.chakra ?? 0)) {
+            if (checkFlexibleUpgrade(card as any, topCard, newState, missionIdxH2) && (card.chakra ?? 0) > (topCard.chakra ?? 0)) {
               upgradeTarget = c; break;
             }
           }
