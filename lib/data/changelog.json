@@ -16,34 +16,50 @@
       "title_pl": "Aktualizacja",
       "title_ja": "アップデート",
       "categories": [
+        "fix",
+        "feature",
         "feature",
         "feature"
       ],
       "changes_fr": [
+        "La carte offerte au vainqueur affiche enfin son illustration, quel que soit son set",
+        "À la création d'un tournoi, la carte offerte peut être choisie dans tous les sets, plus seulement le premier",
         "Les tournois à élimination directe se jouent par ronde: le tour suivant démarre quand tous les matchs du tour sont finis",
         "Le tournoi automatique du jeudi devient un tournoi à élimination directe"
       ],
       "changes_en": [
+        "The winner's prize card now shows its artwork, whatever set it comes from",
+        "Tournament creators can choose a prize card from every set, not just the first one",
         "Single elimination tournaments now play round by round: the next round starts once every match of the round is over",
         "The automatic Thursday tournament becomes a single elimination tournament"
       ],
       "changes_es": [
+        "La carta de premio del ganador ya muestra su ilustracion, sea del set que sea",
+        "Al crear un torneo se puede elegir una carta de premio de cualquier set, no solo del primero",
         "Los torneos de eliminacion directa se juegan ahora por rondas: la siguiente ronda empieza cuando todos los combates han terminado",
         "El torneo automatico del jueves pasa a ser de eliminacion directa"
       ],
       "changes_pt": [
+        "A carta de premio do vencedor mostra agora a sua ilustracao, seja de que colecao for",
+        "Ao criar um torneio pode escolher-se uma carta de premio de qualquer colecao, nao so da primeira",
         "Os torneios de eliminacao direta jogam-se agora por rondas: a ronda seguinte comeca quando todos os combates terminarem",
         "O torneio automatico de quinta-feira passa a ser de eliminacao direta"
       ],
       "changes_it": [
+        "La carta premio del vincitore mostra ora la sua illustrazione, da qualunque set provenga",
+        "Creando un torneo si puo scegliere una carta premio di qualsiasi set, non solo del primo",
         "I tornei a eliminazione diretta si giocano ora per turni: il turno successivo inizia quando tutti gli incontri sono finiti",
         "Il torneo automatico del giovedi diventa a eliminazione diretta"
       ],
       "changes_pl": [
+        "Karta nagrody dla zwyciezcy pokazuje teraz swoja ilustracje, niezaleznie od dodatku",
+        "Tworzac turniej mozna wybrac karte nagrody z kazdego dodatku, nie tylko z pierwszego",
         "Turnieje pucharowe rozgrywane sa teraz rundami: kolejna runda zaczyna sie, gdy wszystkie mecze dobiegna konca",
         "Automatyczny turniej czwartkowy staje sie turniejem pucharowym"
       ],
       "changes_ja": [
+        "優勝者の賞品カードの絵柄が、どの弾のカードでも表示されるようになりました",
+        "大会作成時に、第1弾以外の弾からも賞品カードを選べるようになりました",
         "勝ち抜き大会がラウンド制になりました。そのラウンドの全試合が終わってから次のラウンドが始まります",
         "木曜の自動大会が勝ち抜き形式になりました"
       ]

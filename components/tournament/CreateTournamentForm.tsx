@@ -7,7 +7,8 @@ import { useTournamentStore, type CreateTournamentInput } from '@/stores/tournam
 import { useRouter } from '@/lib/i18n/navigation';
 import { RANK_TIERS } from '@/components/EloBadge';
 import { ALL_SET_IDS, SET_REGISTRY, isSetSealedReady, getSetName, getLatestSealedSetId } from '@/lib/data/sets/registry';
-import { TOURNAMENT_PRIZE_CARD_IDS } from '@/lib/variants/constants';
+import { poolDePrixTousSets } from '@/lib/tournament/prizePool';
+import { portraitImagePath } from '@/lib/utils/imagePath';
 import { getCardById } from '@/lib/data/cardIndex';
 import { getAllCards } from '@/lib/data/cardLoader';
 import { facetOptions } from '@/lib/collection/facets';
@@ -74,6 +75,11 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
   const [restrictionNote, setRestrictionNote] = useState('');
   const [bannedCardIds, setBannedCardIds] = useState('');
   const [prizeCardId, setPrizeCardId] = useState<string>('');
+  const cartesDePrix = useMemo(
+    () => sortCardsForDisplay(poolDePrixTousSets().map((id) => getCardById(id)).filter((c): c is NonNullable<typeof c> => !!c))
+      .map((c) => c.id),
+    [],
+  );
 
   const deckLegalCards = useMemo(
     () => sortCardsForDisplay(getAllCards().filter((c) => c.card_type !== 'mission')),
@@ -219,10 +225,12 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
           >
             {t('prizeNone')}
           </button>
-          {TOURNAMENT_PRIZE_CARD_IDS.map((cardId) => {
+          {cartesDePrix.map((cardId) => {
             const selected = prizeCardId === cardId;
             const card = getCardById(cardId);
             const number = cardId.split('-')[1] ?? '';
+            const rarete = String(card?.rarity ?? cardId.split('-').slice(-1)[0] ?? '');
+            const chemin = portraitImagePath(card);
             const displayLabel = card
               ? `${getCardName(card, locale as 'en' | 'fr')} ${getCardTitle(card, locale as 'en' | 'fr')}`
               : cardId;
@@ -242,17 +250,19 @@ export function CreateTournamentForm({ isAdmin, canCreatePublic = true }: Props)
               >
                 <div className="relative" style={{ width: '100%', aspectRatio: '110 / 160' }}>
                   {card ? <CardArtFallback card={card} /> : null}
-                  <Image
-                    src={`/images/cards/KS/mythos_v/${cardId}.webp`}
-                    alt=""
-                    fill
-                    sizes="110px"
-                    style={{ objectFit: 'cover' }}
-                  />
+                  {chemin && (
+                    <Image
+                      src={chemin}
+                      alt=""
+                      fill
+                      sizes="110px"
+                      style={{ objectFit: 'cover' }}
+                    />
+                  )}
                 </div>
                 <div className="px-2 py-1.5 text-[10px] tracking-wide" style={{ color: selected ? 'var(--t-accent)' : 'var(--t-text)' }}>
                   <div className="truncate">{card ? getCardName(card, locale as 'en' | 'fr') : cardId}</div>
-                  <div className="text-[9px]" style={{ color: 'var(--t-dim)' }}>{number} MV</div>
+                  <div className="text-[9px]" style={{ color: 'var(--t-dim)' }}>{number} {rarete}</div>
                 </div>
               </button>
             );

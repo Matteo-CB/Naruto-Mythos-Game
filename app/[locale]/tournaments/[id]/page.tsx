@@ -4,12 +4,14 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import Image from 'next/image';
 import { getCardById } from '@/lib/data/cardIndex';
-import { getCardName, getCardTitle } from '@/lib/utils/cardLocale';
+import { getCardName, getCardTitle, getRarityLabel } from '@/lib/utils/cardLocale';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
 import { Link, useRouter } from '@/lib/i18n/navigation';
 import { motion } from 'framer-motion';
 import { CloudBackground } from '@/components/CloudBackground';
+import { CardArtFallback } from '@/components/cards/CardArtFallback';
+import { portraitImagePath } from '@/lib/utils/imagePath';
 import { ChakraIcon, CHAKRA_COLOR } from '@/components/icons/GameIcons';
 import { Footer } from '@/components/Footer';
 import { BracketTree } from '@/components/tournament/BracketTree';
@@ -87,6 +89,7 @@ export default function TournamentDetailPage() {
   const tSpectate = useTranslations('tournamentSpectate');
   const tc = useTranslations('common');
   const tRoot = useTranslations();
+  const tCardMeta = useTranslations('cardMeta');
   const locale = useLocale();
   const router = useRouter();
   const params = useParams();
@@ -554,13 +557,20 @@ export default function TournamentDetailPage() {
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.18 }}
             className="mb-4 p-4 flex gap-4 items-center" style={{ backgroundColor: 'var(--t-panel)', border: '1px solid var(--t-border)' }}>
             <div className="relative shrink-0" style={{ width: 110, height: 160 }}>
-              <Image
-                src={`/images/cards/KS/mythos_v/${tour.prizeCardId}.webp`}
-                alt=""
-                fill
-                sizes="110px"
-                style={{ objectFit: 'cover', boxShadow: '0 0 18px var(--t-accent)44' }}
-              />
+              {(() => {
+                const carte = getCardById(tour.prizeCardId!);
+                const chemin = portraitImagePath(carte);
+                if (!chemin) return carte ? <CardArtFallback card={carte} /> : null;
+                return (
+                  <Image
+                    src={chemin}
+                    alt=""
+                    fill
+                    sizes="110px"
+                    style={{ objectFit: 'cover' }}
+                  />
+                );
+              })()}
             </div>
             <div className="flex flex-col gap-1">
               <h2 className="text-sm font-medium uppercase tracking-wider mb-1" style={{ color: 'var(--t-accent)' }}>{t('prizePanelTitle')}</h2>
@@ -572,7 +582,7 @@ export default function TournamentDetailPage() {
                   <>
                     <p className="text-xs font-display" style={{ color: 'var(--t-text)' }}>{getCardName(card, locale as 'en' | 'fr')}</p>
                     <p className="text-[10px]" style={{ color: 'var(--t-muted)' }}>{getCardTitle(card, locale as 'en' | 'fr')}</p>
-                    <p className="text-[10px]" style={{ color: 'var(--t-dim)' }}>{number} Mythos V</p>
+                    <p className="text-[10px]" style={{ color: 'var(--t-dim)' }}>{number} {getRarityLabel(String(card.rarity ?? ''), tCardMeta)}</p>
                     <p className="text-[10px] mt-2" style={{ color: 'var(--t-muted)' }}>{t('prizeDescription')}</p>
                     <p className="text-[10px] mt-2 italic" style={{ color: 'var(--t-muted)' }}>{t('prizeDisclaimer')}</p>
                   </>
