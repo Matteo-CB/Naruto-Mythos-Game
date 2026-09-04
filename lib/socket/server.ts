@@ -3815,7 +3815,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         ?? (socket.id === room.hostSocket ? 'player1' : socket.id === room.guestSocket ? 'player2' : null);
 
       if (room.gameState && room.gameState.phase !== 'gameOver' && !room.finalized) {
-        const seatOfSender = socket.id === room.hostSocket ? 'player1' : socket.id === room.guestSocket ? 'player2' : null;
+        const seatOfSender = siegeDuJoueur;
         console.warn(
           `[Socket] room:select-deck ignored in room ${code}: a game is already running (turn ${room.gameState.turn}, `
           + `phase ${room.gameState.phase}). Restarting it would wipe the match, resyncing the sender instead.`,
@@ -3889,7 +3889,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
         }
       }
       if (resolvedChars.some((c) => c.isHolo)) {
-        const holoOwnerId = socket.id === room.hostSocket ? room.hostId : (socket.id === room.guestSocket ? room.guestId : null);
+        const holoOwnerId = siegeDuJoueur === 'player1' ? room.hostId : (siegeDuJoueur === 'player2' ? room.guestId : null);
         let holoAllowAll = false;
         let ownedHoloIds = new Set<string>();
         if (holoOwnerId) {
@@ -3931,8 +3931,12 @@ export function setupSocketHandlers(io: SocketIOServer) {
       const safeDeck = { characters: resolvedChars, missions: resolvedMissions };
 
       if (room.isSealed) {
-        const isHost = socket.id === room.hostSocket;
-        const poolIds = isHost ? room.hostSealedPoolIds : room.guestSealedPoolIds;
+        if (!siegeDuJoueur) {
+          console.warn(`[Socket] room:select-deck refuse dans ${code}: siege introuvable, le pool scelle ne peut pas etre verifie`);
+          socket.emit('room:error', { message: 'Your seat could not be found in this room', errorKey: 'room.error.seatGone' });
+          return;
+        }
+        const poolIds = siegeDuJoueur === 'player1' ? room.hostSealedPoolIds : room.guestSealedPoolIds;
         if (!poolIds || poolIds.length === 0) {
           socket.emit('room:error', { message: 'Sealed pool not initialized', errorKey: 'game.error.invalidDeck' });
           return;
@@ -3950,7 +3954,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
       }
 
       if (!room.isSealed) {
-        const ownerId = socket.id === room.hostSocket ? room.hostId : (socket.id === room.guestSocket ? room.guestId : null);
+        const ownerId = siegeDuJoueur === 'player1' ? room.hostId : (siegeDuJoueur === 'player2' ? room.guestId : null);
         if (ownerId) {
           try {
             const variantCheck = await validateDeckVariantUnlocks(ownerId, resolvedChars.map((c) => c.id));
@@ -4027,7 +4031,7 @@ export function setupSocketHandlers(io: SocketIOServer) {
 
       if (room.isSealed) {
 
-        const otherSocket = socket.id === room.hostSocket ? room.guestSocket : room.hostSocket;
+        const otherSocket = siegeDuJoueur === 'player1' ? room.guestSocket : room.hostSocket;
         if (otherSocket) {
           io.to(otherSocket).emit('sealed:opponent-ready');
         }
@@ -4154,11 +4158,11 @@ export function setupSocketHandlers(io: SocketIOServer) {
           armTournamentGameTimer(room, code, io);
         }
       } else {
-        const who = socket.id === room.hostSocket ? 'host' : 'guest';
+        const who = siegeDuJoueur === 'player1' ? 'host' : 'guest';
         console.log(`[Socket] Deck accepted from ${who} in room ${code}, waiting for other player`);
         socket.emit('room:deck-accepted');
         
-        const otherSocket = socket.id === room.hostSocket ? room.guestSocket : room.hostSocket;
+        const otherSocket = siegeDuJoueur === 'player1' ? room.guestSocket : room.hostSocket;
         if (otherSocket) {
           io.to(otherSocket).emit('room:opponent-deck-ready');
         }
