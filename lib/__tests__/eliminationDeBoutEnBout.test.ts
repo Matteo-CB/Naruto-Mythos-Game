@@ -362,6 +362,52 @@ describe('un tournoi a elimination va jusqu au bout, quel que soit l effectif', 
     expect(second, 'et rien n est signale comme rattrape').toBe(0);
   });
 
+  it('la petite finale s ouvre en meme temps que la finale, sans la retarder', async () => {
+    installe(4);
+    const petiteFinale = bd.matchs.find((m) => m.bracket !== MAIN_BRACKET);
+    expect(petiteFinale, 'un tableau de quatre a bien une petite finale').toBeTruthy();
+    expect(petiteFinale!.round, 'elle porte le numero de la finale').toBe(2);
+
+    for (const m of principaux(1)) {
+      Object.assign(m, { status: 'completed', winnerId: m.player1Id, winnerUsername: m.player1Username });
+      await advanceMatchWinner(fauxIo(), TID, {
+        round: 1, matchIndex: m.matchIndex as number, bracket: m.bracket as string,
+        player1Id: m.player1Id as string, player2Id: m.player2Id as string,
+        player1Username: m.player1Username as string, player2Username: m.player2Username as string,
+      }, m.player1Id as string, m.player1Username as string);
+    }
+
+    expect(tournoi().currentRound, 'la ronde 2 est ouverte').toBe(2);
+    const finale = principaux(2)[0];
+    expect(finale.status, 'la finale est jouable').toBe('ready');
+    expect(
+      petiteFinale!.status,
+      'et la petite finale aussi, elles se jouent en parallele',
+    ).toBe('ready');
+  });
+
+  it('la petite finale non resolue n empeche pas la ronde finale d etre consideree finie', async () => {
+    installe(4);
+    for (const m of principaux(1)) {
+      Object.assign(m, { status: 'completed', winnerId: m.player1Id, winnerUsername: m.player1Username });
+      await advanceMatchWinner(fauxIo(), TID, {
+        round: 1, matchIndex: m.matchIndex as number, bracket: m.bracket as string,
+        player1Id: m.player1Id as string, player2Id: m.player2Id as string,
+        player1Username: m.player1Username as string, player2Username: m.player2Username as string,
+      }, m.player1Id as string, m.player1Username as string);
+    }
+    const petiteFinale = bd.matchs.find((m) => m.bracket !== MAIN_BRACKET)!;
+    Object.assign(petiteFinale, { status: 'in_progress' });
+
+    const finale = principaux(2)[0];
+    Object.assign(finale, { status: 'completed', winnerId: finale.player1Id });
+    const bascule = await basculerSiRondeTerminee(fauxIo(), TID, 2);
+    expect(
+      bascule,
+      'il n y a pas de ronde 3, donc rien a ouvrir: la petite finale ne bloque personne',
+    ).toBe(false);
+  });
+
   it('la bascule est sans effet tant qu un match de la ronde tourne encore', async () => {
     installe(8);
     const [premier, ...autres] = principaux(1);
