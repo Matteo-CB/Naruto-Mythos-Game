@@ -330,6 +330,14 @@ export default function SealedPage() {
     router.push('/');
   }, [router]);
 
+  const messageDErreur = socketError ?? (socketErrorKey ? tc('errorOccurred') : null);
+
+  const renvoyerLeDeck = useCallback(() => {
+    const deck = dernierDeckEnvoye.current;
+    if (!deck) { router.push('/play/online'); return; }
+    socketSelectDeck(deck.characters, deck.missions);
+  }, [socketSelectDeck, router]);
+
   const onlineTimerSeconds = sealedDeadline
     ? Math.max(0, Math.floor((sealedDeadline - Date.now()) / 1000))
     : 900;
@@ -387,14 +395,6 @@ export default function SealedPage() {
       />
     );
   }
-
-  const messageDErreur = socketError ?? (socketErrorKey ? tc('errorOccurred') : null);
-
-  const renvoyerLeDeck = useCallback(() => {
-    const deck = dernierDeckEnvoye.current;
-    if (!deck) { router.push('/play/online'); return; }
-    socketSelectDeck(deck.characters, deck.missions);
-  }, [socketSelectDeck, router]);
 
   if (step === 'starting') {
     return (
