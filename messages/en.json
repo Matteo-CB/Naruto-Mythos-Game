@@ -878,7 +878,8 @@
         "ss133Powerup": "{card} ({id}): {target} gains {amount} Power on arrival.",
         "ss135Discarded": "{card} ({id}): {target} discarded, cost {amount}.",
         "ss135Hidden": "{card} ({id}): the enemy character is hidden.",
-        "ssDeckSearchBottom": "{card} ({id}): the {amount} cards looked at go randomly to the bottom of the deck."
+        "ssDeckSearchBottom": "{card} ({id}): the {amount} cards looked at go randomly to the bottom of the deck.",
+        "ss086Hidden": "{card} ({id}): the character is hidden, there is no other mission to move it to."
       },
       "score": {
         "draw": "[SCORE] {card}: Drew {count} card(s).",
@@ -1661,7 +1662,8 @@
         "autoConfirmInstant": "Apply this effect?",
         "ss007ChoosePowerup": "Choose a friendly Team 7 character to POWERUP 2.",
         "ss017RevealResult": "Revealed card",
-        "attachReturnChooseTarget": "Choose where {card} goes back."
+        "attachReturnChooseTarget": "Choose where {card} goes back.",
+        "ss086HideOnly": "Hide this character? There is no other mission to move it to."
       },
       "upgradeModifierConfirm": "Apply the UPGRADE effect",
       "upgradeModifierDecline": "Keep the MAIN effect only",

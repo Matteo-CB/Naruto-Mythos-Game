@@ -882,7 +882,8 @@
         "ss133Powerup": "{card}（{id}）：{target}が登場時にパワー{amount}を得ました。",
         "ss135Discarded": "{card}（{id}）：{target}を捨てました。コスト{amount}。",
         "ss135Hidden": "{card}（{id}）：敵キャラクターを裏向きにしました。",
-        "ssDeckSearchBottom": "{card} ({id}): 見た {amount} 枚のカードはランダムに山札の一番下に戻ります。"
+        "ssDeckSearchBottom": "{card} ({id}): 見た {amount} 枚のカードはランダムに山札の一番下に戻ります。",
+        "ss086Hidden": "{card}（{id}）：移動できる別のミッションがないため、キャラクターを伏せました"
       },
       "score": {
         "draw": "[SCORE] {card}：カードを {count} 枚引きました。",
@@ -1665,7 +1666,8 @@
         "autoConfirmInstant": "この効果を適用しますか？",
         "ss007ChoosePowerup": "パワーアップ2を与える味方の第七班キャラクターを選んでください。",
         "ss017RevealResult": "公開されたカード",
-        "attachReturnChooseTarget": "{card} をどこに戻すか選んでください。"
+        "attachReturnChooseTarget": "{card} をどこに戻すか選んでください。",
+        "ss086HideOnly": "このキャラクターを伏せますか。移動できる別のミッションがありません"
       },
       "upgradeModifierConfirm": "UPGRADE効果を適用",
       "upgradeModifierDecline": "MAIN効果のみを使用",

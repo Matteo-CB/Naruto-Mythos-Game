@@ -370,10 +370,20 @@ describe('seuls les qualifies entrent au Kage, et ils recoivent le code', () => 
     expect(mpEnvoyes, 'et le huitieme du classement').toContain('318819703910957057');
     expect(mpEnvoyes, 'un non qualifie n est pas contacte').not.toContain('999000111222333444');
 
-    expect(envoi.salon, 'le code est aussi annonce dans le salon').toBe(true);
-    const annonce = salons.find((s) => s.contenu.includes('KAGE42'));
-    expect(annonce, 'le message contient bien le code').toBeTruthy();
-    expect(annonce?.contenu, 'et l heure de depart en heure locale britannique').toContain('20:00 BST');
+    expect(envoi.salon, 'le Kage ne s annonce plus publiquement').toBe(false);
+    expect(
+      salons.filter((s) => s.contenu.includes('KAGE42')),
+      'le code du Kage ne doit apparaitre dans aucun salon',
+    ).toEqual([]);
+  });
+
+  it('le code part uniquement en message prive, jamais dans un salon', async () => {
+    await diffuserCodeKage('SECRET99', KAGE_SEPTEMBRE);
+    expect(mpEnvoyes.length, 'les huit sont prevenus en prive').toBe(8);
+    expect(
+      salons.map((s) => s.contenu).join(' '),
+      'aucun salon ne voit passer le code',
+    ).not.toContain('SECRET99');
   });
 
   it('un qualifie injoignable en prive est signale aux organisateurs', async () => {

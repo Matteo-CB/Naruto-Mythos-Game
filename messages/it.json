@@ -2975,7 +2975,8 @@
         "ss133Powerup": "{card} ({id}): {target} guadagna {amount} Potenza all'arrivo.",
         "ss135Discarded": "{card} ({id}): {target} scartata, costo {amount}.",
         "ss135Hidden": "{card} ({id}): il personaggio nemico viene nascosto.",
-        "ssDeckSearchBottom": "{card} ({id}): le {amount} carte guardate tornano a caso in fondo al mazzo."
+        "ssDeckSearchBottom": "{card} ({id}): le {amount} carte guardate tornano a caso in fondo al mazzo.",
+        "ss086Hidden": "{card} ({id}): il personaggio viene nascosto, non c e un altra missione dove spostarlo."
       },
       "score": {
         "draw": "[SCORE] {card}: Ha pescato {count} carta/e.",
@@ -3758,7 +3759,8 @@
         "autoConfirmInstant": "Applicare questo effetto?",
         "ss007ChoosePowerup": "Scegli un personaggio alleato del Team 7 da POTENZIARE di 2.",
         "ss017RevealResult": "Carta rivelata",
-        "attachReturnChooseTarget": "Scegli dove torna {card}."
+        "attachReturnChooseTarget": "Scegli dove torna {card}.",
+        "ss086HideOnly": "Nascondere questo personaggio? Non c e un altra missione dove spostarlo."
       },
       "upgradeModifierConfirm": "Applica l'effetto UPGRADE",
       "upgradeModifierDecline": "Mantieni solo l'effetto MAIN",

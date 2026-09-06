@@ -102,7 +102,15 @@ function smokeBombMain(ctx: EffectContext): EffectResult {
   const { state, sourcePlayer, sourceCard, sourceMissionIndex } = ctx;
   const destinations = smokeBombDestinations(state, sourceMissionIndex);
   if (destinations.length === 0) {
-    return refuse(state, sourcePlayer, 'Smoke Bomb (086): no other mission to move this character to.', 'BOMBE FUMIGENE', SMOKE_BOMB_ID);
+    return {
+      state,
+      requiresTargetSelection: true,
+      targetSelectionType: 'SS086_HIDE_ONLY',
+      validTargets: [sourceCard.instanceId],
+      isOptional: true,
+      description: JSON.stringify({ hostInstanceId: sourceCard.instanceId }),
+      descriptionKey: 'game.effect.desc.ss086HideOnly',
+    };
   }
   return confirmFirst({
     state,

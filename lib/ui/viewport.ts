@@ -3,15 +3,25 @@ export interface ViewportSize {
   height: number;
 }
 
+export const RETRECISSEMENT_DU_CLAVIER = 150;
+
 export function readViewport(): ViewportSize {
   if (typeof window === 'undefined') return { width: 1180, height: 670 };
   const visual = window.visualViewport;
-  const width = Math.round(visual?.width ?? window.innerWidth ?? 0);
-  const height = Math.round(visual?.height ?? window.innerHeight ?? 0);
+  const largeurDeMiseEnPage = window.innerWidth || document.documentElement?.clientWidth || 0;
+  const hauteurDeMiseEnPage = window.innerHeight || document.documentElement?.clientHeight || 0;
+
+  const width = Math.round(visual?.width ?? largeurDeMiseEnPage);
+  let height = Math.round(visual?.height ?? hauteurDeMiseEnPage);
+
+  if (hauteurDeMiseEnPage > 0 && hauteurDeMiseEnPage - height > RETRECISSEMENT_DU_CLAVIER) {
+    height = hauteurDeMiseEnPage;
+  }
+
   if (width > 0 && height > 0) return { width, height };
   return {
-    width: window.innerWidth || document.documentElement.clientWidth || 1180,
-    height: window.innerHeight || document.documentElement.clientHeight || 670,
+    width: largeurDeMiseEnPage || 1180,
+    height: hauteurDeMiseEnPage || 670,
   };
 }
 

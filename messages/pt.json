@@ -2975,7 +2975,8 @@
         "ss133Powerup": "{card} ({id}): {target} ganha {amount} de Potência ao chegar.",
         "ss135Discarded": "{card} ({id}): {target} descartada, custo {amount}.",
         "ss135Hidden": "{card} ({id}): o personagem inimigo fica oculto.",
-        "ssDeckSearchBottom": "{card} ({id}): as {amount} cartas observadas voltam ao acaso para o fundo do baralho."
+        "ssDeckSearchBottom": "{card} ({id}): as {amount} cartas observadas voltam ao acaso para o fundo do baralho.",
+        "ss086Hidden": "{card} ({id}): a personagem fica oculta, nao ha outra missao para onde a mover."
       },
       "score": {
         "draw": "[SCORE] {card}: Comprou {count} carta(s).",
@@ -3758,7 +3759,8 @@
         "autoConfirmInstant": "Aplicar este efeito?",
         "ss007ChoosePowerup": "Escolhe um personagem aliado da Equipa 7 para REFORÇAR 2.",
         "ss017RevealResult": "Carta revelada",
-        "attachReturnChooseTarget": "Escolhe para onde volta {card}."
+        "attachReturnChooseTarget": "Escolhe para onde volta {card}.",
+        "ss086HideOnly": "Ocultar esta personagem? Nao ha outra missao para onde a mover."
       },
       "upgradeModifierConfirm": "Aplicar o efeito UPGRADE",
       "upgradeModifierDecline": "Manter apenas o efeito MAIN",

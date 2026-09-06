@@ -13301,6 +13301,18 @@ export class EffectEngine {
         break;
       }
 
+      case 'SS086_HIDE_ONLY': {
+        let sHide086: { hostInstanceId?: string } = {};
+        try { sHide086 = JSON.parse(pendingEffect.effectDescription); } catch {}
+        const hoteSeul086 = sHide086.hostInstanceId ?? pendingEffect.sourceInstanceId;
+        newState = EffectEngine.hideCharacterWithLog(newState, hoteSeul086, pendingEffect.sourcePlayer);
+        newState.log = logAction(newState.log, newState.turn, newState.phase, pendingEffect.sourcePlayer,
+          'EFFECT_HIDE', 'Smoke Bomb (086): the character is hidden, there is no other mission to move it to.',
+          'game.log.effect.ss086Hidden',
+          { card: 'BOMBE FUMIGENE', id: 'SS-086-C' });
+        break;
+      }
+
       case 'SS086_HIDE_AND_MOVE': {
         let s086: { hostInstanceId?: string } = {};
         try { s086 = JSON.parse(pendingEffect.effectDescription); } catch {}

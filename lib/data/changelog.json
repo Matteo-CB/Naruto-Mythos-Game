@@ -7,6 +7,48 @@
   ],
   "entries": [
     {
+      "date": "2026-09-06",
+      "title_fr": "Mise à jour",
+      "title_en": "Update",
+      "title_es": "Actualización",
+      "title_pt": "Atualização",
+      "title_it": "Aggiornamento",
+      "title_pl": "Aktualizacja",
+      "title_ja": "アップデート",
+      "categories": [
+        "fix",
+        "fix"
+      ],
+      "changes_fr": [
+        "La Bombe fumigène cache désormais le personnage même s'il n'y a aucune autre mission où le déplacer",
+        "Écrire dans le chat sur tablette ne redimensionne plus tout le plateau"
+      ],
+      "changes_en": [
+        "Smoke Bomb now hides the character even when there is no other mission to move it to",
+        "Typing in the chat on a tablet no longer resizes the whole board"
+      ],
+      "changes_es": [
+        "La Bomba de Humo ahora oculta al personaje aunque no haya otra mision a la que moverlo",
+        "Escribir en el chat desde una tableta ya no redimensiona todo el tablero"
+      ],
+      "changes_pt": [
+        "A Bomba de Fumo passa a ocultar a personagem mesmo quando nao ha outra missao para onde a mover",
+        "Escrever no chat num tablet ja nao redimensiona todo o tabuleiro"
+      ],
+      "changes_it": [
+        "La Bomba Fumogena nasconde ora il personaggio anche quando non c e un altra missione dove spostarlo",
+        "Scrivere in chat da tablet non ridimensiona piu tutto il tavolo"
+      ],
+      "changes_pl": [
+        "Bomba dymna ukrywa teraz postac nawet wtedy, gdy nie ma innej misji, na ktora mozna ja przeniesc",
+        "Pisanie na czacie na tablecie nie zmienia juz rozmiaru calej planszy"
+      ],
+      "changes_ja": [
+        "煙玉は、移動できる別のミッションがないときもキャラクターを伏せるようになりました",
+        "タブレットでチャットに入力しても、盤面全体の表示が変わらなくなりました"
+      ]
+    },
+    {
       "date": "2026-09-04",
       "title_fr": "Mise à jour",
       "title_en": "Update",

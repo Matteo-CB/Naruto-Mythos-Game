@@ -2975,7 +2975,8 @@
         "ss133Powerup": "{card} ({id}): {target} zyskuje {amount} Mocy po wejściu.",
         "ss135Discarded": "{card} ({id}): odrzucono {target}, koszt {amount}.",
         "ss135Hidden": "{card} ({id}): wroga postać zostaje zakryta.",
-        "ssDeckSearchBottom": "{card} ({id}): {amount} obejrzanych kart wraca losowo na spód talii."
+        "ssDeckSearchBottom": "{card} ({id}): {amount} obejrzanych kart wraca losowo na spód talii.",
+        "ss086Hidden": "{card} ({id}): postac zostaje ukryta, nie ma innej misji, na ktora mozna ja przeniesc."
       },
       "score": {
         "draw": "[SCORE] {card}: Dobrał {count} kart(y).",
@@ -3758,7 +3759,8 @@
         "autoConfirmInstant": "Zastosować ten efekt?",
         "ss007ChoosePowerup": "Wybierz sojuszniczą postać z Drużyny 7, aby WZMOCNIĆ o 2.",
         "ss017RevealResult": "Odkryta karta",
-        "attachReturnChooseTarget": "Wybierz, dokąd wraca {card}."
+        "attachReturnChooseTarget": "Wybierz, dokąd wraca {card}.",
+        "ss086HideOnly": "Ukryc te postac? Nie ma innej misji, na ktora mozna ja przeniesc."
       },
       "upgradeModifierConfirm": "Zastosuj efekt UPGRADE",
       "upgradeModifierDecline": "Zachowaj tylko efekt MAIN",

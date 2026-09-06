@@ -883,7 +883,8 @@
         "ss133Powerup": "{card} ({id}): {target} gana {amount} de Potencia al llegar.",
         "ss135Discarded": "{card} ({id}): {target} descartada, coste {amount}.",
         "ss135Hidden": "{card} ({id}): el personaje enemigo queda oculto.",
-        "ssDeckSearchBottom": "{card} ({id}): las {amount} cartas miradas vuelven al azar al fondo del mazo."
+        "ssDeckSearchBottom": "{card} ({id}): las {amount} cartas miradas vuelven al azar al fondo del mazo.",
+        "ss086Hidden": "{card} ({id}): el personaje queda oculto, no hay otra mision a la que moverlo."
       },
       "score": {
         "draw": "[SCORE] {card}: Robó {count} carta(s).",
@@ -1666,7 +1667,8 @@
         "autoConfirmInstant": "¿Aplicar este efecto?",
         "ss007ChoosePowerup": "Elige un personaje aliado del Equipo 7 para POTENCIAR 2.",
         "ss017RevealResult": "Carta revelada",
-        "attachReturnChooseTarget": "Elige dónde vuelve {card}."
+        "attachReturnChooseTarget": "Elige dónde vuelve {card}.",
+        "ss086HideOnly": "¿Ocultar a este personaje? No hay otra mision a la que moverlo."
       },
       "upgradeModifierConfirm": "Aplicar el efecto UPGRADE",
       "upgradeModifierDecline": "Mantener solo el efecto MAIN",

@@ -530,20 +530,12 @@ You have made it in the Top ${NWL_KAGE_STANDINGS_SLOTS}.`,
       NWL_MOD_CHANNEL_ID,
       [
         `**${NWL_KAGE_TOURNAMENT_NAME}**: ${injoignables.length} qualified player(s) could not be reached in private.`,
-        'They are mentioned with the code in the announcement channel, but please make sure they see it:',
+        'The Kage code is never posted publicly, so please pass it to them yourself:',
         ...injoignables.map((l) => `- ${l}`),
       ].join('\n'),
     );
   }
-  const mentions = qualifies.map((q) => q.discordId).filter((d): d is string => !!d);
-  const entete = mentions.length > 0 ? `${mentions.map((d) => `<@${d}>`).join(' ')}\n` : '';
-  const salon = await nwlPostMessage(
-    NWL_ANNOUNCE_CHANNEL_ID,
-    `${entete}${texteCodeAcces(NWL_KAGE_TOURNAMENT_NAME, code, NWL_KAGE_START_HOUR)}`,
-    undefined,
-    mentions,
-  );
-  return { mp, salon: salon !== null };
+  return { mp, salon: false };
 }
 
 
@@ -1277,8 +1269,17 @@ export async function rappelerLesTournoisProches(now: Date = new Date()): Promis
     let poste: NwlMessageRef | null = null;
     if (t.partner === NWL_KAGE_PARTNER_KEY) {
       const huit = (await kageQualifiers(now)).map((q) => q.discordId).filter((d): d is string => !!d);
-      const entete = huit.length > 0 ? `${huit.map((d) => `<@${d}>`).join(' ')}\n` : '';
-      poste = await nwlPostMessage(NWL_ANNOUNCE_CHANNEL_ID, `${entete}${texte}`, undefined, huit);
+      let recus = 0;
+      for (const discordId of huit) {
+        if (await nwlSendDirectMessage(discordId, texte)) recus += 1;
+      }
+      if (recus === 0 && huit.length > 0) {
+        await prisma.tournament.updateMany({ where: { id: t.id }, data: { reminderSentAt: null } });
+        console.warn(`[NWL] rappel Kage non delivre a ${t.id}, nouvelle tentative au prochain passage`);
+        continue;
+      }
+      rappels += 1;
+      continue;
     } else {
       const role = t.partner === NWL_CHUNIN_PARTNER_KEY ? NWL_CHUNIN_ROLE_ID : NWL_NARUTO_MYTHOS_ROLE_ID;
       poste = await nwlPostMessage(salonDuPalier(t.partner), `<@&${role}>\n${texte}`, role);

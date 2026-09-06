@@ -884,7 +884,8 @@
         "ss133Powerup": "{card} ({id}) : {target} gagne {amount} de Puissance en arrivant.",
         "ss135Discarded": "{card} ({id}) : {target} défaussée, coût {amount}.",
         "ss135Hidden": "{card} ({id}) : le personnage ennemi est caché.",
-        "ssDeckSearchBottom": "{card} ({id}) : les {amount} cartes regardées repartent au hasard sous le deck."
+        "ssDeckSearchBottom": "{card} ({id}) : les {amount} cartes regardées repartent au hasard sous le deck.",
+        "ss086Hidden": "{card} ({id}) : le personnage est caché, il n’y a aucune autre mission où le déplacer."
       },
       "score": {
         "draw": "[SCORE] {card} : Pioche {count} carte(s).",
@@ -1667,7 +1668,8 @@
         "autoConfirmInstant": "Appliquer cet effet ?",
         "ss007ChoosePowerup": "Choisissez un personnage Équipe 7 allié à renforcer de 2.",
         "ss017RevealResult": "Carte révélée",
-        "attachReturnChooseTarget": "Choisis où {card} retourne."
+        "attachReturnChooseTarget": "Choisis où {card} retourne.",
+        "ss086HideOnly": "Cacher ce personnage ? Il n’y a aucune autre mission où le déplacer."
       },
       "upgradeModifierConfirm": "Appliquer l'effet UPGRADE",
       "upgradeModifierDecline": "Garder l'effet MAIN seul",
